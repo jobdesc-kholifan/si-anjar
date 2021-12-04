@@ -30,7 +30,7 @@ class FindPermission
     {
         $hasAccess = false;
         if(!empty($this->menu))
-            foreach($this->menu->permission() as $permission) {
+            foreach($this->menu->privileges() as $permission) {
                 if($permission->getFeature()->getSlug() == $slugFeature) {
                     $hasAccess = true;
                     break;

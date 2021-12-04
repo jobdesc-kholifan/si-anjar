@@ -38,6 +38,7 @@ class PrivilegesController extends Controller
     public function index()
     {
         try {
+            findPermission(\DBMenus::securityPrivileges)->hasAccessOrFail(\DBFeature::view);
 
             return $this->view('privileges');
         } catch (\Exception $e) {
@@ -48,6 +49,8 @@ class PrivilegesController extends Controller
     public function features(Request $req)
     {
         try {
+            findPermission(\DBMenus::securityPrivileges)->hasAccessOrFail(\DBFeature::view);
+
             $userTypeId = $req->get('role_id');
 
             $resultMenu = $this->menu->select('id', 'parent_id')
@@ -99,6 +102,7 @@ class PrivilegesController extends Controller
     public function update(Request $req)
     {
         try {
+            findPermission(\DBMenus::securityPrivileges)->hasAccessOrFail(\DBFeature::update);
 
             DB::beginTransaction();
 

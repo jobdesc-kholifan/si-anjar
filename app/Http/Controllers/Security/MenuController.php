@@ -37,6 +37,8 @@ class MenuController extends Controller
     public function index()
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail(\DBFeature::view);
+
             $this->breadcrumbs[] = ['label' => 'Menu', 'active' => true];
 
             return $this->view('menu');
@@ -48,6 +50,8 @@ class MenuController extends Controller
     public function select(Request $req)
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail(\DBFeature::view);
+
             $searchValue = trim(strtolower($req->get('term')));
 
             $query = $this->menu->defaultWith()
@@ -71,6 +75,8 @@ class MenuController extends Controller
     public function datatables()
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail(\DBFeature::view);
+
             $query = $this->menu->defaultWith()
                 ->with([
                     'parent' => function($query) {
@@ -85,13 +91,18 @@ class MenuController extends Controller
                     return ['name' => !is_null($data->parent) ? $data->parent->name : ''];
                 })
                 ->addColumn('action', function($data) {
-                    $btnEdit = new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit);
-                    $btnDelete = new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete);
 
-                    return implode("", [
-                        $btnEdit->render(),
-                        $btnDelete->render(),
-                    ]);
+                    $btnEdit = false;
+                    if(findPermission(\DBMenus::securityMenu)->hasAccess(\DBFeature::update))
+                        $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
+                            ->render();
+
+                    $btnDelete = false;
+                    if(findPermission(\DBMenus::securityMenu)->hasAccess(\DBFeature::delete))
+                        $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
+                            ->render();
+
+                    return \DBText::renderAction([$btnEdit, $btnDelete]);
                 })
                 ->toJson();
         } catch (\Exception $e) {
@@ -102,6 +113,7 @@ class MenuController extends Controller
     public function form()
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail(\DBFeature::view);
 
             return response()->json([
                 'content' => $this->viewResponse('modal-form'),
@@ -114,6 +126,7 @@ class MenuController extends Controller
     public function store(Request $req)
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail(\DBFeature::create);
 
             DB::beginTransaction();
 
@@ -150,6 +163,8 @@ class MenuController extends Controller
     public function edit($id)
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail(\DBFeature::update);
+
             $this->title = 'Detail Menu';
             $this->breadcrumbs[] = ['label' => 'Menu', 'link' => route(\DBRoutes::securityMenu)];
             $this->breadcrumbs[] = ['label' => 'Detail Menu', 'active'];
@@ -178,6 +193,8 @@ class MenuController extends Controller
     public function update(Request $req, $id)
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail(\DBFeature::update);
+
             $row = $this->menu->find($id, ['id']);
 
             if(is_null($row))
@@ -195,6 +212,8 @@ class MenuController extends Controller
     public function destroy($id)
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail(\DBFeature::delete);
+
             $row = $this->menu->find($id, ['id']);
 
             if(is_null($row))

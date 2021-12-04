@@ -25,19 +25,26 @@ class MenuFeatureController extends Controller
     public function datatables($id)
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail(\DBFeature::view);
+
             $query = $this->menuFeature->defaultWith()
                 ->addSelect($this->menuFeature->defaultSelects)
                 ->where('menu_id', $id);
 
             return datatables()->eloquent($query)
                 ->addColumn('action', function($data) {
-                    $btnEdit = new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit);
-                    $btnDelete = new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete);
 
-                    return implode("", [
-                        $btnEdit->render(),
-                        $btnDelete->render(),
-                    ]);
+                    $btnEdit = false;
+                    if(findPermission(\DBMenus::securityMenu)->hasAccess('update-feature'))
+                        $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
+                            ->render();
+
+                    $btnDelete = false;
+                    if(findPermission(\DBMenus::securityMenu)->hasAccess('delete-feature'))
+                        $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
+                            ->render();
+
+                    return \DBText::renderAction([$btnEdit, $btnDelete]);
                 })
                 ->toJson();
         } catch (\Exception $e) {
@@ -48,6 +55,7 @@ class MenuFeatureController extends Controller
     public function form()
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail(\DBFeature::view);
 
             return response()->json([
                 'content' => $this->viewResponse('modal-form-feature')
@@ -60,6 +68,7 @@ class MenuFeatureController extends Controller
     public function store(Request $req, $id)
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail('add-feature');
 
             $insertFeature = collect($req->only($this->menuFeature->getFillable()))
                 ->merge([
@@ -76,6 +85,7 @@ class MenuFeatureController extends Controller
     public function show($id, $featureId)
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail(\DBFeature::view);
 
             $row = $this->menuFeature->find($featureId);
 
@@ -91,6 +101,8 @@ class MenuFeatureController extends Controller
     public function update(Request $req, $id, $featureId)
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail('update-feature');
+
             $row = $this->menuFeature->find($featureId, ['id']);
 
             if(is_null($row))
@@ -108,6 +120,8 @@ class MenuFeatureController extends Controller
     public function destroy($id, $featureId)
     {
         try {
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail('delete-feature');
+
             $row = $this->menuFeature->find($featureId);
 
             if(is_null($row))

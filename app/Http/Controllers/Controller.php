@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 
 class Controller extends BaseController
@@ -50,10 +51,15 @@ class Controller extends BaseController
 
     public function errorPage(\Exception $e, $trace = false): bool
     {
-        if($e->getCode() == \DBCodes::authorizedError)
-            echo "<b>".$e->getMessage()."</b><br />";
-        else if($e->getCode() == \DBCodes::permissionError)
-            echo "<b>".$e->getMessage()."</b>. <a href=\"". url('/') ."\">Kembali ke Beranda</a><br />";
+        if($e->getCode() == \DBCodes::authorizedError) {
+            echo "<b>" . $e->getMessage() . "</b><br />";
+            exit;
+        }
+
+        else if($e->getCode() == \DBCodes::permissionError) {
+            echo "<b>" . $e->getMessage() . "</b>. <a href=\"" . url('/') . "\">Kembali ke Beranda</a><br />";
+            exit;
+        }
 
         if($trace)
             print_r($e->getTraceAsString());
@@ -69,27 +75,29 @@ class Controller extends BaseController
     public function jsonError(\Exception $e, string $classname = null, string $function = null): JsonResponse
     {
 
-        $code = intval($e->getCode());
-        $message = $e->getMessage();
+        if(Request::ajax()) {
+            $code = intval($e->getCode());
+            $message = $e->getMessage();
 
-        if($code == 0)
-            $message = \DBMessages::serverError;
+            if($code == 0)
+                $message = \DBMessages::serverError;
 
-        return response()->json([
-            'status' => $code,
-            'result' => false,
-            'message' => $message,
-            'code' => $code,
-            'reporting' => array(
-                'type' => 'API Web',
-                'filename' => $e->getFile(),
-                'classname' => $classname,
-                'function' => $function,
-                'line' => $e->getLine(),
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            )
-        ], $code != \DBCodes::authorizedError ? 500 : 200);
+            return response()->json([
+                'status' => $code,
+                'result' => false,
+                'message' => $message,
+                'code' => $code,
+                'reporting' => array(
+                    'type' => 'API Web',
+                    'filename' => $e->getFile(),
+                    'classname' => $classname,
+                    'function' => $function,
+                    'line' => $e->getLine(),
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                )
+            ], $code != \DBCodes::authorizedError ? 500 : 200);
+        } else return $this->errorPage($e);
     }
 
     public function jsonSuccess($message, $data = array()): JsonResponse

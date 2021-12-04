@@ -4,11 +4,11 @@ namespace App\Models\Authorization;
 
 use App\Models\Masters\Config;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\DB;
 
-class User extends Model
+class User extends Authenticatable
 {
     use HasFactory;
 
@@ -94,6 +94,11 @@ class User extends Model
     public function defaultWith($selects = [], $query = null)
     {
         return $this->_defaultWith(is_null($query) ? $this : $query, $selects);
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->user_password;
     }
 
     public function role()

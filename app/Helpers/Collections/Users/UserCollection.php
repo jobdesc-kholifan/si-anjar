@@ -4,9 +4,22 @@ namespace App\Helpers\Collections\Users;
 
 use App\Helpers\Collections\Collection;
 use App\Helpers\Collections\Config\ConfigCollection;
+use App\Models\Authorization\User;
 
 class UserCollection extends Collection
 {
+
+    /**
+     * @return UserCollection
+     * */
+    static public function session()
+    {
+        $user = new User();
+        $row = $user->defaultWith($user->defaultSelects)
+            ->find(auth()->id());
+
+        return new UserCollection($row);
+    }
 
     public function getId()
     {
@@ -36,6 +49,11 @@ class UserCollection extends Collection
     public function getUserName()
     {
         return $this->get('user_name');
+    }
+
+    public function getRoleId()
+    {
+        return $this->get('role_id');
     }
 
     /**

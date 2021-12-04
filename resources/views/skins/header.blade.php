@@ -13,10 +13,10 @@
 {{--                <span>Profil Saya</span>--}}
 {{--            </a>--}}
 {{--        </li>--}}
-{{--        <li class="nav-item pt-1">--}}
-{{--            <a class="btn btn-sm btn-danger" data-toggle="tooltip" title="Keluar" href="{{ route(DBRoutes::authLogout) }}" aria-expanded="true">--}}
-{{--                <i class="fa fa-sign-out-alt"></i>--}}
-{{--            </a>--}}
-{{--        </li>--}}
+        <li class="nav-item pt-1">
+            <a class="btn btn-sm btn-danger" data-toggle="tooltip" title="Keluar" href="{{ route(DBRoutes::authLogout) }}" aria-expanded="true">
+                <i class="fa fa-sign-out-alt"></i>
+            </a>
+        </li>
     </ul>
 </nav>

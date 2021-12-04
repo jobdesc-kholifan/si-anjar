@@ -25,7 +25,7 @@
                                 <th data-data="icon" data-name="icon">Icon</th>
                                 <th data-data="slug" data-name="slug">Slug</th>
                                 <th data-data="parent.name" data-name="parent_id">Parent</th>
-                                <th data-data="action" data-name="action">Aksi</th>
+                                <th data-data="action" data-name="action" style="width: 200px">Aksi</th>
                             </tr>
                             </thead>
                             <tbody></tbody>

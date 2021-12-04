@@ -1,3 +1,8 @@
+<?php
+
+$hasAccessUpdate = findPermission(DBMenus::securityPrivileges)->hasAccess(DBFeature::update);
+
+?>
 @extends('skins.template')
 
 @section('content')
@@ -25,10 +30,12 @@
                         </div>
                         <div class="col-sm-9 form-group">
                             <i class="fas fa-spinner fa-pulse fa-2x d-none" id="spinner"></i>
+                            @if($hasAccessUpdate)
                             <button type="button" class="btn btn-outline-primary btn-md d-none" id="btn-save">
                                 <i class="fa fa-check mr-1"></i>
                                 <span>Simpan Perubahan</span>
                             </button>
+                            @endif
                         </div>
                     </div>
                     <div class="">

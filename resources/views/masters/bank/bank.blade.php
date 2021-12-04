@@ -24,7 +24,7 @@
                                 <th data-data="bank_code" data-name="bank_code" style="width: 200px">Code</th>
                                 <th data-data="bank_name" data-name="bank_name">Name</th>
                                 <th data-data="description" data-name="description">Deskripsi</th>
-                                <th data-data="action" data-orderable="false" data-searchable="false" style="width: 100px">Aksi</th>
+                                <th data-data="action" data-orderable="false" data-searchable="false" style="width: 200px">Aksi</th>
                             </tr>
                             </thead>
                             <tbody></tbody>

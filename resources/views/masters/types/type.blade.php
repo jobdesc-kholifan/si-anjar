@@ -35,7 +35,7 @@ $hasCreatePermission = findPermission("masters/type/$slug")->hasAccess(DBFeature
                                 <th data-name="no" data-orderable="false" data-searchable="false">No</th>
                                 <th data-data="name" data-name="name">{{ $title }}</th>
                                 <th data-data="description" data-name="description">Deskripsi</th>
-                                <th data-data="action" data-orderable="false" data-searchable="false">Aksi</th>
+                                <th data-data="action" data-orderable="false" data-searchable="false" style="width: 200px">Aksi</th>
                             </tr>
                             </thead>
                             <tbody></tbody>

@@ -7,7 +7,6 @@ use App\Models\Masters\Bank;
 use App\View\Components\Button;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
-use mysql_xdevapi\Exception;
 
 class BankController extends Controller
 {
@@ -32,6 +31,7 @@ class BankController extends Controller
     public function index()
     {
         try {
+            findPermission(\DBMenus::masterBank)->hasAccessOrFail(\DBFeature::view);
 
             return $this->view('bank');
         } catch (\Exception $e) {
@@ -42,21 +42,24 @@ class BankController extends Controller
     public function datatables()
     {
         try {
+            findPermission(\DBMenus::masterBank)->hasAccessOrFail(\DBFeature::view);
 
             $query = $this->bank->defaultWith($this->bank->defaultSelects);
 
             return datatables()->eloquent($query)
                 ->addColumn('action', function($data) {
 
-                    $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
-                        ->render();
-                    $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
-                        ->render();
+                    $btnEdit = false;
+                    if(findPermission(\DBMenus::masterBank)->hasAccess(\DBFeature::update))
+                        $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
+                            ->render();
 
-                    return implode("", [
-                        $btnEdit,
-                        $btnDelete,
-                    ]);
+                    $btnDelete = false;
+                    if(findPermission(\DBMenus::masterBank)->hasAccess(\DBFeature::delete))
+                        $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
+                            ->render();
+
+                    return \DBText::renderAction([$btnEdit, $btnDelete]);
                 })
                 ->toJson();
         } catch (\Exception $e) {
@@ -67,6 +70,7 @@ class BankController extends Controller
     public function form()
     {
         try {
+            findPermission(\DBMenus::masterBank)->hasAccessOrFail(\DBFeature::view);
 
             return response()->json([
                 'content' => $this->viewResponse('modal-form'),
@@ -79,6 +83,8 @@ class BankController extends Controller
     public function store(Request $req)
     {
         try {
+            findPermission(\DBMenus::masterBank)->hasAccessOrFail(\DBFeature::create);
+
             $rules = collect([
                 'bank_code:Kode Bank' => 'required|max:15',
                 'bank_name:Nama Bank' => 'required|max:100',
@@ -99,6 +105,7 @@ class BankController extends Controller
     public function show($id)
     {
         try {
+            findPermission(\DBMenus::masterBank)->hasAccessOrFail(\DBFeature::view);
 
             $row = $this->bank->defaultWith($this->bank->defaultSelects)
                 ->find($id);
@@ -115,6 +122,8 @@ class BankController extends Controller
     public function update(Request $req, $id)
     {
         try {
+            findPermission(\DBMenus::masterBank)->hasAccessOrFail(\DBFeature::update);
+
             $rules = collect([
                 'bank_code:Kode Bank' => 'required|max:15',
                 'bank_name:Nama Bank' => 'required|max:100',
@@ -139,6 +148,8 @@ class BankController extends Controller
     public function destroy($id)
     {
         try {
+            findPermission(\DBMenus::masterBank)->hasAccessOrFail(\DBFeature::delete);
+
             $row = $this->bank->find($id);
 
             if(is_null($row))

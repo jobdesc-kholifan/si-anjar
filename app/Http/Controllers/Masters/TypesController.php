@@ -31,6 +31,7 @@ class TypesController extends Controller
     public function select(Request $req)
     {
         try {
+
             $searchValue = trim(strtolower($req->get('term')));
 
             $query = $this->type->defaultWith($this->type->defaultSelects)
@@ -65,6 +66,8 @@ class TypesController extends Controller
     public function index($slug)
     {
         try {
+            findPermission("masters/type/$slug")->hasAccessOrFail(\DBFeature::view);
+
             $type = findConfig()->in($slug);
 
             $this->title = $type->get()->getName();
@@ -82,6 +85,7 @@ class TypesController extends Controller
     public function datatables($slug)
     {
         try {
+            findPermission("masters/type/$slug")->hasAccessOrFail(\DBFeature::view);
 
             $query = $this->type->defaultWith($this->type->defaultSelects)
                 ->whereHas('parent', function($query) use ($slug) {
@@ -91,10 +95,18 @@ class TypesController extends Controller
 
             return datatables()->eloquent($query)
                 ->addColumn('action', function($data) use ($slug) {
-                    $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))->render();
-                    $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))->render();
 
-                    return implode("", [$btnEdit,$btnDelete]);
+                    $btnDelete = false;
+                    if(findPermission("masters/type/$slug")->hasAccess(\DBFeature::update))
+                        $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
+                            ->render();
+
+                    $btnEdit = false;
+                    if(findPermission("masters/type/$slug")->hasAccess(\DBFeature::delete))
+                        $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
+                            ->render();
+
+                    return \DBText::renderAction([$btnEdit, $btnDelete]);
                 })
                 ->toJson();
         } catch (Exception $e) {
@@ -105,6 +117,8 @@ class TypesController extends Controller
     public function form($slug)
     {
         try {
+            findPermission("masters/type/$slug")->hasAccessOrFail(\DBFeature::view);
+
             $type = findConfig()->in($slug);
 
             return response()->json([
@@ -120,6 +134,8 @@ class TypesController extends Controller
     public function store(Request $req, $slug)
     {
         try {
+            findPermission("masters/type/$slug")->hasAccessOrFail(\DBFeature::create);
+
             $type = findConfig()->in($slug);
 
             $inserts = collect($req->only($this->type->getFillable()))
@@ -139,6 +155,7 @@ class TypesController extends Controller
     public function show($slug, $id)
     {
         try {
+            findPermission("masters/type/$slug")->hasAccessOrFail(\DBFeature::view);
 
             $row = $this->type->defaultWith($this->type->defaultSelects)
                 ->find($id);
@@ -155,6 +172,7 @@ class TypesController extends Controller
     public function update(Request $req, $slug, $id)
     {
         try {
+            findPermission("masters/type/$slug")->hasAccessOrFail(\DBFeature::update);
 
             $row = $this->type->find($id, ['id']);
 
@@ -176,6 +194,8 @@ class TypesController extends Controller
     public function destroy($slug, $id)
     {
         try {
+            findPermission("masters/type/$slug")->hasAccessOrFail(\DBFeature::delete);
+
             $row = $this->type->find($id, ['id']);
 
             if(is_null($row))
