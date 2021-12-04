@@ -1,0 +1,262 @@
+/* Override Style */
+.user-panel,
+.brand-link {
+    border: none!important;
+}
+[class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active,
+[class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active:focus,
+[class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active:hover {
+    background-color: rgba(255,255,255,.1);
+    color: #fff;
+}
+.btn.btn-sm > i.fa {
+    font-size: smaller;
+}
+.card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.card .card-header .card-title {
+    flex: 1;
+}
+.close:hover {
+    cursor: pointer;
+}
+.form-group label {
+    font-size: 14px;
+    line-height: 0.5;
+}
+.form-group .help-text {
+    font-size: 12px;
+}
+.toasts-top-right {
+    top: 10px;
+    right: 10px;
+}
+h3.form-title {
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    padding: 18px 0 16px 0;
+}
+.table-sm td, .table-sm th {
+    font-size: 14px;
+}
+.nav.nav-pills.nav-success .nav-link.active, .nav.nav-pills.nav-success .nav-pills .show>.nav-link {
+    color: #fff!important;
+    background-color: var(--success)!important;
+}
+
+.nav.nav-pills.nav-primary .nav-link.active, .nav.nav-pills.nav-primary .nav-pills .show>.nav-link {
+    color: #fff!important;
+    background-color: var(--primary)!important;
+}
+
+@media (min-width: 991px) {
+    .table-responsive {
+        overflow-x: hidden;
+    }
+    .toggle-pushmenu {
+        display: none;
+    }
+}
+
+@media (min-width: 576px) {
+    .modal-dialog.modal-dialog-confirm {
+        margin: 0 auto;
+    }
+    .modal-dialog-centered.modal-dialog-confirm {
+        min-height: 100%!important;
+    }
+}
+
+/* Customer Style*/
+.user-panel .img-circle-medium {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.img-contain {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.user-panel .user-info {
+    text-align: center;
+}
+.user-panel .user-info .info-level {
+    font-size: 14px;
+    font-weight: 100;
+}
+.user-panel .user-info .info-name {
+    font-size: 16px;
+    font-weight: 600;
+}
+.footer-actions {
+    border-top: 1px solid #ccc;
+    padding: 15px 0;
+    text-align: right;
+}
+label.required:after {
+    content: '*';
+    color: red;
+    margin-left: 2px;
+}
+.list-information .section-info {
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+.list-information dl > dt, .list-information dl > dd {
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.2;
+}
+
+.list-information dl.dt-bold > dt {
+    font-weight: 700!important;
+}
+
+.cursor-pointer:hover {
+    cursor: pointer;
+}
+dl.row.font-size-md > dt, dl.row.font-size-md > dd {
+    font-size: 16px;
+}
+
+.loading {
+    position: relative;
+}
+.loading:before {
+    content: '';
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 999;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    text-align: center;
+}
+.loading:after {
+    content: 'Sedang memproses ...';
+    position: absolute;
+    z-index: 9999;
+    left: 0;
+    right: 0;
+    top: 30%;
+    bottom: 0;
+    text-align: center;
+}
+
+.wrapper-upload {
+    width: 100%;
+    display: flex;
+    overflow: auto;
+}
+
+.form-upload {
+    margin-right: 10px;
+    position: relative;
+}
+
+.form-upload .image-canvas {
+    width: 150px;
+    height: 200px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.form-upload .image-canvas > i.fa {
+    font-size: 20px;
+    color: #bfbfbf;
+}
+.form-upload .image-canvas:hover {
+    cursor: pointer;
+}
+.form-upload .image-actions {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    background-color: rgba(0, 0, 0, .3);
+    border-radius: 5px;
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: all ease-in-out 0.3s;
+}
+.form-upload:hover .image-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+}
+.form-upload .image-canvas .image-preview {
+    max-width: 100%;
+    border-radius: 5px;
+}
+.form-upload .btn-image {
+    border: none;
+    border-radius: 2px;
+    transition: all ease-in-out 0.3s;
+    padding: 2px 8px;
+    background-color: white;
+    color: #000;
+}
+.form-upload .btn-image:hover {
+    cursor: pointer;
+}
+.form-upload .btn-image.remove:hover {
+    background-color: var(--red);
+    color: #fff;
+}
+.form-upload .btn-image.preview:hover {
+    background-color: var(--primary);
+    color: #fff;
+}
+.box-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5px;
+    border-bottom: 2px solid #efefef;
+    border-radius: 2px;
+}
+.box-item .item-detail-info {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+.box-item .item-info {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.54);
+}
+.box-item .item-info .item-info-bold {
+    font-weight: bold;
+}
+.box-item .item-detail-desc {
+    padding: 5px 0;
+    color: rgba(0, 0, 0, 0.38);
+}
+.box-item .text-amount {
+    font-size: 18px;
+}
+.box-item.box-success .text-amount {
+    color: var(--success);
+}
+.box-item.box-danger .text-amount {
+    color: var(--danger);
+}
+.box-item.box-primary .text-amount {
+    color: var(--primary);
+}
