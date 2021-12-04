@@ -51,7 +51,6 @@
             _token: "{{ csrf_token() }}",
         };
         actions.callback.form.onSetData = function(value, key, row, form) {
-            console.log(key);
             const $el = form.find(`[name="${key}"]`);
             if(value != null && ['role_id'].includes(key)) {
                 const data = row[key.replace('_id', '')];

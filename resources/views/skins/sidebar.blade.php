@@ -28,6 +28,7 @@ $menus = new AllMenuCollection(
         })
         ->get()
     );
+
 ?>
 <aside class="main-sidebar bg-gray-dark sidebar-dark-primary elevation-4">
     <a href="{{ url('/') }}" class="brand-link text-center py-2">

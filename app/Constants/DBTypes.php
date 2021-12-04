@@ -9,4 +9,6 @@ class DBTypes
 
     const role = 'role';
     const roleAdministrator = 'administrator';
+
+    const categoryProject = 'category-project';
 }

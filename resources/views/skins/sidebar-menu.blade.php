@@ -5,6 +5,7 @@
  * @var string $menuId
  * @var array $route
  * */
+
 ?>
 <ul class="nav nav-treeview">
     @foreach($menus->getParent($menuId) as $menu)
@@ -18,9 +19,9 @@
                     @endif
                 </p>
             </a>
+            @if($menus->hasChild($menu->getId()))
+                {!! $menus->renderChild($menu->getId(), $route) !!}
+            @endif
         </li>
-        @if($menus->hasChild($menu->getId()))
-            {!! $menus->renderChild($menu->getId(), $route) !!}
-        @endif
     @endforeach
 </ul>

@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Addresses\CityController;
+use App\Http\Controllers\Addresses\ProvinceController;
 use App\Http\Controllers\AppController;
+use App\Http\Controllers\Masters\BankController;
 use App\Http\Controllers\Masters\TypesController;
 use App\Http\Controllers\Masters\UsersController;
 use App\Http\Controllers\Security\MenuController;
@@ -50,6 +53,46 @@ Route::group(['prefix' => 'masters'], function() {
             Route::post('{id}', [TypesController::class, 'update']);
             Route::delete('{id}', [TypesController::class, 'destroy']);
         });
+    });
+
+    Route::group(['prefix' => 'bank'], function() {
+
+        Route::get('select', [BankController::class, 'select'])->name(DBRoutes::mastersBankSelect);
+        Route::post('datatables', [BankController::class, 'datatables']);
+        Route::get('form', [BankController::class, 'form']);
+
+        Route::get('', [BankController::class, 'index']);
+        Route::post('', [BankController::class, 'store']);
+        Route::get('{id}', [BankController::class, 'show']);
+        Route::post('{id}', [BankController::class, 'update']);
+        Route::delete('{id}', [BankController::class, 'destroy']);
+    });
+});
+
+Route::group(['prefix' => 'addresses'], function() {
+
+    Route::group(['prefix' => 'province'], function() {
+        Route::get('select', [ProvinceController::class, 'select'])->name(DBRoutes::addressesProvinceSelect);
+        Route::post('datatables', [ProvinceController::class, 'datatables']);
+        Route::get('form', [ProvinceController::class, 'form']);
+
+        Route::get('', [ProvinceController::class, 'index']);
+        Route::post('', [ProvinceController::class, 'store']);
+        Route::get('{id}', [ProvinceController::class, 'show']);
+        Route::post('{id}', [ProvinceController::class, 'update']);
+        Route::delete('{id}', [ProvinceController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'city'], function() {
+        Route::get('select', [CityController::class, 'select'])->name(DBRoutes::addressesCitySelect);
+        Route::post('datatables', [CityController::class, 'datatables']);
+        Route::get('form', [CityController::class, 'form']);
+
+        Route::get('', [CityController::class, 'index']);
+        Route::post('', [CityController::class, 'store']);
+        Route::get('{id}', [CityController::class, 'show']);
+        Route::post('{id}', [CityController::class, 'update']);
+        Route::delete('{id}', [CityController::class, 'destroy']);
     });
 });
 

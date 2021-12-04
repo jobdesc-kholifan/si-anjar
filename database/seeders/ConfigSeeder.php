@@ -43,5 +43,10 @@ class ConfigSeeder extends Seeder
         $this->config->insert([
             ['parent_id' => $type->id, 'slug' => DBTypes::roleAdministrator, 'name' => 'Administrator', 'created_at' => currentDate(), 'updated_at' => currentDate()],
         ]);
+
+        $type = $this->config->create([
+            'slug' => DBTypes::categoryProject,
+            'name' => 'Kategori Proyek',
+        ]);
     }
 }
