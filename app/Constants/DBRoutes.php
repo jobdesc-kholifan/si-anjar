@@ -14,6 +14,16 @@ class DBRoutes
     const mastersTypes = 'master.types';
     const mastersTypesSelect = 'master.types.select';
 
+    const mastersBankSelect = 'masters.bank.select';
+
+    const addresses = 'addresses';
+
+    const addressesProvince = 'addresses.province';
+    const addressesProvinceSelect = 'addresses.province.select';
+
+    const addressesCity = 'addresses.city';
+    const addressesCitySelect = 'addresses.city.select';
+
     const securityMenu = 'security.menus';
     const securityMenuSelect = 'security.menus.select';
 

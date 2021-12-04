@@ -58,6 +58,15 @@ class MenuSeeder extends Seeder
             ])
         );
 
+        $this->feature(
+            $this->menus->create([
+                'parent_id' => $masters->id,
+                'name' => 'Kategori Proyek',
+                'slug' => \DBMenus::masterCategoryProject,
+                'sequence' => $sequenceMaster + 10,
+            ])
+        );
+
         $security = $this->menus->create([
             'name' => 'Keamanan',
             'icon' => '<i class="fa fa-database"></i>',

@@ -53,7 +53,7 @@ class AllMenuCollection
 
     public function renderChild($menuId, $route)
     {
-        $menus = new AllMenuCollection(collect($this->getParent($menuId)));
+        $menus = new AllMenuCollection($this->menus);
 
         return view('skins.sidebar-menu', [
             'route' => $route,
