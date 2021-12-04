@@ -6,6 +6,8 @@ use App\Helpers\Collections\Menu\MenuCollection;
  * @var MenuCollection $row
 */
 
+$hasAccessCreateFeature = findPermission(DBMenus::securityMenu)->hasAccess('create-feature');
+
 ?>
 @extends('skins.template')
 
@@ -101,10 +103,12 @@ use App\Helpers\Collections\Menu\MenuCollection;
                                         <i class="fa fa-angle-left"></i>
                                         <span>Kembali</span>
                                     </a>
+                                    @if($hasAccessCreateFeature)
                                     <button type="button" class="btn btn-primary btn-xs" onclick="actions.create()">
                                         <i class="fa fa-plus-circle"></i>
                                         <span>Tambah Fitur</span>
                                     </button>
+                                    @endif
                                 </div>
                             </h5>
                             <div class="w-100">

@@ -67,6 +67,42 @@ class MenuSeeder extends Seeder
             ])
         );
 
+        $this->feature(
+            $this->menus->create([
+                'parent_id' => $masters->id,
+                'name' => 'Bank',
+                'slug' => \DBMenus::masterBank,
+                'sequence' => $sequenceMaster + 10,
+            ])
+        );
+
+        $sequenceAddresses = 0;
+        $addresses = $this->menus->create([
+            'parent_id' => $masters->id,
+            'name' => 'Address',
+            'slug' => \DBMenus::addresses,
+            'sequence' => $sequenceMaster + 10,
+        ]);
+        $this->feature($addresses, [DBFeature::view]);
+
+        $this->feature(
+            $this->menus->create([
+                'parent_id' => $addresses->id,
+                'name' => 'Province',
+                'slug' => \DBMenus::addressesProvince,
+                'sequence' => $sequenceAddresses + 10,
+            ])
+        );
+
+        $this->feature(
+            $this->menus->create([
+                'parent_id' => $addresses->id,
+                'name' => 'Kota / Kabupaten',
+                'slug' => \DBMenus::addressesCity,
+                'sequence' => $sequenceAddresses + 10,
+            ])
+        );
+
         $security = $this->menus->create([
             'name' => 'Keamanan',
             'icon' => '<i class="fa fa-database"></i>',
@@ -82,7 +118,15 @@ class MenuSeeder extends Seeder
                 'name' => 'Menu',
                 'slug' => \DBMenus::securityMenu,
                 'sequence' => $sequenceSecurity + 10,
-            ])
+            ]),
+            null,
+            function($menu) {
+                return [
+                    ['menu_id' => $menu->id, 'title' => 'Tambah Fitur', 'slug' => 'create-feature', 'description' => 'User dapat menambahkan fitur dari menu', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+                    ['menu_id' => $menu->id, 'title' => 'Ubah Fitur', 'slug' => 'update-feature', 'description' => 'User dapat mengubah fitur dari menu', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+                    ['menu_id' => $menu->id, 'title' => 'Hapus Fitur', 'slug' => 'delete-feature', 'description' => 'User dapat menghapus fitur dari menu', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+                ];
+            }
         );
 
         $this->feature(
@@ -96,7 +140,7 @@ class MenuSeeder extends Seeder
         );
     }
 
-    public function feature($menu, $features = null)
+    public function feature($menu, $features = null, $callback = null)
     {
         $insertFeatures = [];
 
@@ -121,6 +165,10 @@ class MenuSeeder extends Seeder
                 ['menu_id' => $menu->id, 'title' => 'Ubah', 'slug' => DBFeature::update, 'description' => 'User dapat melakukan perubahan data', 'created_at' => currentDate(), 'updated_at' => currentDate()],
                 ['menu_id' => $menu->id, 'title' => 'Hapus', 'slug' => DBFeature::delete, 'description' => 'User dapat menghapus data', 'created_at' => currentDate(), 'updated_at' => currentDate()],
             ];
+        }
+
+        if(is_callable($callback)) {
+            $insertFeatures = array_merge($insertFeatures, call_user_func_array($callback, [$menu]));
         }
 
         $this->menusFeature->insert($insertFeatures);

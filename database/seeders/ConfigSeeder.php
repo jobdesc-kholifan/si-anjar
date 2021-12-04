@@ -41,6 +41,7 @@ class ConfigSeeder extends Seeder
         ]);
 
         $this->config->insert([
+            ['parent_id' => $type->id, 'slug' => DBTypes::roleSuperuser, 'name' => 'Superuser', 'created_at' => currentDate(), 'updated_at' => currentDate()],
             ['parent_id' => $type->id, 'slug' => DBTypes::roleAdministrator, 'name' => 'Administrator', 'created_at' => currentDate(), 'updated_at' => currentDate()],
         ]);
 

@@ -33,6 +33,8 @@ class ProvinceController extends Controller
     public function select(Request $req)
     {
         try {
+            findPermission(\DBMenus::addressesProvince)->hasAccessOrFail(\DBFeature::view);
+
             $searchValue = trim(strtolower($req->get('searchValue')));
 
             $query = $this->province->defaultWith($this->province->defaultSelects)
@@ -54,6 +56,7 @@ class ProvinceController extends Controller
     public function index()
     {
         try {
+            findPermission(\DBMenus::addressesProvince)->hasAccessOrFail(\DBFeature::view);
 
             return $this->view('province');
         } catch (\Exception $e) {
@@ -64,20 +67,24 @@ class ProvinceController extends Controller
     public function datatables()
     {
         try {
+            findPermission(\DBMenus::addressesProvince)->hasAccessOrFail(\DBFeature::view);
+
             $query = $this->province->defaultWith($this->province->defaultSelects);
 
             return datatables()->eloquent($query)
                 ->addColumn('action', function($data) {
 
-                    $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
-                        ->render();
-                    $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
-                        ->render();
+                    $btnEdit = false;
+                    if(findPermission(\DBMenus::addressesProvince)->hasAccess(\DBFeature::update))
+                        $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
+                            ->render();
 
-                    return implode("", [
-                        $btnEdit,
-                        $btnDelete,
-                    ]);
+                    $btnDelete = false;
+                    if(findPermission(\DBMenus::addressesProvince)->hasAccess(\DBFeature::delete))
+                        $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
+                            ->render();
+
+                    return \DBText::renderAction([$btnEdit, $btnDelete]);
                 })
                 ->toJson();
         } catch (\Exception $e) {
@@ -88,6 +95,8 @@ class ProvinceController extends Controller
     public function store(Request $req)
     {
         try {
+            findPermission(\DBMenus::addressesProvince)->hasAccessOrFail(\DBFeature::create);
+
             $rules = collect([
                 'province_name:Nama Provinsi' => 'required|max:100',
             ]);
@@ -106,6 +115,8 @@ class ProvinceController extends Controller
     public function form()
     {
         try {
+            findPermission(\DBMenus::addressesProvince)->hasAccessOrFail(\DBFeature::view);
+
             return response()->json([
                 'content' => $this->viewResponse('modal-form')
             ]);
@@ -117,6 +128,8 @@ class ProvinceController extends Controller
     public function show($id)
     {
         try {
+            findPermission(\DBMenus::addressesProvince)->hasAccessOrFail(\DBFeature::view);
+
             $row = $this->province->defaultWith($this->province->defaultSelects)
                 ->find($id);
 
@@ -132,6 +145,8 @@ class ProvinceController extends Controller
     public function update(Request $req, $id)
     {
         try {
+            findPermission(\DBMenus::addressesProvince)->hasAccessOrFail(\DBFeature::update);
+
             $rules = collect([
                 'province_name:Nama Provinsi' => 'required|max:100',
             ]);
@@ -155,6 +170,7 @@ class ProvinceController extends Controller
     public function destroy($id)
     {
         try {
+            findPermission(\DBMenus::addressesProvince)->hasAccessOrFail(\DBFeature::delete);
 
             $row = $this->province->find($id);
 

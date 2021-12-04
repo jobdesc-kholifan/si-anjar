@@ -9,6 +9,7 @@ class DBTypes
 
     const role = 'role';
     const roleAdministrator = 'administrator';
+    const roleSuperuser = 'superuser';
 
     const categoryProject = 'category-project';
 }

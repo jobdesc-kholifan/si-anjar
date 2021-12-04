@@ -56,6 +56,7 @@ use App\Helpers\Collections\Config\ConfigArrayCollection;
                     name="user_name"
                     placeholder="{{ DBText::inputPlaceholder('Nama Pengguna') }}"
                     maxlength="30"
+                    required
                 />
             </div>
             <div class="form-group">
@@ -67,6 +68,7 @@ use App\Helpers\Collections\Config\ConfigArrayCollection;
                     name="user_password"
                     placeholder="{{ DBText::inputPlaceholder('Kata Sandi') }}"
                     maxlength="100"
+                    required
                 />
             </div>
             <div class="form-group">

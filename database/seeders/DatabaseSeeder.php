@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             MenuSeeder::class,
             ConfigSeeder::class,
+            UserSeeder::class,
+            PrivilegesSeeder::class,
         ]);
     }
 }

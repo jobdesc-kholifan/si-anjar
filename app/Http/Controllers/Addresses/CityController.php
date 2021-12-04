@@ -33,6 +33,8 @@ class CityController extends Controller
     public function select(Request $req)
     {
         try {
+            findPermission(\DBMenus::addressesCity)->hasAccessOrFail(\DBFeature::view);
+
             $searchValue = trim(strtolower($req->get('searchValue')));
 
             $query = $this->city->defaultWith($this->city->defaultSelects)
@@ -58,6 +60,7 @@ class CityController extends Controller
     public function index()
     {
         try {
+            findPermission(\DBMenus::addressesCity)->hasAccessOrFail(\DBFeature::view);
 
             return $this->view('city');
         } catch (\Exception $e) {
@@ -68,21 +71,24 @@ class CityController extends Controller
     public function datatables()
     {
         try {
+            findPermission(\DBMenus::addressesCity)->hasAccessOrFail(\DBFeature::view);
 
             $query = $this->city->defaultWith($this->city->defaultSelects);
 
             return datatables()->eloquent($query)
                 ->addColumn('action', function($data) {
 
-                    $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
-                        ->render();
-                    $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
-                        ->render();
+                    $btnEdit = false;
+                    if(findPermission(\DBMenus::addressesCity)->hasAccess(\DBFeature::update))
+                        $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
+                            ->render();
 
-                    return implode("", [
-                        $btnEdit,
-                        $btnDelete,
-                    ]);
+                    $btnDelete = false;
+                    if(findPermission(\DBMenus::addressesCity)->hasAccess(\DBFeature::delete))
+                        $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
+                            ->render();
+
+                    return \DBText::renderAction([$btnEdit, $btnDelete]);
                 })
                 ->toJson();
         } catch (\Exception $e) {
@@ -93,6 +99,8 @@ class CityController extends Controller
     public function form()
     {
         try {
+            findPermission(\DBMenus::addressesCity)->hasAccessOrFail(\DBFeature::view);
+
             return response()->json([
                 'content' => $this->viewResponse('modal-form'),
             ]);
@@ -104,6 +112,7 @@ class CityController extends Controller
     public function store(Request $req)
     {
         try {
+            findPermission(\DBMenus::addressesCity)->hasAccessOrFail(\DBFeature::create);
 
             $insertCity = collect($req->only($this->city->getFillable()));
             $this->city->create($insertCity->toArray());
@@ -117,6 +126,7 @@ class CityController extends Controller
     public function show($id)
     {
         try {
+            findPermission(\DBMenus::addressesCity)->hasAccessOrFail(\DBFeature::view);
 
             $row = $this->city->defaultWith($this->city->defaultSelects)
                 ->find($id);
@@ -133,6 +143,7 @@ class CityController extends Controller
     public function update(Request $req, $id)
     {
         try {
+            findPermission(\DBMenus::addressesCity)->hasAccessOrFail(\DBFeature::update);
 
             $row = $this->city->find($id);
 
@@ -151,6 +162,7 @@ class CityController extends Controller
     public function destroy($id)
     {
         try {
+            findPermission(\DBMenus::addressesCity)->hasAccessOrFail(\DBFeature::delete);
 
             $row = $this->city->defaultWith($this->city->defaultSelects)
                 ->find($id);

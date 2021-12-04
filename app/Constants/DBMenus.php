@@ -5,7 +5,7 @@ class DBMenus
 
     const master = '#master';
     const masterUsers = 'masters/users';
-    const masterRole = 'masters/type/' . DBTypes::roleAdministrator;
+    const masterRole = 'masters/type/' . DBTypes::role;
     const masterCategoryProject = 'masters/type/' . DBTypes::categoryProject;
     const masterBank = 'masters/bank';
 

@@ -36,6 +36,8 @@ class UsersController extends Controller
     public function index()
     {
         try {
+            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::view);
+
             $this->title = "Users";
             $this->breadcrumbs[] = ['label' => "Users", 'active' => true];
 
@@ -48,6 +50,8 @@ class UsersController extends Controller
     public function select(Request $req)
     {
         try {
+            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::view);
+
             $searchValue = trim(strtolower($req->get('term')));
 
             $query = $this->user->withoutRelations() ($this->user->defaultSelects)
@@ -85,6 +89,7 @@ class UsersController extends Controller
     public function datatables()
     {
         try {
+            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::view);
 
             $query = $this->user->defaultWith($this->user->defaultSelects);
 
@@ -106,19 +111,20 @@ class UsersController extends Controller
                 })
                 ->addColumn('action', function($data) {
 
-                    $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
+                    $btnEdit = false;
+                    if(findPermission(\DBMenus::masterUsers)->hasAccess(\DBFeature::update))
+                        $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
+                                ->render();
+
+                    $btnDelete = false;
+                    if(findPermission(\DBMenus::masterUsers)->hasAccess(\DBFeature::delete))
+                        $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
                             ->render();
-                    $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
-                        ->render();
 
                     $btnDetail = new Button("actions.detail($data->id)", Button::btnInfo, Button::btnIconInfo);
                     $btnDetail->setLabel('Lihat Detail');
 
-                    return implode("", [
-                        $btnDetail->render(),
-                        $btnEdit,
-                        $btnDelete,
-                    ]);
+                    return \DBText::renderAction([$btnDetail->render(), $btnEdit, $btnDelete]);
                 })
                 ->toJson();
         } catch (\Exception $e) {
@@ -129,6 +135,7 @@ class UsersController extends Controller
     public function form()
     {
         try {
+            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::view);
 
             return response()->json([
                 'content' => $this->viewResponse('modal-form'),
@@ -141,6 +148,8 @@ class UsersController extends Controller
     public function detail(Request $req)
     {
         try {
+            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::view);
+
             $row = $this->user->defaultWith($this->user->defaultSelects)
                 ->find($req->get('id'));
 
@@ -162,6 +171,7 @@ class UsersController extends Controller
     public function store(Request $req)
     {
         try {
+            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::create);
 
             $rules = collect([
                 'full_name:Nama Lengkap' => 'required|max:100',
@@ -196,6 +206,7 @@ class UsersController extends Controller
     public function show($id)
     {
         try {
+            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::view);
 
             $row = $this->user->defaultWith($this->user->defaultSelects)
                 ->find($id);
@@ -212,6 +223,7 @@ class UsersController extends Controller
     public function update(Request $req, $id)
     {
         try {
+            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::update);
 
             $row = $this->user->defaultWith($this->user->defaultSelects)
                 ->find($id);
@@ -236,6 +248,7 @@ class UsersController extends Controller
     public function destroy($id)
     {
         try {
+            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::delete);
 
             $row = $this->user->defaultWith($this->user->defaultSelects)
                 ->find($id);
@@ -254,6 +267,7 @@ class UsersController extends Controller
     public function multipleDelete(Request $req)
     {
         try {
+            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::delete);
 
             $ids = $req->get('ids');
 
