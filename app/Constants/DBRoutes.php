@@ -8,8 +8,12 @@ class DBRoutes
     const authLogin = 'auth.login';
     const authLogout = 'auth.logout';
 
-    const mastersUsers = 'master.users';
-    const mastersUsersSelect = 'master.users.select';
+    const usersUser = 'users.user';
+    const usersUserSelect = 'users.user.select';
+
+    const usersRole = 'users.role';
+    const usersRoleEdit = 'users.role.edit';
+    const usersRoleFeatures = 'users.role.features';
 
     const mastersTypes = 'master.types';
     const mastersTypesSelect = 'master.types.select';
@@ -28,4 +32,7 @@ class DBRoutes
     const securityMenuSelect = 'security.menus.select';
 
     const securityPrivileges = 'security.privileges';
+
+    const investor = 'investor';
+    const investorCreate = 'investor.create';
 }

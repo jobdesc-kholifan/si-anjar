@@ -4,8 +4,6 @@ class DBMenus
 {
 
     const master = '#master';
-    const masterUsers = 'masters/users';
-    const masterRole = 'masters/type/' . DBTypes::role;
     const masterCategoryProject = 'masters/type/' . DBTypes::categoryProject;
     const masterBank = 'masters/bank';
 
@@ -13,7 +11,12 @@ class DBMenus
     const addressesProvince = 'addresses/province';
     const addressesCity = 'addresses/city';
 
+    const users = '#users';
+    const usersUser = 'users/user';
+    const usersRole = 'users/privileges';
+
     const security = '#security';
     const securityMenu = 'security/menu';
-    const securityPrivileges = 'security/privileges';
+
+    const investor = 'investor';
 }

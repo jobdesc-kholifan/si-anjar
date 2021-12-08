@@ -150,6 +150,7 @@ class Controller extends BaseController
             'max' => ':attribute tidak boleh lebih dari :max karakter',
             'email' => 'Alamat :attribute tidak valid',
             'date' => ':attribute harus berformat :format',
+            'digits' => ':attribute harus :value digit',
             'digits_between' => ':attribute harus lebih dari :min digit dan kurang dari :max digit',
         ], $messages));
 

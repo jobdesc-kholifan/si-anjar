@@ -17,9 +17,9 @@ class ProvinceController extends Controller
     protected $route = [\DBMenus::master, \DBMenus::addresses, \DBMenus::addressesProvince];
 
     protected $breadcrumbs = [
-        ['label' => 'Master'],
+        ['label' => 'Master Data'],
         ['label' => 'Alamat'],
-        ['label' => 'Province', 'active' => true],
+        ['label' => 'Provinsi', 'active' => true],
     ];
 
     /* @var Province|Relation */

@@ -1,3 +1,9 @@
+<?php
+
+$hasAccessCreate = findPermission(DBMenus::usersUser)->hasAccess(DBFeature::create);
+$hasAccessDelete = findPermission(DBMenus::usersUser)->hasAccess(DBFeature::delete);
+
+?>
 @extends('skins.template')
 
 @section('content')
@@ -8,14 +14,18 @@
                 <div class="card-header">
                     <h3 class="card-title">Data {{ $title }}</h3>
                     <div class="card-actions">
+                        @if($hasAccessDelete)
                         <button type="button" class="btn btn-danger btn-sm d-none" id="btn-multiple-delete" onclick="actions.multipleDelete()">
                             <i class="fa fa-trash"></i>
                             <span>Hapus</span>
                         </button>
+                        @endif
+                        @if($hasAccessCreate)
                         <button type="button" class="btn btn-outline-primary btn-sm" onclick="actions.create()">
                             <i class="fa fa-plus"></i>
                             <span>Tambah</span>
                         </button>
+                        @endif
                     </div>
                 </div>
                 <div class="card-body">
@@ -27,7 +37,7 @@
                                 <th data-data="full_name" data-name="full_name">Nama Lengkap</th>
                                 <th data-data="email_phone" data-name="email">Email/No Telp</th>
                                 <th data-data="user_name" data-name="user_name">Nama Pengguna</th>
-                                <th data-data="role.name" data-name="roleid">Nama Pengguna</th>
+                                <th data-data="role.name" data-name="role_id">Role</th>
                                 <th data-data="action" data-orderable="false" data-searchable="false" style="width: 200px">Aksi</th>
                             </tr>
                             </thead>

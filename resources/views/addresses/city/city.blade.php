@@ -22,7 +22,7 @@
                             <tr>
                                 <th data-name="no" data-orderable="false" data-searchable="false">No</th>
                                 <th data-data="city_name" data-name="city_name">Kota / Kabupaten</th>
-                                <th data-data="province.province_name" data-name="province_id">Provinsi</th>
+                                <th data-data="province.province_name" data-name="province.province_name">Provinsi</th>
                                 <th data-data="action" data-orderable="false" data-searchable="false" style="width: 100px">Aksi</th>
                             </tr>
                             </thead>

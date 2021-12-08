@@ -7,6 +7,7 @@ use App\Models\Masters\Bank;
 use App\View\Components\Button;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BankController extends Controller
 {
@@ -16,7 +17,7 @@ class BankController extends Controller
     protected $route = [\DBMenus::master, \DBMenus::masterBank];
 
     protected $breadcrumbs = [
-        ['label' => 'Master'],
+        ['label' => 'Master Data'],
         ['label' => 'Bank', 'active' => true],
     ];
 
@@ -26,6 +27,28 @@ class BankController extends Controller
     public function __construct()
     {
         $this->bank = new Bank();
+    }
+
+    public function select(Request $req)
+    {
+        try {
+            $searchValue = trim(strtolower($req->get('term')));
+
+            $query = $this->bank->defaultWith($this->bank->defaultSelects)
+                ->where(function($query) use ($searchValue) {
+                    /* @var Relation $query */
+                    $query->where(DB::raw('TRIM(LOWER(bank_name))'), 'like', "%$searchValue%")
+                        ->orWhere(DB::raw('TRIM(LOWER(bank_code))'), 'like', "%$searchValue%");
+                });
+
+            $json = [];
+            foreach($query->get() as $db)
+                $json[] = ['id' => $db->id, 'text' => $db->bank_name];
+
+            return response()->json($json);
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
     }
 
     public function index()

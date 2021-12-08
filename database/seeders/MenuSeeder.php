@@ -30,9 +30,10 @@ class MenuSeeder extends Seeder
      */
     public function run()
     {
+        /* MASTER */
         $sequence = 0;
         $masters = $this->menus->create([
-            'name' => 'Master',
+            'name' => 'Master Data',
             'icon' => '<i class="fa fa-database"></i>',
             'slug' => \DBMenus::master,
             'sequence' => $sequence + 10,
@@ -43,17 +44,8 @@ class MenuSeeder extends Seeder
         $this->feature(
             $this->menus->create([
                 'parent_id' => $masters->id,
-                'name' => 'Role',
-                'slug' => \DBMenus::masterRole,
-                'sequence' => $sequenceMaster + 10,
-            ])
-        );
-
-        $this->feature(
-            $this->menus->create([
-                'parent_id' => $masters->id,
-                'name' => 'Users',
-                'slug' => \DBMenus::masterUsers,
+                'name' => 'Bank',
+                'slug' => \DBMenus::masterBank,
                 'sequence' => $sequenceMaster + 10,
             ])
         );
@@ -67,19 +59,11 @@ class MenuSeeder extends Seeder
             ])
         );
 
-        $this->feature(
-            $this->menus->create([
-                'parent_id' => $masters->id,
-                'name' => 'Bank',
-                'slug' => \DBMenus::masterBank,
-                'sequence' => $sequenceMaster + 10,
-            ])
-        );
-
+        /* MASTER ADDRESSES */
         $sequenceAddresses = 0;
         $addresses = $this->menus->create([
             'parent_id' => $masters->id,
-            'name' => 'Address',
+            'name' => 'Alamat',
             'slug' => \DBMenus::addresses,
             'sequence' => $sequenceMaster + 10,
         ]);
@@ -88,7 +72,7 @@ class MenuSeeder extends Seeder
         $this->feature(
             $this->menus->create([
                 'parent_id' => $addresses->id,
-                'name' => 'Province',
+                'name' => 'Provinsi',
                 'slug' => \DBMenus::addressesProvince,
                 'sequence' => $sequenceAddresses + 10,
             ])
@@ -102,9 +86,51 @@ class MenuSeeder extends Seeder
                 'sequence' => $sequenceAddresses + 10,
             ])
         );
+        /* END OF MASTER ADDRESSES */
+        /* END OF MASTER */
 
+        /* MANAGEMENT USERS */
+        $sequenceUsers = 0;
+        $users = $this->menus->create([
+            'name' => 'Manajemen Pengguna',
+            'icon' => '<i class="fa fa-database"></i>',
+            'slug' => \DBMenus::users,
+            'sequence' => $sequence + 10,
+        ]);
+        $this->feature($users, [DBFeature::view]);
+
+        $this->feature(
+            $this->menus->create([
+                'parent_id' => $users->id,
+                'name' => 'Pengguna',
+                'slug' => \DBMenus::usersUser,
+                'sequence' => $sequenceUsers + 10,
+            ])
+        );
+
+        $this->feature(
+            $this->menus->create([
+                'parent_id' => $users->id,
+                'name' => 'Role',
+                'slug' => \DBMenus::usersRole,
+                'sequence' => $sequenceUsers + 10,
+            ]),
+        );
+        /* END OF MANAGEMENT USERS */
+
+        /* INVESTOR */
+        $investor = $this->menus->create([
+            'name' => 'Investor',
+            'icon' => '<i class="fa fa-database"></i>',
+            'slug' => \DBMenus::investor,
+            'sequence' => $sequence + 10,
+        ]);
+        $this->feature($investor);
+        /* END OF INVESTOR */
+
+        /* SETTINGS */
         $security = $this->menus->create([
-            'name' => 'Keamanan',
+            'name' => 'Pengaturan',
             'icon' => '<i class="fa fa-database"></i>',
             'slug' => \DBMenus::security,
             'sequence' => $sequence + 10,
@@ -128,16 +154,7 @@ class MenuSeeder extends Seeder
                 ];
             }
         );
-
-        $this->feature(
-            $this->menus->create([
-                'parent_id' => $security->id,
-                'name' => 'Hak Akses',
-                'slug' => \DBMenus::securityPrivileges,
-                'sequence' => $sequenceSecurity + 10,
-            ]),
-            [DBFeature::view, DBFeature::update]
-        );
+        /* END OF SETTINGS */
     }
 
     public function feature($menu, $features = null, $callback = null)

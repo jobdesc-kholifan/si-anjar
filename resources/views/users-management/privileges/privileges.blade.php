@@ -1,3 +1,8 @@
+<?php
+
+$hasAccessCreate = findPermission(DBMenus::usersRole)->hasAccess(DBFeature::create);
+
+?>
 @extends('skins.template')
 
 @section('content')
@@ -9,10 +14,12 @@
                 <div class="card-header">
                     <h3 class="card-title">Data {{ $title }}</h3>
                     <div class="card-actions">
+                        @if($hasAccessCreate)
                         <button type="button" class="btn btn-outline-primary btn-sm" onclick="actions.create()">
                             <i class="fa fa-plus"></i>
                             <span>Tambah</span>
                         </button>
+                        @endif
                     </div>
                 </div>
                 <div class="card-body">
@@ -21,13 +28,10 @@
                             <thead>
                             <tr>
                                 <th data-name="no" data-orderable="false" data-searchable="false">No</th>
-                                <th data-data="bank_code" data-name="bank_code" style="width: 200px">Kode Bank</th>
-                                <th data-data="bank_name" data-name="bank_name">Nama Bank</th>
-                                <th data-data="description" data-name="description">Deskripsi</th>
+                                <th data-data="name" data-name="name">Nama Role</th>
                                 <th data-data="action" data-orderable="false" data-searchable="false" style="width: 200px">Aksi</th>
                             </tr>
                             </thead>
-                            <tbody></tbody>
                         </table>
                     </div>
                 </div>
@@ -52,6 +56,9 @@
                 },
             }
         ];
+        actions.edit = function(id) {
+            window.location.href = "{{ route(DBRoutes::usersRoleEdit, ['__id__']) }}".route({id: id});
+        };
 
         actions.build();
     </script>

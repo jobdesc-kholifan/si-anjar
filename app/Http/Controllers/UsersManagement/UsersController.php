@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Masters;
+namespace App\Http\Controllers\UsersManagement;
 
 use App\Helpers\Collections\Users\UserCollection;
 use App\Http\Controllers\Controller;
@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\Hash;
 class UsersController extends Controller
 {
 
-    protected $viewPath = 'masters.users';
+    protected $viewPath = 'users-management.users';
     protected $route = [
-        \DBMenus::master,
-        \DBMenus::masterUsers,
+        \DBMenus::users,
+        \DBMenus::usersUser,
     ];
 
     protected $breadcrumbs = [
@@ -36,7 +36,7 @@ class UsersController extends Controller
     public function index()
     {
         try {
-            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::view);
+            findPermission(\DBMenus::usersUser)->hasAccessOrFail(\DBFeature::view);
 
             $this->title = "Users";
             $this->breadcrumbs[] = ['label' => "Users", 'active' => true];
@@ -50,7 +50,7 @@ class UsersController extends Controller
     public function select(Request $req)
     {
         try {
-            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::view);
+            findPermission(\DBMenus::usersUser)->hasAccessOrFail(\DBFeature::view);
 
             $searchValue = trim(strtolower($req->get('term')));
 
@@ -89,7 +89,7 @@ class UsersController extends Controller
     public function datatables()
     {
         try {
-            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::view);
+            findPermission(\DBMenus::usersUser)->hasAccessOrFail(\DBFeature::view);
 
             $query = $this->user->defaultWith($this->user->defaultSelects);
 
@@ -100,24 +100,18 @@ class UsersController extends Controller
                     $checkbox->setFullName($data->full_name);
                     return $checkbox->render();
                 })
-                ->addColumn('gender', function($data) {
-                    return !is_null($data->gender) ? ['name' => $data->gender->name] : ['name' => '-'];
-                })
-                ->addColumn('pob_dob', function($data) {
-                    return sprintf("%s, %s ", $data->place_of_birth, !is_null($data->date_of_birth) ? date('d F Y', strtotime($data->date_of_birth)) : '-');
-                })
                 ->addColumn('email_phone', function($data) {
-                    return sprintf("%s/%s", $data->email, $data->phone);
+                    return sprintf("%s/%s", $data->email, $data->phone_number);
                 })
                 ->addColumn('action', function($data) {
 
                     $btnEdit = false;
-                    if(findPermission(\DBMenus::masterUsers)->hasAccess(\DBFeature::update))
+                    if(findPermission(\DBMenus::usersUser)->hasAccess(\DBFeature::update))
                         $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
                                 ->render();
 
                     $btnDelete = false;
-                    if(findPermission(\DBMenus::masterUsers)->hasAccess(\DBFeature::delete))
+                    if(findPermission(\DBMenus::usersUser)->hasAccess(\DBFeature::delete))
                         $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
                             ->render();
 
@@ -135,7 +129,7 @@ class UsersController extends Controller
     public function form()
     {
         try {
-            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::view);
+            findPermission(\DBMenus::usersUser)->hasAccessOrFail(\DBFeature::view);
 
             return response()->json([
                 'content' => $this->viewResponse('modal-form'),
@@ -148,7 +142,7 @@ class UsersController extends Controller
     public function detail(Request $req)
     {
         try {
-            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::view);
+            findPermission(\DBMenus::usersUser)->hasAccessOrFail(\DBFeature::view);
 
             $row = $this->user->defaultWith($this->user->defaultSelects)
                 ->find($req->get('id'));
@@ -171,7 +165,7 @@ class UsersController extends Controller
     public function store(Request $req)
     {
         try {
-            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::create);
+            findPermission(\DBMenus::usersUser)->hasAccessOrFail(\DBFeature::create);
 
             $rules = collect([
                 'full_name:Nama Lengkap' => 'required|max:100',
@@ -206,7 +200,7 @@ class UsersController extends Controller
     public function show($id)
     {
         try {
-            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::view);
+            findPermission(\DBMenus::usersUser)->hasAccessOrFail(\DBFeature::view);
 
             $row = $this->user->defaultWith($this->user->defaultSelects)
                 ->find($id);
@@ -223,7 +217,7 @@ class UsersController extends Controller
     public function update(Request $req, $id)
     {
         try {
-            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::update);
+            findPermission(\DBMenus::usersUser)->hasAccessOrFail(\DBFeature::update);
 
             $row = $this->user->defaultWith($this->user->defaultSelects)
                 ->find($id);
@@ -248,7 +242,7 @@ class UsersController extends Controller
     public function destroy($id)
     {
         try {
-            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::delete);
+            findPermission(\DBMenus::usersUser)->hasAccessOrFail(\DBFeature::delete);
 
             $row = $this->user->defaultWith($this->user->defaultSelects)
                 ->find($id);
@@ -267,7 +261,7 @@ class UsersController extends Controller
     public function multipleDelete(Request $req)
     {
         try {
-            findPermission(\DBMenus::masterUsers)->hasAccessOrFail(\DBFeature::delete);
+            findPermission(\DBMenus::usersUser)->hasAccessOrFail(\DBFeature::delete);
 
             $ids = $req->get('ids');
 

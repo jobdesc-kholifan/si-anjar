@@ -2,6 +2,7 @@
 
 namespace App\Models\Masters;
 
+use App\Models\Authorization\Privilege;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -73,5 +74,10 @@ class Config extends Model
     public function parent()
     {
         return $this->hasOne(Config::class, 'id', 'parent_id');
+    }
+
+    public function privileges()
+    {
+        return $this->hasMany(Privilege::class, 'role_id', 'id');
     }
 }
