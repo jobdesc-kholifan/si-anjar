@@ -11,8 +11,14 @@ class ConfigCollection extends Collection
     static public function create($values) {
         /* @var Config|Relation $model */
         $model = new Config();
-        $create = $model->create($values);
-        return new ConfigCollection($create);
+        return new ConfigCollection($model->create($values));
+    }
+
+    static public function find($id)
+    {
+        /* @var Config|Relation $model */
+        $model = new Config();
+        return new ConfigCollection($model->find($id));
     }
 
     public function getId()

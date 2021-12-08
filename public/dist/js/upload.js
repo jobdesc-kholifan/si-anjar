@@ -1,5 +1,5 @@
 +function($) {
-    const UploadImageConfig = function(options) {
+    const UploadConfig = function(options) {
         this.allowed = options !== undefined && options.allowed !== undefined ? options.allowed : [];
         this.multiple = options !== undefined && options.multiple !== undefined ? options.multiple : false;
         this.name = options !== undefined && options.name !== undefined ? options.name : null;
@@ -7,10 +7,10 @@
 
         this.getMimeType = options !== undefined && options.getMimeType !== undefined ? options.getMimeType : (file) => file.mimetype;
         this.getThumbnail = options !== undefined && options.getThumbnail !== undefined ? options.getThumbnail : (file) => file.thumbnail;
-        this.getImage = options !== undefined && options.getImage !== undefined ? options.getImage : (file) => file.image;
+        this.getPreview = options !== undefined && options.getPreview !== undefined ? options.getPreview : (file) => file.image;
     };
 
-    const FormUploadImage = function(selector, upload) {
+    const FormUpload = function(selector, upload) {
         this.$ = $(selector);
         this.__upload = upload;
 
@@ -23,24 +23,23 @@
         this.init();
     };
 
-    FormUploadImage.prototype.init = function() {
+    FormUpload.prototype.init = function() {
         this.button.click(() => {
             this.file.click();
         });
 
+        this.file.attr('accept', this.__upload.options.allowed.join(","));
         this.file.change(this.onChange.bind(this));
         this.remove.click(() => {
             this.$.remove();
 
-            console.log(this.__upload.$wrapper.children().length);
-
             if(this.__upload.$wrapper.children().length === 0
                 && !this.__upload.options.multiple)
-                this.__upload.form();
+                this.__upload.add();
         });
     };
 
-    FormUploadImage.prototype.onChange = function(e) {
+    FormUpload.prototype.onChange = function(e) {
         const files = e.target.files;
         for(let i = 0; i < files.length; i++) {
             this.render(files[i]);
@@ -50,7 +49,7 @@
             this.__upload.form();
     };
 
-    FormUploadImage.prototype.render = function(file) {
+    FormUpload.prototype.render = function(file) {
         const $preview = $('<div>', {class: 'image-canvas'});
         if(file.type.indexOf('image') !== -1) {
             const imageReader = new FileReader();
@@ -65,13 +64,24 @@
         this.actions.removeClass('d-none');
     };
 
-    const UploadImage = function(selector, options) {
+    FormUpload.prototype.renderImage = function(file) {
+        const $preview = $('<div>', {class: 'image-canvas'});
+        const imageURL = this.__upload.options.getPreview(file);
+        $preview.css({backgroundImage: `url(${imageURL})`});
+
+        this.$.append($preview);
+
+        this.button.addClass('d-none');
+        this.actions.removeClass('d-none');
+    };
+
+    const Upload = function(selector, options) {
         this.$ = $(selector);
 
         this.$wrapper = $('<div>', {class: 'wrapper-upload'});
         this.$.append(this.$wrapper);
 
-        this.options = new UploadImageConfig(options);
+        this.options = new UploadConfig(options);
 
         this.$form = $('<div>', {class: 'form-upload'}).append(
             $('<input>', {type: 'file', name: this.options.name, class: 'd-none', 'data-action': 'file'}),
@@ -86,24 +96,39 @@
             )
         );
 
-        this.init();
+        this.add();
     };
 
-    UploadImage.prototype.form = function() {
+    Upload.prototype.add = function() {
         const $form = this.$form.clone();
-        $form.data('form', new FormUploadImage($form, this));
+        $form.data('form', new FormUpload($form, this));
 
         this.$wrapper.append($form);
+
+        return $form;
     };
 
-    UploadImage.prototype.init = function() {
-        this.form();
-    };
+    Upload.prototype.set = function(document) {
+        this.$wrapper.children().each((i, item) => {
+            const $item = $(item);
+            $item.remove();
+        });
 
-    $.fn.uploadImage = function(options) {
+        let documents = Array.isArray(document) ? document : [document];
+        documents.forEach(document => {
+            const mimeType = this.options.getMimeType(document);
+            if(mimeType !== undefined) {
+                if(mimeType.indexOf('image/') !== -1) {
+                    this.add().data('form').renderImage(document);
+                }
+            }
+        });
+    }
+
+    $.fn.upload = function(options) {
         let $this = $(this);
-        let data = new UploadImage($this, options);
-        $this.data('imageUpload', data);
+        let data = new Upload($this, options);
+        $this.data('upload', data);
 
         return data;
     };

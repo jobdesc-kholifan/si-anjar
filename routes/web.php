@@ -2,14 +2,16 @@
 
 use App\Http\Controllers\Addresses\CityController;
 use App\Http\Controllers\Addresses\ProvinceController;
+use App\Http\Controllers\API\PreviewController;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Investors\InvestorController;
 use App\Http\Controllers\Masters\BankController;
 use App\Http\Controllers\Masters\TypesController;
-use App\Http\Controllers\Masters\UsersController;
+use App\Http\Controllers\UsersManagement\UsersController;
 use App\Http\Controllers\Security\MenuController;
 use App\Http\Controllers\Security\MenuFeatureController;
-use App\Http\Controllers\Security\PrivilegesController;
+use App\Http\Controllers\UsersManagement\PrivilegesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -48,21 +50,12 @@ Route::group(['middleware' => 'auth'], function() {
 
     Route::get('/', [AppController::class, 'index']);
 
+    Route::group(['prefix' => 'preview'], function() {
+
+        Route::get('{directory}/view', [PreviewController::class, 'index']);
+    });
+
     Route::group(['prefix' => 'masters'], function() {
-
-        Route::group(['prefix' => 'users'], function() {
-            Route::get('select', [UsersController::class, 'select'])->name(DBRoutes::mastersUsersSelect);
-            Route::post('datatables', [UsersController::class, 'datatables']);
-            Route::get('form', [UsersController::class, 'form']);
-            Route::get('detail', [UsersController::class, 'detail']);
-            Route::post('multiple-delete', [UsersController::class, 'multipleDelete']);
-
-            Route::get('', [UsersController::class, 'index'])->name(DBRoutes::mastersUsers);
-            Route::post('', [UsersController::class, 'store']);
-            Route::get('{id}', [UsersController::class, 'show']);
-            Route::post('{id}', [UsersController::class, 'update']);
-            Route::delete('{id}', [UsersController::class, 'destroy']);
-        });
 
         Route::group(['prefix' => 'type'], function() {
             Route::get('select', [TypesController::class, 'select'])->name(DBRoutes::mastersTypesSelect);
@@ -80,7 +73,6 @@ Route::group(['middleware' => 'auth'], function() {
         });
 
         Route::group(['prefix' => 'bank'], function() {
-
             Route::get('select', [BankController::class, 'select'])->name(DBRoutes::mastersBankSelect);
             Route::post('datatables', [BankController::class, 'datatables']);
             Route::get('form', [BankController::class, 'form']);
@@ -120,6 +112,46 @@ Route::group(['middleware' => 'auth'], function() {
         });
     });
 
+    Route::group(['prefix' => 'users'], function() {
+
+        Route::group(['prefix' => 'user'], function() {
+            Route::get('select', [UsersController::class, 'select'])->name(DBRoutes::usersUserSelect);
+            Route::post('datatables', [UsersController::class, 'datatables']);
+            Route::get('form', [UsersController::class, 'form']);
+            Route::get('detail', [UsersController::class, 'detail']);
+            Route::post('multiple-delete', [UsersController::class, 'multipleDelete']);
+
+            Route::get('', [UsersController::class, 'index'])->name(DBRoutes::usersUser);
+            Route::post('', [UsersController::class, 'store']);
+            Route::get('{id}', [UsersController::class, 'show']);
+            Route::post('{id}', [UsersController::class, 'update']);
+            Route::delete('{id}', [UsersController::class, 'destroy']);
+        });
+
+        Route::group(['prefix' => 'privileges'], function() {
+            Route::get('features', [PrivilegesController::class, 'features'])->name(DBRoutes::usersRoleFeatures);
+            Route::post('datatables', [PrivilegesController::class, 'datatables']);
+
+            Route::get('', [PrivilegesController::class, 'index'])->name(DBRoutes::usersRole);
+            Route::get('form', [PrivilegesController::class, 'form']);
+            Route::post('', [PrivilegesController::class, 'store']);
+            Route::get('{id}', [PrivilegesController::class, 'edit'])->name(DBRoutes::usersRoleEdit);
+            Route::post('{id}', [PrivilegesController::class, 'update']);
+            Route::delete('{id}', [PrivilegesController::class, 'destroy']);
+        });
+    });
+
+    Route::group(['prefix' => 'investor'], function() {
+        Route::post('datatables', [InvestorController::class, 'datatables']);
+
+        Route::get('', [InvestorController::class, 'index'])->name(DBRoutes::investor);
+        Route::get('form', [InvestorController::class, 'form']);
+        Route::post('', [InvestorController::class, 'store']);
+        Route::get('{id}', [InvestorController::class, 'show']);
+        Route::post('{id}', [InvestorController::class, 'update']);
+        Route::delete('{id}', [InvestorController::class, 'destroy']);
+    });
+
     Route::group(['prefix' => 'security'], function() {
 
         Route::group(['prefix' => 'menu'], function() {
@@ -142,13 +174,6 @@ Route::group(['middleware' => 'auth'], function() {
                 Route::post('{featureId}', [MenuFeatureController::class,'update']);
                 Route::delete('{featureId}', [MenuFeatureController::class, 'destroy']);
             });
-        });
-
-        Route::group(['prefix' => 'privileges'], function() {
-            Route::get('features', [PrivilegesController::class, 'features']);
-
-            Route::get('', [PrivilegesController::class, 'index'])->name(DBRoutes::securityPrivileges);
-            Route::post('', [PrivilegesController::class, 'update']);
         });
     });
 });

@@ -45,13 +45,13 @@ MenuCollection.prototype.renderChild = function(index, id = null) {
             const $checkbox = $('<input>', {
                 type: "checkbox",
                 name: feature.slug,
-                class: "form-check-input",
+                class: "custom-control-input",
                 id: "feature-{0}-{1}".format(menu.id, feature.slug),
             });
             $checkbox.prop('checked', feature.has_access);
 
             const $label = $('<label>', {
-                class: 'form-check-label',
+                class: 'custom-control-label',
                 for: "feature-{0}-{1}".format(menu.id, feature.slug),
                 title: feature.description,
             });
@@ -59,7 +59,7 @@ MenuCollection.prototype.renderChild = function(index, id = null) {
             $label.tooltip('enable');
 
             $features.append(
-                $('<div>', {class: 'form-check d-inline mr-2'}).append($checkbox,$label)
+                $('<div>', {class: 'custom-control custom-switch d-inline mr-2'}).append($checkbox,$label)
             );
 
             $checkbox.click(() => {

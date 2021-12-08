@@ -63,8 +63,9 @@ ActionsForm.prototype.setData = function(items) {
     Object.keys(items).forEach(key => {
         const $el = this._form.find(`[name="${key}"]`);
 
-        if($el.length > 0)
-            $el.val(items[key]);
+        if($el.length > 0
+            && ($el.is('input')&& !['radio', 'checkbox', 'file'].includes($el.attr('type')))
+        )$el.val(items[key]);
 
         if(this._actions.callback.form.onSetData !== null)
             this._actions.callback.form.onSetData(items[key], key, items, this);
@@ -77,6 +78,12 @@ ActionsForm.prototype.find = function(selector, check) {
 
 ActionsForm.prototype.submit = function() {
     this._form.submit({
+        data: (params) => {
+            if(this._actions.callback.form.appendData !== undefined) {
+                return this._actions.callback.form.appendData(params, this);
+            }
+            return params;
+        },
         beforeSubmit: () => {
             this.disabled(true);
 
@@ -91,6 +98,9 @@ ActionsForm.prototype.submit = function() {
             if(res.result) {
                 this._actions.modal.close();
                 this._actions.datatable.reload();
+
+                if(res.data !== undefined && res.data.redirect !== undefined)
+                    window.location.href = res.data.redirect;
             }
 
             AlertNotif.toastr.response(res);
@@ -238,7 +248,7 @@ Actions.prototype.edit = function(id) {
                     this.form.disabled(false);
 
                     if(this.callback.onEdit !== null)
-                        this.callback.onEdit(this);
+                        this.callback.onEdit(res.data, res, this);
                 });
         }
     });

@@ -87,7 +87,6 @@ TransactionHistory.prototype.init = function() {
         const $item = $(item);
         $item.children().each((j, child) => {
             const $child = $(child);
-            console.log($child);
             $child.click(() => {
                 $($item.find('.btn-primary')).removeClass('btn-primary').addClass('btn-outline-primary');
                 $child.removeClass('btn-outline-primary').addClass('btn-primary');

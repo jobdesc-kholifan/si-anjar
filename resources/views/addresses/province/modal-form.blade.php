@@ -1,7 +1,7 @@
 <form>
     {{ csrf_field() }}
     <div class="modal-header">
-        <h3 class="card-title">Form Bank</h3>
+        <h3 class="card-title">Form Provinsi</h3>
         <span class="close" data-dismiss="modal">&times;</span>
     </div>
     <div class="modal-body ">

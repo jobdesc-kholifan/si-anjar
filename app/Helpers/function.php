@@ -2,6 +2,8 @@
 
 use App\Helpers\Finders\FindConfig;
 use App\Helpers\Finders\FindPermission;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 if(!function_exists('isMenuActive')) {
 
@@ -59,5 +61,23 @@ if (!function_exists('toSlug')) {
     function toSlug($value, $replacement = '', $pattern = '/\s+/') {
         $slug = trim(strtolower(preg_replace($pattern, $replacement, $value)));
         return sprintf("usr-%s", substr($slug, 0, 100));
+    }
+}
+
+if (!function_exists('fileUnlink')) {
+
+    function fileUnlink($files) {
+        foreach($files as $file) {
+            $path = storage_path($file->directory) . DIRECTORY_SEPARATOR .$file->file_name;
+            if(file_exists($path))
+                unlink($path);
+        }
+    }
+}
+
+if (!function_exists('DBImage')) {
+
+    function DBImage($alias = 'preview') {
+        return DB::raw(sprintf("CONCAT('%s/',REPLACE(directory, '/', '_'),'/view?token=%s&filename=',file_name) as %s", url('preview'), encrypt(env('APP_KEY_VALUE')), $alias));
     }
 }

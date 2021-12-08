@@ -21,7 +21,7 @@
                             <thead>
                             <tr>
                                 <th data-name="no" data-orderable="false" data-searchable="false">No</th>
-                                <th data-data="province_name" data-name="province_name">Name</th>
+                                <th data-data="province_name" data-name="province_name">Provinsi</th>
                                 <th data-data="action" data-orderable="false" data-searchable="false" style="width: 100px">Aksi</th>
                             </tr>
                             </thead>

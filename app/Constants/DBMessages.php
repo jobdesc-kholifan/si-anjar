@@ -14,4 +14,10 @@ class DBMessages
     const loginSuccess = "Login berhasil";
 
     const permissionRequired = "Anda tidak memiliki akses pada proses atau halaman ini";
+
+    const fieldRequired = '%s tidak boleh kosong';
+    const fieldRequiredImage = 'Gambar %s tidak boleh kosong';
+    const fieldRequiredFile = 'Dokumen %s tidak boleh kosong';
+
+    const uploadFailed = "Gagal upload file";
 }

@@ -16,10 +16,6 @@ class TypesController extends Controller
     protected $viewPath = 'masters.types';
     protected $title = 'Jenis Data';
 
-    protected $breadcrumbs = [
-        ['masters' => 'Masters'],
-    ];
-
     /* @var Config|Relation */
     protected $type;
 
