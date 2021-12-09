@@ -8,6 +8,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Investors\InvestorController;
 use App\Http\Controllers\Masters\BankController;
 use App\Http\Controllers\Masters\TypesController;
+use App\Http\Controllers\Project\ProjectController;
+use App\Http\Controllers\Project\ProjectInvestorController;
+use App\Http\Controllers\Project\ProjectSKController;
+use App\Http\Controllers\Project\ProjectSurkasController;
 use App\Http\Controllers\UsersManagement\UsersController;
 use App\Http\Controllers\Security\MenuController;
 use App\Http\Controllers\Security\MenuFeatureController;
@@ -150,6 +154,29 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('{id}', [InvestorController::class, 'show']);
         Route::post('{id}', [InvestorController::class, 'update']);
         Route::delete('{id}', [InvestorController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'project'], function() {
+
+        Route::get('', [ProjectController::class, 'index'])->name(DBRoutes::project);
+        Route::get('create', [ProjectController::class, 'create'])->name(DBRoutes::projectCreate);
+
+        Route::group(['prefix' => 'investor'], function() {
+            Route::get('', [ProjectInvestorController::class, 'index'])->name(DBRoutes::projectInvestor);
+            Route::get('form', [ProjectInvestorController::class, 'form']);
+        });
+
+        Route::group(['prefix' => 'sk'], function() {
+
+            Route::get('', [ProjectSKController::class, 'index'])->name(DBRoutes::projectSK);
+            Route::get('form', [ProjectSKController::class, 'form']);
+        });
+
+        Route::group(['prefix' => 'surkas'], function() {
+
+            Route::get('', [ProjectSurkasController::class, 'index'])->name(DBRoutes::projectSurkas);
+            Route::get('form', [ProjectSurkasController::class, 'form']);
+        });
     });
 
     Route::group(['prefix' => 'security'], function() {

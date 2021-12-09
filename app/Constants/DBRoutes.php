@@ -35,4 +35,13 @@ class DBRoutes
 
     const investor = 'investor';
     const investorCreate = 'investor.create';
+
+    const project = 'project';
+    const projectCreate = 'project.create';
+
+    const projectInvestor = 'project.investor';
+
+    const projectSK = 'project.sk';
+
+    const projectSurkas = 'project.surkas';
 }

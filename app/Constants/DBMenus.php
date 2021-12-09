@@ -19,4 +19,6 @@ class DBMenus
     const securityMenu = 'security/menu';
 
     const investor = 'investor';
+
+    const project = 'project';
 }
