@@ -52,7 +52,7 @@ Route::group(['middleware' => 'auth'], function() {
 
     Route::group(['prefix' => 'preview'], function() {
 
-        Route::get('{directory}/view', [PreviewController::class, 'index']);
+        Route::get('{directory}/{token}/view', [PreviewController::class, 'index']);
     });
 
     Route::group(['prefix' => 'masters'], function() {

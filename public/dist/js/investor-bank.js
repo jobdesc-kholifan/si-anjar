@@ -3,22 +3,13 @@ const FormBankOptions = function(options) {
 };
 
 const BankData = function(value = {}) {
+    this.id = value.id !== undefined ? value.id : 0;
     this.bank_id = value.bank_id !== undefined ? value.bank_id : 0;
     this.bank = value.bank !== undefined ? value.bank : null;
     this.branch_name = value.branch_name !== undefined ? value.branch_name : null;
     this.no_rekening = value.no_rekening !== undefined ? value.no_rekening : null;
     this.atas_nama = value.atas_nama !== undefined ? value.atas_nama : null;
-    this.is_deleted = false;
-};
-
-BankData.prototype.toJSON = function() {
-    return {
-        bank_id: this.bank_id,
-        bank: this.bank,
-        branch_name: this.branch_name,
-        no_rekening: this.no_rekening,
-        atas_nama: this.atas_nama,
-    };
+    this.deleted = false;
 };
 
 const FormBankItem = function(element, form) {
@@ -36,9 +27,9 @@ const FormBankItem = function(element, form) {
 FormBankItem.prototype.init = function() {
     FormComponents.select2.init(this.selectBank);
 
-    this.inputBranch.on('keypress', () => this.$.data('data').branch_name = this.inputBranch.val());
-    this.inputNoRek.on('keypress', () => this.$.data('data').no_rekening = this.inputNoRek.val());
-    this.inputAtasNama.on('keypress', () => this.$.data('data').atas_nama = this.inputAtasNama.val());
+    this.inputBranch.on('keydown, keypress, keyup', () => this.$.data('data').branch_name = this.inputBranch.val());
+    this.inputNoRek.on('keydown, keypress, keyup', () => this.$.data('data').no_rekening = this.inputNoRek.val());
+    this.inputAtasNama.on('keydown, keypress, keyup', () => this.$.data('data').atas_nama = this.inputAtasNama.val());
 
     this.selectBank.change(() => {
         this.$.data('data').bank_id = this.selectBank.val();
@@ -54,24 +45,38 @@ FormBankItem.prototype.init = function() {
         this.buttonAdd.addClass('d-none');
     });
     this.buttonDelete.click(() => {
-        if(this.__form.banks.length > 1) {
-            this.__form.$.children().first().css({border: 'none'});
+        const children = this.__form.$.children();
+        if(children.length > 1) {
+            children.first().css({border: 'none'});
+
+            const bank = this.$.data('data');
+            if(bank.bank_id !== 0) {
+                this.$.data('data').deleted = true;
+                this.$.addClass('d-none');
+            }
+
             this.$.remove();
-
-            const bank = this.__form.banks.get(this.$.data('index'));
-            if(bank.bank_id === 0)
-                this.__form.banks.splice(this.$.data('index'), 1);
-
-            else this.__form.banks[this.$.data('index')].is_deleted = true;
-
-            this.__form.$.children().last().data('form').buttonAdd.removeClass('d-none');
         } else {
             this.selectBank.val(null).text(null);
             this.inputBranch.val(null);
             this.inputNoRek.val(null);
             this.inputAtasNama.val(null);
         }
+
+        this.__form.$.children().last().data('form').buttonAdd.removeClass('d-none');
     });
+};
+
+FormBankItem.prototype.toJSON = function() {
+    return {
+        id: this.$.data('data').id,
+        bank_id: this.$.data('data').bank_id,
+        bank: this.$.data('data').bank,
+        branch_name: this.$.data('data').branch_name,
+        no_rekening: this.$.data('data').no_rekening,
+        atas_nama: this.$.data('data').atas_nama,
+        deleted: this.$.data('data').deleted
+    };
 };
 
 const FormBank = function(selector, options = {}) {
@@ -129,43 +134,38 @@ const FormBank = function(selector, options = {}) {
             )
         )
     );
-
-    this.banks = [];
 };
 
 FormBank.prototype.add = function() {
     const $form = $(this.$formBank.clone());
     $form.data('form', new FormBankItem($form, this));
     $form.data('data', new BankData());
-    $form.data('index', this.banks.length);
 
     this.$.append($form);
 
     $form.data('form').init();
 
-    this.banks.push($form.data('data'));
-
     return $form;
 };
 
 FormBank.prototype.set = function(values) {
-    let bankData = [];
     values.forEach(value => {
         const $form = this.add();
         $form.data('form').selectBank.append($('<option>', {value: value.bank_id}).text(value.bank.bank_name));
         $form.data('form').inputBranch.val(value.branch_name);
         $form.data('form').inputNoRek.val(value.no_rekening);
         $form.data('form').inputAtasNama.val(value.atas_nama);
+        $form.data('form').buttonAdd.addClass('d-none');
 
-        bankData.push(new BankData(value));
+        $form.data('data', new BankData(value));
     });
 
-    this.banks = bankData;
+    this.$.children().last().data('form').buttonAdd.removeClass('d-none');
 };
 
 FormBank.prototype.toJSON = function() {
     let json = [];
-    this.banks.forEach((bank) => json.push(bank.toJSON()));
+    this.$.children().each((i, value) => json.push($(value).data('form').toJSON()));
     return json;
 };
 

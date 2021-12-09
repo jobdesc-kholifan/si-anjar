@@ -17,6 +17,15 @@ class FileCollection extends Collection
         return new FileCollection($file->create($values));
     }
 
+    static public function update($id, $values)
+    {
+        /* @var File|Relation $file */
+        $file = new File();
+
+        return $file->where('id', $id)
+            ->update($values);
+    }
+
     public function getId()
     {
         return $this->get('id');

@@ -22,10 +22,15 @@ class File extends Model
     ];
 
     public $defaultSelects = [
+        'ref_id',
         'file_name',
-        'directory',
-        'file_size',
+        'mime_type'
     ];
+
+    public function getPreviewAttribute($data)
+    {
+        return $data."?token=".encrypt($this->file_name);
+    }
 
     /**
      * static function yang digunakan ketika memanggil with biar tidak perlu
