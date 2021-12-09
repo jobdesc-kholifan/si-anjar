@@ -128,6 +128,16 @@ class MenuSeeder extends Seeder
         $this->feature($investor);
         /* END OF INVESTOR */
 
+        /* PROJECT */
+        $project = $this->menus->create([
+            'name' => 'Proyek',
+            'icon' => '<i class="fa fa-database"></i>',
+            'slug' => \DBMenus::project,
+            'sequence' => $sequence + 10,
+        ]);
+        $this->feature($project);
+        /* END OF PROJECT */
+
         /* SETTINGS */
         $security = $this->menus->create([
             'name' => 'Pengaturan',
