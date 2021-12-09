@@ -6,7 +6,6 @@ use App\Helpers\Collections\Config\ConfigCollection;
 use App\Helpers\Collections\Files\FileCollection;
 use App\Models\Masters\File;
 use Illuminate\Support\Facades\File as SupportFile;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileUpload
@@ -56,10 +55,9 @@ class FileUpload
 
     /**
      * @param string $directory
-     * @param callable|null $filename
+     * @param null $callable
      * @return FileUpload
      *
-     * @throws \Exception
      */
     public function moveTo($directory, $callable = null)
     {
@@ -83,7 +81,9 @@ class FileUpload
 
     /**
      * @return FileUpload
-     * */
+     *
+     * @throws \Exception
+     */
     public function save()
     {
         if(is_null($this->refType))
@@ -107,6 +107,27 @@ class FileUpload
                 'updated_at' => currentDate(),
             ]);
         }
+
+        return $this;
+    }
+
+    public function update($file)
+    {
+        if(is_null($this->refType))
+            throw new \Exception("Tidak dapat menyimpan sebelum upload file diketahui. Gunakan setReference untuk mengidentifikasi upload file");
+
+        if(is_null($this->refId))
+            throw new \Exception("Tidak dapat menyimpan sebelum reference id diketahui. Gunakan setReference untuk mengidentifikasi upload file");
+
+        $files = is_array($file) ? $file : [$file];
+
+        fileUnlink($files);
+
+        File::query()->where('ref_type_id', $this->refType->getId())
+            ->where('ref_id', $this->refId)
+            ->delete();
+
+        $this->save();
 
         return $this;
     }

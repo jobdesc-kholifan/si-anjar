@@ -10,16 +10,15 @@ use Intervention\Image\Facades\Image;
 class PreviewController extends Controller
 {
 
-    public function index(Request $req, $directory)
+    public function index(Request $req, $directory, $token)
     {
         try {
             $pathNotFound = storage_path('app/images/not-found.png');
-            $token = decrypt($req->get('token'));
-            if($token != env('APP_KEY_VALUE'))
-                return response()->file($pathNotFound);
 
-            $filename = $req->get('filename');
+            if($token != md5(env('APP_KEY_VALUE')))
+                throw new \Exception(\DBMessages::permissionRequired);
 
+            $filename = decrypt($req->get('token'));
             $path = storage_path(str_replace('_', '\\', $directory) . DIRECTORY_SEPARATOR . $filename);
             if(!file_exists($path))
                 return response()->file($pathNotFound);

@@ -28,15 +28,10 @@ class InvestorController extends Controller
     /* @var InvestorBank|Relation */
     protected $investorBank;
 
-    /* @var File|Relation */
-    protected $file;
-
     public function __construct()
     {
         $this->investor = new Investor();
         $this->investorBank = new InvestorBank();
-
-        $this->file = new File();
     }
 
     public function index()
@@ -155,30 +150,34 @@ class InvestorController extends Controller
             $types = findConfig()->in([\DBTypes::fileInvestorKTP, \DBTypes::fileInvestorNPWP]);
 
             $fileKTP = FileUpload::upload($req->file('file_ktp'));
-            try {
-                $fileKTP->setReference($types->get(\DBTypes::fileInvestorKTP), $investor->id);
-                $fileKTP->moveTo('app/dokumen-investor', function ($file) {
-                    /* @var UploadedFile $file */
-                    return sprintf("ktp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
-                });
-                $fileKTP->save();
-            } catch (\Exception $e) {
-                $fileKTP->rollBack();
-                throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
+            if($req->hasFile('file_ktp')) {
+                try {
+                    $fileKTP->setReference($types->get(\DBTypes::fileInvestorKTP), $investor->id);
+                    $fileKTP->moveTo('app/dokumen-investor', function ($file) {
+                        /* @var UploadedFile $file */
+                        return sprintf("ktp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
+                    });
+                    $fileKTP->save();
+                } catch (\Exception $e) {
+                    $fileKTP->rollBack();
+                    throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
+                }
             }
 
             $fileNPWP = FileUpload::upload($req->file('file_npwp'));
-            try {
-                $fileNPWP->setReference($types->get(\DBTypes::fileInvestorNPWP), $investor->id);
-                $fileNPWP->moveTo('app/dokumen-investor', function ($file) {
-                    /* @var UploadedFile $file */
-                    return sprintf("npwp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
-                });
-                $fileNPWP->save();
-            } catch (\Exception $e) {
-                $fileNPWP->rollBack();
-                $fileKTP->rollBack();
-                throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
+            if($req->hasFile('file_npwp')) {
+                try {
+                    $fileNPWP->setReference($types->get(\DBTypes::fileInvestorNPWP), $investor->id);
+                    $fileNPWP->moveTo('app/dokumen-investor', function ($file) {
+                        /* @var UploadedFile $file */
+                        return sprintf("npwp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
+                    });
+                    $fileNPWP->save();
+                } catch (\Exception $e) {
+                    $fileNPWP->rollBack();
+                    $fileKTP->rollBack();
+                    throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
+                }
             }
 
             DB::commit();
@@ -196,12 +195,10 @@ class InvestorController extends Controller
             $row = $this->investor->defaultQuery()
                 ->with([
                     'file_npwp' => function($query) {
-                        File::foreignWith($query, [DBImage(), 'mime_type'])
-                            ->addSelect('ref_id');
+                        File::foreignWith($query)->addSelect(DBImage());
                     },
                     'file_ktp' => function($query) {
-                        File::foreignWith($query, [DBImage(), 'mime_type'])
-                            ->addSelect('ref_id');
+                        File::foreignWith($query)->addSelect(DBImage());
                     }
                 ])
                 ->find($id);
@@ -228,6 +225,93 @@ class InvestorController extends Controller
 
             $updateInvestor = collect($req->only($this->investor->getFillable()));
             $row->update($updateInvestor->toArray());
+
+            $deletedId = [];
+            $updatedId = [];
+
+            $insertBanks = [];
+            $updateBanks = [];
+
+            $banks = json_decode($req->get('banks', '[]'));
+            foreach ($banks as $bank) {
+
+                if(!$bank->deleted) {
+                    if(empty($bank->bank_id))
+                        throw new \Exception("Data bank tidak valid, terdapat bank yang kosong", \DBCodes::authorizedError);
+
+                    if(empty($bank->branch_name))
+                        throw new \Exception("Data bank tidak valid, terdapat nama cabang yang kosong", \DBCodes::authorizedError);
+
+                    if(empty($bank->no_rekening))
+                        throw new \Exception("Data bank tidak valid, terdapat no rekening yang kosong", \DBCodes::authorizedError);
+
+                    if(empty($bank->atas_nama))
+                        throw new \Exception("Data bank tidak valid, terdapat atas nama bank yang kosong", \DBCodes::authorizedError);
+
+                    $item = [
+                        'investor_id' => $id,
+                        'bank_id' => $bank->bank_id,
+                        'branch_name' => $bank->branch_name,
+                        'no_rekening' => $bank->no_rekening,
+                        'atas_nama' => $bank->atas_nama,
+                        'created_at' => currentDate(),
+                        'updated_at' => currentDate(),
+                    ];
+
+                    if($bank->id == 0)
+                        $insertBanks[] = $item;
+                    else $updateBanks[$bank->id] = collect($item)->except('created_at', 'updated_at')
+                        ->toArray();
+
+                    if(!in_array($bank->id, $updatedId))
+                        $updatedId[] = $bank->id;
+                }
+
+                else {
+                    if(!in_array($bank->id, $deletedId))
+                        $deletedId[] = $bank->id;
+                }
+            }
+
+            $this->investorBank->insert($insertBanks);
+
+            foreach($updateBanks as $bankId => $values) {
+                $this->investorBank->where('id', $bankId)
+                    ->update($values);
+            }
+
+            $types = findConfig()->in([\DBTypes::fileInvestorKTP, \DBTypes::fileInvestorNPWP]);
+
+            $fileKTP = FileUpload::upload($req->file('file_ktp'));
+            if($req->hasFile('file_ktp')) {
+                try {
+                    $fileKTP->setReference($types->get(\DBTypes::fileInvestorKTP), $id);
+                    $fileKTP->moveTo('app/dokumen-investor', function ($file) {
+                        /* @var UploadedFile $file */
+                        return sprintf("ktp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
+                    });
+                    $fileKTP->update($row->file_ktp);
+                } catch (\Exception $e) {
+                    $fileKTP->rollBack();
+                    throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
+                }
+            }
+
+            $fileNPWP = FileUpload::upload($req->file('file_npwp'));
+            if($req->hasFile('file_npwp')) {
+                try {
+                    $fileNPWP->setReference($types->get(\DBTypes::fileInvestorKTP), $id);
+                    $fileNPWP->moveTo('app/dokumen-investor', function ($file) {
+                        /* @var UploadedFile $file */
+                        return sprintf("npwp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
+                    });
+                    $fileNPWP->update($row->file_npwp);
+                } catch (\Exception $e) {
+                    $fileNPWP->rollBack();
+                    $fileKTP->rollBack();
+                    throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
+                }
+            }
 
             DB::commit();
 
