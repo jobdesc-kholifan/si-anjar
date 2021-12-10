@@ -19,7 +19,7 @@
 </div>
 <div class="form-group">
     <div class="w-100">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="table-project-investor">
             <thead>
             <tr>
                 <th data-data="checkbox" data-name="no" data-orderable="false" data-searchable="false"></th>

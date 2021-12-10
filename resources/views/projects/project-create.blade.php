@@ -73,12 +73,24 @@
         });
 
         const actionsInvestor = new Actions("{{ route(DBRoutes::projectInvestor) }}");
+        actionsInvestor.selectors.table = '#table-project-investor';
+        actionsInvestor.datatable.params = {
+            _token: "{{ csrf_token() }}",
+        };
         actionsInvestor.build();
 
         const actionsSK = new Actions("{{ route(DBRoutes::projectSK) }}");
+        actionsSK.selectors.table = '#table-project-sk';
+        actionsSK.datatable.params = {
+            _token: "{{ csrf_token() }}",
+        };
         actionsSK.build();
 
         const actionsSurkas = new Actions("{{ route(DBRoutes::projectSurkas) }}");
+        actionsSurkas.selectors.table = '#table-project-surkas';
+        actionsSurkas.datatable.params = {
+            _token: "{{ csrf_token() }}",
+        };
         actionsSurkas.build();
     </script>
 @endpush

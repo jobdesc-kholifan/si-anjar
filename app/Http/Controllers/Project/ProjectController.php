@@ -39,6 +39,19 @@ class ProjectController extends Controller
         }
     }
 
+    public function datatables()
+    {
+        try {
+            $query = $this->project->defaultWith($this->project->defaultSelects);
+
+            return datatables()->eloquent($query)
+                ->toJson();
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
+
     public function create()
     {
         try {
