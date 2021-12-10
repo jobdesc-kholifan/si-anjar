@@ -19,7 +19,7 @@ class Controller extends BaseController
 
     protected $title;
     protected $subTitle;
-    protected $pageTitle = 'Scanner Food';
+    protected $pageTitle = 'SiAnjar';
 
     protected $breadcrumbs = array();
 
