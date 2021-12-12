@@ -33,7 +33,7 @@ class ProjectInvestorController extends Controller
 
             $row = ProjectCollection::find($projectId);
 
-            return $this->view('project-investor', [
+            return $this->view('project-tab-investor', [
                 'projectId' => $projectId,
                 'project' => $row,
             ]);
