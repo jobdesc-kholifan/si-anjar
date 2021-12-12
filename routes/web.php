@@ -175,6 +175,10 @@ Route::group(['middleware' => 'auth'], function() {
 
                 Route::get('', [ProjectInvestorController::class, 'index'])->name(DBRoutes::projectInvestor);
                 Route::get('form', [ProjectInvestorController::class, 'form']);
+                Route::post('', [ProjectInvestorController::class, 'store']);
+                Route::get('{id}', [ProjectInvestorController::class, 'show']);
+                Route::post('{id}', [ProjectInvestorController::class, 'update']);
+                Route::delete('{id}', [ProjectInvestorController::class, 'destroy']);
             });
 
             Route::group(['prefix' => 'sk'], function() {

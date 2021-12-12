@@ -10,6 +10,7 @@
             <select
                 id="select-investor"
                 class="form-control"
+                name="investor_id"
                 data-toggle="select2"
                 data-url="{{ route(DBRoutes::investorSelect) }}"
             ></select>
@@ -21,10 +22,12 @@
                 id="input-nominal"
                 class="form-control"
                 placeholder="Rp. 0"
+                name="investment_value"
+                data-toggle="jquery-number"
             />
         </div>
         <div class="form-group">
-            <label for="input-porsi">Porsi Saham: 0%</label>
+            <label for="input-porsi" id="label-porsi">Porsi Saham: 0%</label>
         </div>
     </div>
     <div class="modal-footer">

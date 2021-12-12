@@ -56,6 +56,12 @@ if(!function_exists('IDR')) {
     }
 }
 
+if(!function_exists('IDRLabel')) {
+    function IDRLabel($value, $symbol = 'Rp. ', $decimal = 0, $dec_point = ',', $thousands_sep = '.') {
+        return "<div class=\"text-right w-100\">".IDR($value, $symbol, $decimal, $dec_point, $thousands_sep)."</div>";
+    }
+}
+
 if(!function_exists('findConfig')) {
 
     /**
