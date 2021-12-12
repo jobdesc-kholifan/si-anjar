@@ -56,7 +56,7 @@ Route::group(['middleware' => 'auth'], function() {
 
     Route::group(['prefix' => 'preview'], function() {
 
-        Route::get('{directory}/{token}/view', [PreviewController::class, 'index']);
+        Route::get('{directory}/{token}/view/{filename}', [PreviewController::class, 'index']);
     });
 
     Route::group(['prefix' => 'masters'], function() {
@@ -147,6 +147,7 @@ Route::group(['middleware' => 'auth'], function() {
 
     Route::group(['prefix' => 'investor'], function() {
         Route::post('datatables', [InvestorController::class, 'datatables']);
+        Route::get('select', [InvestorController::class, 'select'])->name(DBRoutes::investorSelect);
 
         Route::get('', [InvestorController::class, 'index'])->name(DBRoutes::investor);
         Route::get('form', [InvestorController::class, 'form']);
@@ -161,26 +162,35 @@ Route::group(['middleware' => 'auth'], function() {
 
         Route::get('', [ProjectController::class, 'index'])->name(DBRoutes::project);
         Route::get('create', [ProjectController::class, 'create'])->name(DBRoutes::projectCreate);
+        Route::post('create', [ProjectController::class, 'store']);
 
-        Route::group(['prefix' => 'investor'], function() {
-            Route::post('datatables', [ProjectInvestorController::class, 'datatables']);
+        Route::group(['prefix' => '{projectId}'], function() {
+            Route::get('', [ProjectController::class, 'show'])->name(DBRoutes::projectShow);
+            Route::get('edit', [ProjectController::class, 'edit'])->name(DBRoutes::projectEdit);
+            Route::post('edit', [ProjectController::class, 'update']);
+            Route::delete('', [ProjectController::class, 'destroy']);
 
-            Route::get('', [ProjectInvestorController::class, 'index'])->name(DBRoutes::projectInvestor);
-            Route::get('form', [ProjectInvestorController::class, 'form']);
-        });
+            Route::group(['prefix' => 'investor'], function() {
+                Route::post('datatables', [ProjectInvestorController::class, 'datatables']);
 
-        Route::group(['prefix' => 'sk'], function() {
-            Route::post('datatables', [ProjectSKController::class, 'datatables']);
+                Route::get('', [ProjectInvestorController::class, 'index'])->name(DBRoutes::projectInvestor);
+                Route::get('form', [ProjectInvestorController::class, 'form']);
+            });
 
-            Route::get('', [ProjectSKController::class, 'index'])->name(DBRoutes::projectSK);
-            Route::get('form', [ProjectSKController::class, 'form']);
-        });
+            Route::group(['prefix' => 'sk'], function() {
+                Route::post('datatables', [ProjectSKController::class, 'datatables']);
 
-        Route::group(['prefix' => 'surkas'], function() {
-            Route::post('datatables', [ProjectSurkasController::class, 'datatables']);
+                Route::get('', [ProjectSKController::class, 'index'])->name(DBRoutes::projectSK);
+                Route::get('form', [ProjectSKController::class, 'form']);
+                Route::post('', [ProjectSKController::class, 'store']);
+            });
 
-            Route::get('', [ProjectSurkasController::class, 'index'])->name(DBRoutes::projectSurkas);
-            Route::get('form', [ProjectSurkasController::class, 'form']);
+            Route::group(['prefix' => 'surkas'], function() {
+                Route::post('datatables', [ProjectSurkasController::class, 'datatables']);
+
+                Route::get('', [ProjectSurkasController::class, 'index'])->name(DBRoutes::projectSurkas);
+                Route::get('form', [ProjectSurkasController::class, 'form']);
+            });
         });
     });
 

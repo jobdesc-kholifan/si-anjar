@@ -24,8 +24,6 @@ class Config extends Model
     public $defaultSelects = [
         'slug',
         'name',
-        'sequence',
-        'description',
     ];
 
     /**

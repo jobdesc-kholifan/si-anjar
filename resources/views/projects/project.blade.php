@@ -27,12 +27,12 @@ $hasAccessCreate = findPermission(DBMenus::project)->hasAccess(DBFeature::view);
                             <thead>
                             <tr>
                                 <th data-data="checkbox" data-name="no" data-orderable="false" data-searchable="false"></th>
-                                <th data-data="no_ktp" data-name="no_ktp">ID Proyek</th>
-                                <th data-data="investor_name" data-name="investor_name">Nama Proyek</th>
-                                <th data-data="investor_name" data-name="investor_name">Nilai Proyek</th>
-                                <th data-data="created_at" data-name="created_at">Tgl Berakhir</th>
-                                <th data-data="phone_number" data-name="phone_number">Dana Dibagikan</th>
-                                <th data-data="phone_number" data-name="phone_number">Status</th>
+                                <th data-data="project_code" data-name="project_code">ID Proyek</th>
+                                <th data-data="project_name" data-name="project_name">Nama Proyek</th>
+                                <th data-data="project_value" data-name="project_value">Nilai Proyek</th>
+                                <th data-data="start_date" data-name="start_date">Tgl Berakhir</th>
+                                <th data-data="project_value" data-name="project_value">Dana Dibagikan</th>
+                                <th data-data="status" data-name="project_value">Status</th>
                                 <th data-data="action" data-orderable="false" data-searchable="false" style="width: 200px">Aksi</th>
                             </tr>
                             </thead>
@@ -63,6 +63,9 @@ $hasAccessCreate = findPermission(DBMenus::project)->hasAccess(DBFeature::view);
         actions.create = function() {
             window.location.href = "{{ route(DBRoutes::projectCreate) }}"
         };
+        actions.edit = function(id) {
+            window.location.href = "{{ route(DBRoutes::projectEdit, ['__id__']) }}".route({id: id});
+        }
 
         actions.build();
     </script>

@@ -21,6 +21,7 @@ class CreateMsFilesTable extends Migration
             $table->string('file_name', 100);
             $table->string('mime_type', 50);
             $table->bigInteger('file_size');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

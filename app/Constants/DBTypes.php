@@ -13,6 +13,10 @@ class DBTypes
 
     const categoryProject = 'category-project';
 
+    const projectValue = 'project-value';
+    const projectValueNominal = 'project-value-nominal';
+    const projectValuePercentage = 'project-value-percentage';
+
     const gender = 'gender';
     const genderMan = 'laki-laki';
     const genderWoman = 'perempuan';
@@ -26,4 +30,8 @@ class DBTypes
     const file = 'file';
     const fileInvestorKTP = 'file-inv-ktp';
     const fileInvestorNPWP = 'file-inv-npwp';
+    const fileProjectProposal = 'file-proj-proposal';
+    const fileProjectBuktiTransfer = 'file-proj-bukti-tf';
+    const fileProjectAttachment = 'file-proj-attachment';
+    const fileSurkasAttachment = 'file-surkas-attachment';
 }

@@ -35,9 +35,12 @@ class DBRoutes
 
     const investor = 'investor';
     const investorCreate = 'investor.create';
+    const investorSelect = 'investor.select';
 
     const project = 'project';
     const projectCreate = 'project.create';
+    const projectEdit = 'project.edit';
+    const projectShow = 'project.show';
 
     const projectInvestor = 'project.investor';
 

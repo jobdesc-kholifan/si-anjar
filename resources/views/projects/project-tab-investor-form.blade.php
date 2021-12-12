@@ -11,6 +11,7 @@
                 id="select-investor"
                 class="form-control"
                 data-toggle="select2"
+                data-url="{{ route(DBRoutes::investorSelect) }}"
             ></select>
         </div>
         <div class="form-group">

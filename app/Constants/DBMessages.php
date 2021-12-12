@@ -14,6 +14,7 @@ class DBMessages
     const loginSuccess = "Login berhasil";
 
     const permissionRequired = "Anda tidak memiliki akses pada proses atau halaman ini";
+    const pageNotFound = "Halaman tidak ditemukan";
 
     const fieldRequired = '%s tidak boleh kosong';
     const fieldRequiredImage = 'Gambar %s tidak boleh kosong';

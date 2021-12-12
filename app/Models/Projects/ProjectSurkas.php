@@ -6,24 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
-class ProjectPIC extends Model
+class ProjectSurkas extends Model
 {
     use HasFactory;
 
-    protected $table = "tr_project_pic";
+    protected $table = "tr_project_surkas";
 
-    protected $fillable = [
-        'project_id',
-        'pic_name',
-        'phone_number',
-        'address',
-    ];
-
-    public $defaultSelects = [
-        'pic_name',
-        'phone_number',
-        'address',
-    ];
+    public $defaultSelects = [];
 
     /**
      * static function yang digunakan ketika memanggil with biar tidak perlu
@@ -36,7 +25,7 @@ class ProjectPIC extends Model
      * */
     static public function foreignWith($query, $selects = null)
     {
-        $model = new ProjectPIC();
+        $model = new ProjectSurkas();
         return $model->defaultWith(is_null($selects) ? $model->defaultSelects : $selects, $query);
     }
 
@@ -44,7 +33,7 @@ class ProjectPIC extends Model
      * function untuk setting default with apa saja yang akan sering dipakai
      * tetapi jangan banyak-banyak karena akan memperngaruhi proses loading page
      *
-     * @param Relation|ProjectPIC $query
+     * @param Relation|ProjectSurkas $query
      * @param array $selects
      *
      * @return Relation
@@ -59,7 +48,7 @@ class ProjectPIC extends Model
      * function defaultWith yang digunakan untuk dipanggil public
      *
      * @param array $selects
-     * @param Relation|ProjectPIC|null $query
+     * @param Relation|ProjectSurkas|null $query
      *
      * @return Relation
      * */

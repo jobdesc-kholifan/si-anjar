@@ -6,18 +6,19 @@ use App\Helpers\Collections\Config\ConfigCollection;
 use App\Helpers\Collections\Files\FileCollection;
 use App\Models\Masters\File;
 use Illuminate\Support\Facades\File as SupportFile;
+use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileUpload
 {
 
     /**
-     * @param UploadedFile|UploadedFile[] $files
+     * @param string $index
      * @return FileUpload
      * */
-    static public function upload($files)
+    static public function upload($index)
     {
-        return new FileUpload($files);
+        return new FileUpload($index);
     }
 
     /* @var ConfigCollection */
@@ -29,20 +30,35 @@ class FileUpload
     /* @var FileCollection */
     protected $collection;
 
+    protected $index;
+
     /* @var UploadedFile|UploadedFile[] */
     protected $files;
 
+    protected $id;
+
+    protected $descCreate = [];
+
+    protected $descUpdate = [];
+
     protected $uploadedFiles = [];
+
+    protected $deleted = [];
 
     /* @var FileCollection[] */
     protected $savedFiles = [];
 
     /**
-     * @param UploadedFile|UploadedFile[] $files
+     * @param string $index
      * */
-    public function __construct($files)
+    public function __construct($index)
     {
-        $this->files = is_array($files) ? $files : [$files];
+        $this->index = $index;
+        $this->files = Request::file($index);
+        $this->id = Request::input(sprintf("%s_id", $index));
+        $this->descCreate = Request::input(sprintf("%s_desc_create", $index));
+        $this->descUpdate = Request::input(sprintf("%s_desc_update", $index));
+        $this->deleted = Request::input(sprintf("%s_deleted", $index));
     }
 
     public function setReference($refType, $refId)
@@ -61,19 +77,21 @@ class FileUpload
      */
     public function moveTo($directory, $callable = null)
     {
-        foreach($this->files as $file)
-        {
-            $filename = sprintf("%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
-            if(!is_null($callable))
-                $filename = call_user_func_array($callable, [$file]);
+        if(Request::hasFile($this->index)) {
+            foreach($this->files as $i => $file)
+            {
+                $filename = sprintf("%s-%s.%s", date('YmdHis'), $i, $file->getClientOriginalExtension());
+                if(!is_null($callable))
+                    $filename = call_user_func_array($callable, [$file, $i]);
 
-            $file->move(storage_path($directory), $filename);
+                $file->move(storage_path($directory), $filename);
 
-            $this->uploadedFiles[] = (object) [
-                'file_name' => $filename,
-                'directory' => $directory,
-                'file' => $file,
-            ];
+                $this->uploadedFiles[] = (object) [
+                    'file_name' => $filename,
+                    'directory' => $directory,
+                    'file' => $file,
+                ];
+            }
         }
 
         return $this;
@@ -92,9 +110,11 @@ class FileUpload
         if(is_null($this->refId))
             throw new \Exception("Tidak dapat menyimpan sebelum reference id diketahui. Gunakan setReference untuk mengidentifikasi upload file");
 
-        foreach($this->uploadedFiles as $file) {
+        foreach($this->uploadedFiles as $i => $file) {
             /* @var UploadedFile $binaryFile */
             $binaryFile = $file->file;
+
+            $description = $this->descCreate[$i] ?? null;
 
             $this->savedFiles[] = FileCollection::create([
                 'ref_type_id' => $this->refType->getId(),
@@ -103,6 +123,7 @@ class FileUpload
                 'file_name' => $file->file_name,
                 'file_size' => SupportFile::size(storage_path($file->directory) . DIRECTORY_SEPARATOR . $file->file_name),
                 'mime_type' => $binaryFile->getClientMimeType(),
+                'description' => $description,
                 'created_at' => currentDate(),
                 'updated_at' => currentDate(),
             ]);
@@ -111,7 +132,7 @@ class FileUpload
         return $this;
     }
 
-    public function update($file)
+    public function update()
     {
         if(is_null($this->refType))
             throw new \Exception("Tidak dapat menyimpan sebelum upload file diketahui. Gunakan setReference untuk mengidentifikasi upload file");
@@ -119,17 +140,24 @@ class FileUpload
         if(is_null($this->refId))
             throw new \Exception("Tidak dapat menyimpan sebelum reference id diketahui. Gunakan setReference untuk mengidentifikasi upload file");
 
-        $files = is_array($file) ? $file : [$file];
+        $deletedFile = File::query()->whereIn('id', $this->deleted)->get();
+        fileUnlink($deletedFile);
 
-        fileUnlink($files);
-
-        File::query()->where('ref_type_id', $this->refType->getId())
-            ->where('ref_id', $this->refId)
-            ->delete();
+        File::query()->whereIn('id', $this->deleted)->delete();
 
         $this->save();
 
         return $this;
+    }
+
+    public function updateDesc()
+    {
+        foreach($this->id as $i => $id) {
+            File::query()->where('id', $id)
+                ->update([
+                    'description' => $this->descUpdate[$i] ?? null,
+                ]);
+        }
     }
 
     public function rollBack()
