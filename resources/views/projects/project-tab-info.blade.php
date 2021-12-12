@@ -22,7 +22,7 @@
                 <select
                     id="select-category"
                     class="form-control"
-                    name="category_id"
+                    name="project_category_id"
                     data-toggle="select2"
                     data-url="{{ route(DBRoutes::mastersTypesSelect) }}"
                     data-params='{"parent_slug": ["{{ DBTypes::categoryProject }}"]}'
@@ -39,6 +39,7 @@
                     id="input-value"
                     class="form-control"
                     name="project_value"
+                    data-toggle="jquery-number"
                     placeholder="{{ DBText::inputPlaceholder('Nilai Project') }}"
                     maxlength="100"
                 />
@@ -60,6 +61,7 @@
                     data-single-date="true"
                     data-auto-apply="true"
                     data-show-dropdowns="true"
+                    data-disabled-next-date="false"
                 />
             </div>
         </div>
@@ -79,6 +81,7 @@
                     data-single-date="true"
                     data-auto-apply="true"
                     data-show-dropdowns="true"
+                    data-disabled-next-date="false"
                 />
             </div>
         </div>
@@ -93,19 +96,21 @@
                             type="text"
                             id="input-project-name"
                             class="form-control"
-                            name="estimate_profit"
+                            name="estimate_profit_value"
                             placeholder="0"
+                            data-toggle="jquery-number"
                             maxlength="100"
                         />
                     </div>
                     <div class="col-8">
+                        <label for="select-profit-type" class="d-none"></label>
                         <select
                             id="select-profit-type"
                             class="form-control"
                             name="estimate_profit_id"
                             data-toggle="select2"
                             data-url="{{ route(DBRoutes::mastersTypesSelect) }}"
-                            data-params='{"parent_slug": ["{{ DBTypes::categoryProject }}"]}'
+                            data-params='{"parent_slug": ["{{ DBTypes::projectValue }}"]}'
                         ></select>
                     </div>
                 </div>
@@ -125,19 +130,31 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="row justify-content-center align-items-center">
+        <div class="row justify-content-center align-items-start">
             <label for="file-lampiran" class="col-12 col-sm-2 text-left text-sm-right required">Lampiran</label>
-            <div class="col-12 col-sm-10"></div>
+            <div class="col-12 col-sm-10" id="file-lampiran-project"></div>
         </div>
     </div>
 </div>
 <div class="footer-actions">
     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="$('#pic').trigger('click')">
         <i class="fa fa-angle-left"></i>
-        <span class="ml-2">Sebelumnya</span>
+        <span class="ml-1">Sebelumnya</span>
     </button>
-    <button type="button" class="btn btn-outline-primary btn-sm" onclick="$('#investor').trigger('click')">
-        <span class="mr-2">Selanjutnya</span>
-        <i class="fa fa-angle-right"></i>
-    </button>
+    @if(!$saveNext)
+        <button type="submit" class="btn btn-primary btn-sm">
+            <span>Simpan</span>
+        </button>
+    @endif
+    @if($saveNext)
+        <button type="submit" class="btn btn-outline-primary btn-sm">
+            <span class="mr-2">Selanjutnya</span>
+            <i class="fa fa-angle-right"></i>
+        </button>
+    @else
+        <a href="{{ route(DBRoutes::projectInvestor, [$projectId]) }}" class="btn btn-outline-primary btn-sm">
+            <span class="mr-1">Selanjutnya</span>
+            <i class="fa fa-angle-right"></i>
+        </a>
+    @endif
 </div>

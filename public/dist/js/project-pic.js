@@ -5,6 +5,7 @@ const DataPIC = function(value = {}) {
     this.pic_name = value.pic_name !== undefined ? value.pic_name : null;
     this.phone_number = value.phone_number !== undefined ? value.phone_number : null;
     this.address = value.address !== undefined ? value.address : null;
+    this.deleted = false;
 };
 
 const FormPICItem = function(element, form) {
@@ -21,15 +22,14 @@ const FormPICItem = function(element, form) {
 FormPICItem.prototype.init = function() {
     FormComponents.select2.init();
 
-    const data = this.$.data('data');
-    this.inputName.on('keypress, keydown, keyup', () => data.pic_name = this.inputName.val());
-    this.inputPhone.on('keypress, keydown, keyup', () => data.phone_number = this.inputPhone.val());
-    this.inputAddress.on('keypress, keydown, keyup', () => data.address = this.inputAddress.val());
+    this.inputName.on('keypress, keydown, keyup', () => this.$.data('data').pic_name = this.inputName.val());
+    this.inputPhone.on('keypress, keydown, keyup', () => this.$.data('data').phone_number = this.inputPhone.val());
+    this.inputAddress.on('keypress, keydown, keyup', () => this.$.data('data').address = this.inputAddress.val());
 
     this.buttonDelete.click(() => {
         const children = this.__form.$.children();
         if(children.length > 1) {
-            if(data.id !== 0) {
+            if(this.$.data('data').id !== 0) {
                 this.$.addClass('d-none');
                 this.$.data('data').deleted = true;
             } else this.$.remove();
@@ -39,6 +39,8 @@ FormPICItem.prototype.init = function() {
             this.inputName.val(null);
             this.inputPhone.val(null);
             this.inputAddress.val(null);
+
+            if(data.id !== 0) this.$.data('data').deleted = true;
         }
 
         this.__form.$.children().last().data('form').buttonAdd.removeClass('d-none');
@@ -48,6 +50,25 @@ FormPICItem.prototype.init = function() {
         this.__form.add();
         this.buttonAdd.addClass('d-none');
     });
+};
+
+FormPICItem.prototype.initData = function() {
+    const data = this.$.data('data');
+
+    this.inputName.val(data.pic_name);
+    this.inputPhone.val(data.phone_number);
+    this.inputAddress.val(data.address);
+};
+
+FormPICItem.prototype.toJSON = function() {
+    const data = this.$.data('data');
+    return {
+        id: data.id,
+        pic_name: data.pic_name,
+        phone_number: data.phone_number,
+        address: data.address,
+        deleted: data.deleted,
+    };
 };
 
 const FormPIC = function(selector, options = {}) {
@@ -63,7 +84,7 @@ const FormPIC = function(selector, options = {}) {
                         type: 'text',
                         class: 'form-control',
                         placeholder: 'Masukan nama pic disini ...',
-                        maxLength: 10,
+                        maxLength: 100,
                         'data-action': 'pic-name'
                     })
                 ),
@@ -77,8 +98,9 @@ const FormPIC = function(selector, options = {}) {
                         type: 'text',
                         class: 'form-control',
                         placeholder: 'Masukan no hp disini ...',
-                        maxLength: 10,
-                        'data-action': 'phone-number'
+                        maxLength: 15,
+                        'data-action': 'phone-number',
+                        'onkeydown': 'return Helpers.isNumberKey(event);'
                     })
                 ),
             )
@@ -121,4 +143,28 @@ FormPIC.prototype.add = function() {
     this.$.append($form);
 
     return $form;
+};
+
+FormPIC.prototype.set = function(values) {
+    values.forEach(value => {
+        const $form = this.add();
+        $form.data('data', new DataPIC(value));
+        $form.data('form').initData();
+    });
+};
+
+FormPIC.prototype.toJSON = function() {
+    const children = this.$.children();
+
+    let json = [];
+    children.each((i, item) => {
+        const $item = $(item);
+        json.push($item.data('form').toJSON());
+    });
+
+    return json;
+};
+
+FormPIC.prototype.toString = function() {
+    return JSON.stringify(this.toJSON());
 };

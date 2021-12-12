@@ -2,9 +2,13 @@
 
 namespace App\Models\Projects;
 
+use App\Models\Masters\Config;
+use App\Models\Masters\File;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class Project extends Model
 {
@@ -13,21 +17,54 @@ class Project extends Model
     protected $table = "tr_project";
 
     protected $fillable = [
+        'project_code',
         'project_name',
         'project_category_id',
         'project_value',
         'start_date',
         'finish_date',
-        'estimate_profit',
+        'estimate_profit_value',
+        'estimate_profit_id',
+        'modal_value',
     ];
 
     public $defaultSelects = [
+        'project_code',
         'project_name',
         'project_value',
+        'modal_value',
         'start_date',
         'finish_date',
-        'estimate_profit',
+        'estimate_profit_value',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function($model) {
+            /* @var Project $model */
+            $file = $model->file_proposal()->get();
+            fileUnlink($file);
+            $model->file_proposal()->delete();
+
+            $file = $model->file_bukti_transfer()->get();
+            fileUnlink($file);
+            $model->file_bukti_transfer()->delete();
+
+            $model->data_pic()->delete();
+            $model->data_investor()->delete();
+            $model->data_sk()->delete();
+            $model->data_surkas()->delete();
+        });
+    }
+
+    public function getStartDateAttribute($value)
+    {
+        return Carbon::createFromTimestamp(strtotime($value))
+            ->setTimezone(env('APP_TIMEZONE'))
+            ->format('d/m/Y');
+    }
 
     /**
      * static function yang digunakan ketika memanggil with biar tidak perlu
@@ -70,5 +107,89 @@ class Project extends Model
     public function defaultWith($selects = [], $query = null)
     {
         return $this->_defaultWith(is_null($query) ? $this : $query, $selects);
+    }
+    public function lastId()
+    {
+        $data = $this->select(DB::raw('MAX(id) as maxId'))
+            ->first();
+
+        return $data->maxId;
+    }
+
+
+    public function data_pic()
+    {
+        return $this->hasMany(ProjectPIC::class, 'project_id', 'id');
+    }
+
+    public function data_investor()
+    {
+        return $this->hasMany(ProjectPIC::class, 'project_id', 'id');
+    }
+
+    public function data_sk()
+    {
+        return $this->hasMany(ProjectSK::class, 'project_id', 'id');
+    }
+
+    public function data_surkas()
+    {
+        return $this->hasMany(ProjectSurkas::class, 'project_id', 'id');
+    }
+
+    public function project_category()
+    {
+        return $this->hasOne(Config::class, 'id', 'project_category_id');
+    }
+
+    public function estimate_profit()
+    {
+        return $this->hasOne(Config::class, 'id', 'estimate_profit_id');
+    }
+
+    public function file_proposal()
+    {
+        return $this->hasOne(File::class, 'ref_id', 'id')
+            ->whereHas('ref_type', function($query) {
+                /* @var Relation $query */
+                $query->where('slug', \DBTypes::fileProjectProposal);
+            });
+    }
+
+    public function file_bukti_transfer()
+    {
+        return $this->hasOne(File::class, 'ref_id', 'id')
+            ->whereHas('ref_type', function($query) {
+                /* @var Relation $query */
+                $query->where('slug', \DBTypes::fileProjectBuktiTransfer);
+            });
+    }
+
+    public function file_attachment()
+    {
+        return $this->hasMany(File::class, 'ref_id', 'id')
+            ->whereHas('ref_type', function($query) {
+                 /* @var Relation $query */
+                $query->where('slug', \DBTypes::fileProjectAttachment);
+            })
+            ->orderBy('id');
+    }
+
+    public function defaultQuery()
+    {
+        return $this->defaultWith($this->defaultSelects)
+            ->with([
+                'data_pic' => function($query) {
+                    ProjectPIC::foreignWith($query)
+                        ->addSelect('project_id');
+                },
+                'project_category' => function($query) {
+                    Config::foreignWith($query);
+                },
+                'estimate_profit' => function($query) {
+                    Config::foreignWith($query);
+                },
+            ])
+            ->addSelect('project_category_id', 'estimate_profit_id');
     }
 }

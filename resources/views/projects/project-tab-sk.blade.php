@@ -7,7 +7,7 @@
 </div>
 <div class="form-group">
     <div class="w-100">
-        <table class="table table-striped table-hover" id="table-project-sk">
+        <table class="table table-striped table-hover w-100" id="table-project-sk">
             <thead>
             <tr>
                 <th data-data="checkbox" data-name="no" data-orderable="false" data-searchable="false"></th>

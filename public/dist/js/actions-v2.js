@@ -79,7 +79,7 @@ ActionsForm.prototype.find = function(selector, check) {
 ActionsForm.prototype.submit = function() {
     this._form.submit({
         data: (params) => {
-            if(this._actions.callback.form.appendData !== undefined) {
+            if(this._actions.callback.form.appendData !== null) {
                 return this._actions.callback.form.appendData(params, this);
             }
             return params;
@@ -199,6 +199,7 @@ const Actions = function(url) {
             onLoadComplete: null,
         },
         form: {
+            appendData: null,
             beforeSubmit: null,
             onReset: null,
             onDisabled: null,

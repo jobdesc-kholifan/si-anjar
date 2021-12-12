@@ -3,7 +3,6 @@
 use App\Helpers\Finders\FindConfig;
 use App\Helpers\Finders\FindPermission;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 if(!function_exists('isMenuActive')) {
 
@@ -30,6 +29,30 @@ if(!function_exists('currentDate')) {
 
     function currentDate($format = 'Y-m-d H:i:s') {
         return date($format);
+    }
+}
+
+if(!function_exists('dbDate')) {
+
+    function dbDate($date) {
+        $newDate = str_replace("/", "-", $date);
+        return date('Y-m-d', strtotime($newDate));
+    }
+}
+
+if(!function_exists('dbIDR')) {
+
+    function dbIDR($value) {
+        $nominal = str_replace(",", "", $value);
+        return str_replace(".", "", $nominal);
+    }
+}
+
+if(!function_exists('IDR')) {
+
+    function IDR($value, $symbol = 'Rp. ', $decimal = 0, $dec_point = ',', $thousands_sep = '.') {
+        $nominal = number_format($value, $decimal, $dec_point, $thousands_sep);
+        return $symbol.$nominal;
     }
 }
 
@@ -68,9 +91,11 @@ if (!function_exists('fileUnlink')) {
 
     function fileUnlink($files) {
         foreach($files as $file) {
-            $path = storage_path($file->directory) . DIRECTORY_SEPARATOR .$file->file_name;
-            if(file_exists($path))
-                unlink($path);
+            if(!empty($file->directory) && !empty($file->file_name)) {
+                $path = storage_path($file->directory) . DIRECTORY_SEPARATOR .$file->file_name;
+                if(file_exists($path))
+                    unlink($path);
+            }
         }
     }
 }
@@ -78,6 +103,6 @@ if (!function_exists('fileUnlink')) {
 if (!function_exists('DBImage')) {
 
     function DBImage($alias = 'preview') {
-        return DB::raw(sprintf("CONCAT('%s/',REPLACE(directory, '/', '_'), '/%s/view') as %s", url('preview'), md5(env('APP_KEY_VALUE')), $alias));
+        return DB::raw(sprintf("CONCAT('%s/',REPLACE(directory, '/', '_'), '/%s/view/', file_name) as %s", url('preview'), md5(env('APP_KEY_VALUE')), $alias));
     }
 }

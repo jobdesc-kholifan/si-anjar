@@ -70,7 +70,7 @@ class Investor extends Model
     {
         return Carbon::createFromTimeString($value)
             ->setTimezone(env('APP_TIMEZONE'))
-            ->format('Y-m-d H:i:s');
+            ->format('d/m/Y H:i:s');
     }
 
     public function getDateOfBirthAttribute($value)
@@ -181,4 +181,6 @@ class Investor extends Model
                 $query->where('slug', \DBTypes::fileInvestorNPWP);
             });
     }
+
+
 }

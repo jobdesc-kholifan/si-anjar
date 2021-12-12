@@ -287,6 +287,10 @@ const FormComponents = {
                 if(config !== undefined && config.timePicker !== undefined)
                     timePicker = config.timePicker;
 
+                let disabledNextDate = $item.data('disabledNextDate') !== undefined ? $item.data('disabledNextDate') : true;
+                if(config !== undefined && config.disabledNextDate !== undefined)
+                    disabledNextDate = config.disabledNextDate;
+
                 $item.daterangepicker({
                     opens: opens,
                     singleDatePicker: singleDatePicker,
@@ -298,7 +302,7 @@ const FormComponents = {
                     autoUpdateInput: autoUpdateInput,
                     timePicker: timePicker,
                     timePicker24Hour: timePicker,
-                    maxDate: new Date(),
+                    maxDate: disabledNextDate ? new Date() : null,
                }, function(start, end, label) {
                     if(!autoUpdateInput) {
                         if(singleDatePicker)

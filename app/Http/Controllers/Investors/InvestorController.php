@@ -34,6 +34,26 @@ class InvestorController extends Controller
         $this->investorBank = new InvestorBank();
     }
 
+    public function select(Request $req)
+    {
+        try {
+            $searchValue = trim(strtolower($req->get('term')));
+            $query = $this->investor->defaultWith($this->investor->defaultSelects)
+                ->where(function($query) use ($searchValue) {
+                    /* @var Relation $query */
+                    $query->where(DB::raw('TRIM(LOWER(investor_name))'), 'like', "%$searchValue%");
+                });
+
+            $json = [];
+            foreach($query->get() as $db)
+                $json[] = ['id' => $db->id, 'text' => $db->investor_name];
+
+            return response()->json($json);
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
     public function index()
     {
         try {
@@ -51,6 +71,9 @@ class InvestorController extends Controller
             $query = $this->investor->defaultQuery();
 
             return datatables()->eloquent($query)
+                ->editColumn('created_at', function($data) {
+                    return date('d/m/Y', strtotime($data->created_at));
+                })
                 ->addColumn('action', function($data) {
 
                     $btnDelete = false;
@@ -149,35 +172,31 @@ class InvestorController extends Controller
 
             $types = findConfig()->in([\DBTypes::fileInvestorKTP, \DBTypes::fileInvestorNPWP]);
 
-            $fileKTP = FileUpload::upload($req->file('file_ktp'));
-            if($req->hasFile('file_ktp')) {
-                try {
-                    $fileKTP->setReference($types->get(\DBTypes::fileInvestorKTP), $investor->id);
-                    $fileKTP->moveTo('app/dokumen-investor', function ($file) {
-                        /* @var UploadedFile $file */
-                        return sprintf("ktp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
-                    });
-                    $fileKTP->save();
-                } catch (\Exception $e) {
-                    $fileKTP->rollBack();
-                    throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
-                }
+            $fileKTP = FileUpload::upload('file_ktp');
+            try {
+                $fileKTP->setReference($types->get(\DBTypes::fileInvestorKTP), $investor->id);
+                $fileKTP->moveTo('app/dokumen-investor', function ($file) {
+                    /* @var UploadedFile $file */
+                    return sprintf("ktp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
+                });
+                $fileKTP->save();
+            } catch (\Exception $e) {
+                $fileKTP->rollBack();
+                throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
             }
 
-            $fileNPWP = FileUpload::upload($req->file('file_npwp'));
-            if($req->hasFile('file_npwp')) {
-                try {
-                    $fileNPWP->setReference($types->get(\DBTypes::fileInvestorNPWP), $investor->id);
-                    $fileNPWP->moveTo('app/dokumen-investor', function ($file) {
-                        /* @var UploadedFile $file */
-                        return sprintf("npwp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
-                    });
-                    $fileNPWP->save();
-                } catch (\Exception $e) {
-                    $fileNPWP->rollBack();
-                    $fileKTP->rollBack();
-                    throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
-                }
+            $fileNPWP = FileUpload::upload('file_npwp');
+            try {
+                $fileNPWP->setReference($types->get(\DBTypes::fileInvestorNPWP), $investor->id);
+                $fileNPWP->moveTo('app/dokumen-investor', function ($file) {
+                    /* @var UploadedFile $file */
+                    return sprintf("npwp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
+                });
+                $fileNPWP->save();
+            } catch (\Exception $e) {
+                $fileNPWP->rollBack();
+                $fileKTP->rollBack();
+                throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
             }
 
             DB::commit();
@@ -282,35 +301,31 @@ class InvestorController extends Controller
 
             $types = findConfig()->in([\DBTypes::fileInvestorKTP, \DBTypes::fileInvestorNPWP]);
 
-            $fileKTP = FileUpload::upload($req->file('file_ktp'));
-            if($req->hasFile('file_ktp')) {
-                try {
-                    $fileKTP->setReference($types->get(\DBTypes::fileInvestorKTP), $id);
-                    $fileKTP->moveTo('app/dokumen-investor', function ($file) {
-                        /* @var UploadedFile $file */
-                        return sprintf("ktp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
-                    });
-                    $fileKTP->update($row->file_ktp);
-                } catch (\Exception $e) {
-                    $fileKTP->rollBack();
-                    throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
-                }
+            $fileKTP = FileUpload::upload('file_ktp');
+            try {
+                $fileKTP->setReference($types->get(\DBTypes::fileInvestorKTP), $id);
+                $fileKTP->moveTo('app/dokumen-investor', function ($file) {
+                    /* @var UploadedFile $file */
+                    return sprintf("ktp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
+                });
+                $fileKTP->update();
+            } catch (\Exception $e) {
+                $fileKTP->rollBack();
+                throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
             }
 
-            $fileNPWP = FileUpload::upload($req->file('file_npwp'));
-            if($req->hasFile('file_npwp')) {
-                try {
-                    $fileNPWP->setReference($types->get(\DBTypes::fileInvestorKTP), $id);
-                    $fileNPWP->moveTo('app/dokumen-investor', function ($file) {
-                        /* @var UploadedFile $file */
-                        return sprintf("npwp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
-                    });
-                    $fileNPWP->update($row->file_npwp);
-                } catch (\Exception $e) {
-                    $fileNPWP->rollBack();
-                    $fileKTP->rollBack();
-                    throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
-                }
+            $fileNPWP = FileUpload::upload('file_npwp');
+            try {
+                $fileNPWP->setReference($types->get(\DBTypes::fileInvestorKTP), $id);
+                $fileNPWP->moveTo('app/dokumen-investor', function ($file) {
+                    /* @var UploadedFile $file */
+                    return sprintf("npwp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());
+                });
+                $fileNPWP->update();
+            } catch (\Exception $e) {
+                $fileNPWP->rollBack();
+                $fileKTP->rollBack();
+                throw new \Exception($e->getMessage(), \DBCodes::authorizedError);
             }
 
             DB::commit();

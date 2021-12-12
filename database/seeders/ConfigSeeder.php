@@ -92,6 +92,30 @@ class ConfigSeeder extends Seeder
         $this->config->insert([
             ['parent_id' => $type->id, 'slug' => DBTypes::fileInvestorKTP, 'name' => 'Dokumen Investor KTP', 'created_at' => currentDate(), 'updated_at' => currentDate()],
             ['parent_id' => $type->id, 'slug' => DBTypes::fileInvestorNPWP, 'name' => 'Dokumen Investor NPWP', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+            ['parent_id' => $type->id, 'slug' => DBTypes::fileProjectProposal, 'name' => 'Dokumen Proposal Proyek', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+            ['parent_id' => $type->id, 'slug' => DBTypes::fileProjectBuktiTransfer, 'name' => 'Dokumen Bukti Transfer Proyek', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+            ['parent_id' => $type->id, 'slug' => DBTypes::fileProjectAttachment, 'name' => 'Dokumen Lampiran Proyek', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+            ['parent_id' => $type->id, 'slug' => DBTypes::fileSurkasAttachment, 'name' => 'Dokumen Lampiran Surkas', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+        ]);
+
+        $type = $this->config->create([
+            'slug' => DBTypes::categoryProject,
+            'name' => 'Kategori Proyek',
+        ]);
+
+        $this->config->insert([
+            ['parent_id' => $type->id, 'name' => 'Podcast', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+            ['parent_id' => $type->id, 'name' => 'Hiburan', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+        ]);
+
+        $type = $this->config->create([
+            'slug' => DBTypes::projectValue,
+            'name' => 'Nilai Proyek',
+        ]);
+
+        $this->config->insert([
+            ['parent_id' => $type->id, 'slug' => DBTypes::projectValueNominal, 'name' => 'Rp', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+            ['parent_id' => $type->id, 'slug' => DBTypes::projectValuePercentage, 'name' => '%', 'created_at' => currentDate(), 'updated_at' => currentDate()],
         ]);
     }
 }
