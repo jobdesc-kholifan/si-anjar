@@ -14,6 +14,7 @@ class ProjectSKController extends Controller
     protected $title = "SK";
     protected $route = [\DBMenus::project];
 
+
     protected $defaultParams = [
         'tab' => 'sk'
     ];

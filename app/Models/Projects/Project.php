@@ -192,4 +192,13 @@ class Project extends Model
             ])
             ->addSelect('project_category_id', 'estimate_profit_id');
     }
+
+    public function updateModal($projectId)
+    {
+        /* @var Relation $this */
+        return $this->where('id', $projectId)
+            ->update([
+                'modal_value' => DB::raw("(SELECT SUM(investment_value) FROM tr_project_investor WHERE project_id = $projectId)")
+            ]);
+    }
 }

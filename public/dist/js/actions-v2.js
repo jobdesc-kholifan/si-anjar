@@ -269,6 +269,9 @@ Actions.prototype.delete = function(id) {
 
                         modal.disabled(false);
                         AlertNotif.toastr.response(res);
+
+                        if(this.callback.onDelete !== null)
+                            this.callback.onDelete(res.data, res, this);
                     });
             } else modal.close();
         },

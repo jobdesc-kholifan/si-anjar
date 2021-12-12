@@ -2,6 +2,7 @@
 
 namespace App\Models\Projects;
 
+use App\Models\Investors\Investor;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -12,7 +13,15 @@ class ProjectInvestor extends Model
 
     protected $table = "tr_project_investor";
 
-    public $defaultSelects = [];
+    protected $fillable = [
+        'project_id',
+        'investor_id',
+        'investment_value',
+    ];
+
+    public $defaultSelects = [
+        'investment_value'
+    ];
 
     /**
      * static function yang digunakan ketika memanggil with biar tidak perlu
@@ -41,7 +50,10 @@ class ProjectInvestor extends Model
     private function _defaultWith($query, $selects = [])
     {
         return $query->with([
-        ])->select('id')->addSelect($selects);
+            'investor' => function($query) {
+                Investor::foreignWith($query);
+            }
+        ])->select('tr_project_investor.id', 'investor_id')->addSelect($selects);
     }
 
     /**
@@ -55,5 +67,10 @@ class ProjectInvestor extends Model
     public function defaultWith($selects = [], $query = null)
     {
         return $this->_defaultWith(is_null($query) ? $this : $query, $selects);
+    }
+
+    public function investor()
+    {
+        return $this->hasOne(Investor::class, 'id', 'investor_id');
     }
 }
