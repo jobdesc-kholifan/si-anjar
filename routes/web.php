@@ -31,15 +31,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['middleware' => 'guest'], function() {
+Route::group(['middleware' => 'guest'], function () {
 
     Route::get('login', [AuthController::class, 'login'])->name(DBRoutes::authLogin);
     Route::post('login', [AuthController::class, 'processLogin']);
 });
 
-Route::group(['middleware' => 'auth'], function() {
+Route::group(['middleware' => 'auth'], function () {
 
-    Route::get('logout', function(Request $req) {
+    Route::get('logout', function (Request $req) {
 
         Auth::logout();
 
@@ -54,17 +54,17 @@ Route::group(['middleware' => 'auth'], function() {
 
     Route::get('/', [AppController::class, 'index']);
 
-    Route::group(['prefix' => 'preview'], function() {
+    Route::group(['prefix' => 'preview'], function () {
 
         Route::get('{directory}/{token}/view/{filename}', [PreviewController::class, 'index']);
     });
 
-    Route::group(['prefix' => 'masters'], function() {
+    Route::group(['prefix' => 'masters'], function () {
 
-        Route::group(['prefix' => 'type'], function() {
+        Route::group(['prefix' => 'type'], function () {
             Route::get('select', [TypesController::class, 'select'])->name(DBRoutes::mastersTypesSelect);
 
-            Route::group(['prefix' => '{slug}'], function() {
+            Route::group(['prefix' => '{slug}'], function () {
                 Route::post('datatables', [TypesController::class, 'datatables']);
                 Route::get('form', [TypesController::class, 'form']);
 
@@ -76,7 +76,7 @@ Route::group(['middleware' => 'auth'], function() {
             });
         });
 
-        Route::group(['prefix' => 'bank'], function() {
+        Route::group(['prefix' => 'bank'], function () {
             Route::get('select', [BankController::class, 'select'])->name(DBRoutes::mastersBankSelect);
             Route::post('datatables', [BankController::class, 'datatables']);
             Route::get('form', [BankController::class, 'form']);
@@ -89,9 +89,9 @@ Route::group(['middleware' => 'auth'], function() {
         });
     });
 
-    Route::group(['prefix' => 'addresses'], function() {
+    Route::group(['prefix' => 'addresses'], function () {
 
-        Route::group(['prefix' => 'province'], function() {
+        Route::group(['prefix' => 'province'], function () {
             Route::get('select', [ProvinceController::class, 'select'])->name(DBRoutes::addressesProvinceSelect);
             Route::post('datatables', [ProvinceController::class, 'datatables']);
             Route::get('form', [ProvinceController::class, 'form']);
@@ -103,7 +103,7 @@ Route::group(['middleware' => 'auth'], function() {
             Route::delete('{id}', [ProvinceController::class, 'destroy']);
         });
 
-        Route::group(['prefix' => 'city'], function() {
+        Route::group(['prefix' => 'city'], function () {
             Route::get('select', [CityController::class, 'select'])->name(DBRoutes::addressesCitySelect);
             Route::post('datatables', [CityController::class, 'datatables']);
             Route::get('form', [CityController::class, 'form']);
@@ -116,9 +116,9 @@ Route::group(['middleware' => 'auth'], function() {
         });
     });
 
-    Route::group(['prefix' => 'users'], function() {
+    Route::group(['prefix' => 'users'], function () {
 
-        Route::group(['prefix' => 'user'], function() {
+        Route::group(['prefix' => 'user'], function () {
             Route::get('select', [UsersController::class, 'select'])->name(DBRoutes::usersUserSelect);
             Route::post('datatables', [UsersController::class, 'datatables']);
             Route::get('form', [UsersController::class, 'form']);
@@ -132,7 +132,7 @@ Route::group(['middleware' => 'auth'], function() {
             Route::delete('{id}', [UsersController::class, 'destroy']);
         });
 
-        Route::group(['prefix' => 'privileges'], function() {
+        Route::group(['prefix' => 'privileges'], function () {
             Route::get('features', [PrivilegesController::class, 'features'])->name(DBRoutes::usersRoleFeatures);
             Route::post('datatables', [PrivilegesController::class, 'datatables']);
 
@@ -145,7 +145,7 @@ Route::group(['middleware' => 'auth'], function() {
         });
     });
 
-    Route::group(['prefix' => 'investor'], function() {
+    Route::group(['prefix' => 'investor'], function () {
         Route::post('datatables', [InvestorController::class, 'datatables']);
         Route::get('select', [InvestorController::class, 'select'])->name(DBRoutes::investorSelect);
 
@@ -157,20 +157,20 @@ Route::group(['middleware' => 'auth'], function() {
         Route::delete('{id}', [InvestorController::class, 'destroy']);
     });
 
-    Route::group(['prefix' => 'project'], function() {
+    Route::group(['prefix' => 'project'], function () {
         Route::post('datatables', [ProjectController::class, 'datatables']);
 
         Route::get('', [ProjectController::class, 'index'])->name(DBRoutes::project);
         Route::get('create', [ProjectController::class, 'create'])->name(DBRoutes::projectCreate);
         Route::post('create', [ProjectController::class, 'store']);
 
-        Route::group(['prefix' => '{projectId}'], function() {
+        Route::group(['prefix' => '{projectId}'], function () {
             Route::get('', [ProjectController::class, 'show'])->name(DBRoutes::projectShow);
             Route::get('edit', [ProjectController::class, 'edit'])->name(DBRoutes::projectEdit);
             Route::post('edit', [ProjectController::class, 'update']);
             Route::delete('', [ProjectController::class, 'destroy']);
 
-            Route::group(['prefix' => 'investor'], function() {
+            Route::group(['prefix' => 'investor'], function () {
                 Route::post('datatables', [ProjectInvestorController::class, 'datatables']);
 
                 Route::get('', [ProjectInvestorController::class, 'index'])->name(DBRoutes::projectInvestor);
@@ -181,7 +181,7 @@ Route::group(['middleware' => 'auth'], function() {
                 Route::delete('{id}', [ProjectInvestorController::class, 'destroy']);
             });
 
-            Route::group(['prefix' => 'sk'], function() {
+            Route::group(['prefix' => 'sk'], function () {
                 Route::post('datatables', [ProjectSKController::class, 'datatables']);
 
                 Route::get('', [ProjectSKController::class, 'index'])->name(DBRoutes::projectSK);
@@ -189,18 +189,25 @@ Route::group(['middleware' => 'auth'], function() {
                 Route::post('', [ProjectSKController::class, 'store']);
             });
 
-            Route::group(['prefix' => 'surkas'], function() {
+            Route::group(['prefix' => 'surkas'], function () {
                 Route::post('datatables', [ProjectSurkasController::class, 'datatables']);
 
                 Route::get('', [ProjectSurkasController::class, 'index'])->name(DBRoutes::projectSurkas);
                 Route::get('form', [ProjectSurkasController::class, 'form']);
+                Route::post('', [ProjectSurkasController::class, 'store']);
+
+                Route::group(['prefix' => '{id}'], function () {
+                    Route::get('', [ProjectSurkasController::class, 'show']);
+                    Route::post('', [ProjectSurkasController::class, 'update']);
+                    Route::delete('', [ProjectSurkasController::class, 'destroy']);
+                });
             });
         });
     });
 
-    Route::group(['prefix' => 'security'], function() {
+    Route::group(['prefix' => 'security'], function () {
 
-        Route::group(['prefix' => 'menu'], function() {
+        Route::group(['prefix' => 'menu'], function () {
             Route::post('datatables', [MenuController::class, 'datatables']);
             Route::get('form', [MenuController::class, 'form']);
             Route::get('select', [MenuController::class, 'select'])->name(DBRoutes::securityMenuSelect);
@@ -211,13 +218,13 @@ Route::group(['middleware' => 'auth'], function() {
             Route::post('{id}', [MenuController::class, 'update']);
             Route::delete('{id}', [MenuController::class, 'destroy']);
 
-            Route::group(['prefix' => '{id}/features'], function() {
+            Route::group(['prefix' => '{id}/features'], function () {
                 Route::post('datatables', [MenuFeatureController::class, 'datatables']);
                 Route::get('form', [MenuFeatureController::class, 'form']);
 
                 Route::post('', [MenuFeatureController::class, 'store']);
                 Route::get('{featureId}', [MenuFeatureController::class, 'show']);
-                Route::post('{featureId}', [MenuFeatureController::class,'update']);
+                Route::post('{featureId}', [MenuFeatureController::class, 'update']);
                 Route::delete('{featureId}', [MenuFeatureController::class, 'destroy']);
             });
         });

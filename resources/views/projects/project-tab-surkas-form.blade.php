@@ -14,7 +14,10 @@
                 type="text"
                 id="input-nominal"
                 class="form-control"
+                name="surkas_value"
+                data-toggle="jquery-number"
                 placeholder="Rp. 0"
+                maxlength="100"
             />
         </div>
         <div class="form-group">
@@ -23,7 +26,7 @@
                 type="text"
                 id="input-surkas-date"
                 class="form-control"
-                name="finish_date"
+                name="surkas_date"
                 placeholder="{{ DBText::datePlaceholder() }}"
                 data-toggle="daterangepicker"
                 data-format="DD/MM/YYYY"
@@ -33,7 +36,8 @@
             />
         </div>
         <div class="form-group">
-            <label for="input-porsi">Lampiran</label>
+            <label for="file-lampiran-surkas" class="col-12 col-sm-2 text-left text-sm-right required">Lampiran</label>
+            <div class="col-12 col-sm-10" id="file-lampiran-surkas"></div>
         </div>
     </div>
     <div class="modal-footer">
