@@ -36,16 +36,18 @@ class ProjectSurkasController extends Controller
             return $this->view('project-tab-surkas', [
                 'projectId' => $projectId,
                 'project' => $project,
+                'tabActive' => 'surkas'
             ]);
         } catch (\Exception $e) {
             return $this->errorPage($e);
         }
     }
 
-    public function datatables()
+    public function datatables($projectId)
     {
         try {
-            $query = $this->projectSurkas->defaultWith($this->projectSurkas->defaultSelects);
+            $query = $this->projectSurkas->defaultWith($this->projectSurkas->defaultSelects)
+                ->where('project_id', $projectId);
 
             return datatables()->eloquent($query)
                 ->addColumn('surkas_value', function ($row) {
@@ -70,12 +72,16 @@ class ProjectSurkasController extends Controller
         }
     }
 
-    public function form()
+    public function form($projectId)
     {
         try {
 
+            $project = ProjectCollection::find($projectId);
+
             return response()->json([
-                'content' => $this->viewResponse('project-tab-surkas-form'),
+                'content' => $this->viewResponse('project-tab-surkas-form', [
+                    'project' => $project,
+                ]),
             ]);
         } catch (\Exception $e) {
             return $this->jsonError($e);

@@ -5,6 +5,7 @@ namespace App\Models\Projects;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\DB;
 
 class ProjectSK extends Model
 {
@@ -12,7 +13,18 @@ class ProjectSK extends Model
 
     protected $table = "tr_project_sk";
 
-    public $defaultSelects = [];
+    protected $fillable = [
+        'project_id',
+        'revision',
+        'no_sk',
+        'printed_at'
+    ];
+
+    public $defaultSelects = [
+        'revision',
+        'no_sk',
+        'printed_at'
+    ];
 
     /**
      * static function yang digunakan ketika memanggil with biar tidak perlu
@@ -55,5 +67,26 @@ class ProjectSK extends Model
     public function defaultWith($selects = [], $query = null)
     {
         return $this->_defaultWith(is_null($query) ? $this : $query, $selects);
+    }
+
+    public function lastRevision($projectId)
+    {
+        /* @var Relation $this */
+        $row = $this->select(DB::raw('MAX(revision) last_revision'))
+            ->where('project_id', $projectId)
+            ->first();
+
+        return !is_null($row->last_revision) ? $row->last_revision : 0;
+    }
+
+    public function getLatestId($projectId)
+    {
+        /* @var Relation $this */
+        $row = $this->select('id')
+            ->where('project_id', $projectId)
+            ->orderBy('revision', 'desc')
+            ->first();
+
+        return !is_null($row) ? $row->id : null;
     }
 }

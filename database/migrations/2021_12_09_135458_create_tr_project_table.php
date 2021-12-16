@@ -19,7 +19,8 @@ class CreateTrProjectTable extends Migration
             $table->string('project_name', 100);
             $table->bigInteger('project_category_id');
             $table->double('project_value', 18, 2);
-            $table->double('modal_value', 18, 2);
+            $table->integer('project_shares');
+            $table->double('modal_value', 18, 2)->nullable();
             $table->date('start_date');
             $table->date('finish_date');
             $table->double('estimate_profit_value', 18, 2);

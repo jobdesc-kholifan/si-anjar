@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Masters\File;
 use App\Models\Projects\Project;
 use App\Models\Projects\ProjectPIC;
+use App\Models\Projects\ProjectSK;
 use App\View\Components\Button;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -27,16 +28,20 @@ class ProjectController extends Controller
     /* @var Project|Relation */
     protected $project;
 
+    /* @var ProjectSK|Relation */
+    protected $projectSK;
+
     /* @var ProjectPIC|Relation */
     protected $projectPIC;
 
     public function __construct()
     {
         $this->project = new Project();
+        $this->projectSK = new ProjectSK();
         $this->projectPIC = new ProjectPIC();
     }
 
-    public function index(Request $req)
+    public function index()
     {
         try {
             return $this->view('project');
@@ -97,6 +102,7 @@ class ProjectController extends Controller
                 'project_name:Nama Proyek' => 'required|max:100',
                 'project_category_id:Kategori Proyek' => 'required',
                 'project_value:Nilai Proyek' => 'required',
+                'project_shares:Lembar Saham' => 'required',
                 'start_date:Tanggal Mulai' => 'required',
                 'finish_date:Tanggal Berakhir' => 'required',
                 'estimate_profit_value:Proyeksi Keuntungan' => 'required',
@@ -119,9 +125,17 @@ class ProjectController extends Controller
                     'start_date' => dbDate($req->get('start_date')),
                     'finish_date' => dbDate($req->get('finish_date')),
                     'project_value' => dbIDR($req->get('project_value')),
+                    'project_shares' => dbIDR($req->get('project_shares')),
                     'estimate_profit_value' => dbIDR($req->get('estimate_profit_value')),
                 ]);
             $project = $this->project->create($insertProject->toArray());
+
+            $revision = $this->projectSK->lastRevision($project->id);
+            $this->projectSK->create([
+                'project_id' => $project->id,
+                'revision' => $revision,
+                'no_sk' => sprintf("SK-%s", $project->project_code),
+            ]);
 
             $insertPIC = [];
             $dataPIC = json_decode($req->get('data_pic', '[]'));
@@ -233,8 +247,10 @@ class ProjectController extends Controller
     public function edit(Request $req, $projectId)
     {
         try {
+            $tab = $req->get('tab', 'pic');
             return $this->view('project-update', [
-                'tab' => $req->get('tab', 'pic'),
+                'tab' => $tab,
+                'tabActive' => $tab,
                 'projectId' => $projectId,
                 'saveNext' => false,
             ]);
@@ -246,6 +262,18 @@ class ProjectController extends Controller
     public function update(Request $req, $projectId)
     {
         try {
+            $rules = [
+                'project_name:Nama Proyek' => 'required|max:100',
+                'project_category_id:Kategori Proyek' => 'required',
+                'project_value:Nilai Proyek' => 'required',
+                'project_shares:Lembar Saham' => 'required',
+                'start_date:Tanggal Mulai' => 'required',
+                'finish_date:Tanggal Berakhir' => 'required',
+                'estimate_profit_value:Proyeksi Keuntungan' => 'required',
+                'estimate_profit_id:Perhitungan Keuntungan' => 'required',
+            ];
+
+            $this->customValidate($req->all(), $rules);
 
             DB::beginTransaction();
 
@@ -259,6 +287,7 @@ class ProjectController extends Controller
                     'start_date' => dbDate($req->get('start_date')),
                     'finish_date' => dbDate($req->get('finish_date')),
                     'project_value' => dbIDR($req->get('project_value')),
+                    'project_shares' => dbIDR($req->get('project_shares')),
                     'estimate_profit_value' => dbIDR($req->get('estimate_profit_value')),
                 ]);
             $row->update($updateProject->toArray());

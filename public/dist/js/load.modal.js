@@ -307,7 +307,7 @@
                     submitOpt.headers['X-CSRF-TOKEN'] = $('meta[name=csrf-token]').attr('content');
 
                 let next = true;
-                if(submitOpt.beforeSubmit !== null && submitOpt.beforeSubmit(this) === undefined)
+                if(submitOpt.beforeSubmit !== null)
                     next = submitOpt.beforeSubmit(this);
 
                 if(next === undefined || next) {

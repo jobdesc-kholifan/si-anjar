@@ -16,8 +16,11 @@ class CreateTrProjectInvestorTable extends Migration
         Schema::create('tr_project_investor', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('project_id');
+            $table->bigInteger('project_sk_id');
             $table->bigInteger('investor_id');
             $table->double('investment_value', 18, 2);
+            $table->integer('shares_value');
+            $table->double('shares_percentage');
 
             $table->timestamps();
         });

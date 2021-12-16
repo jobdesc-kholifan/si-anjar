@@ -21,6 +21,7 @@ class Project extends Model
         'project_name',
         'project_category_id',
         'project_value',
+        'project_shares',
         'start_date',
         'finish_date',
         'estimate_profit_value',
@@ -32,6 +33,7 @@ class Project extends Model
         'project_code',
         'project_name',
         'project_value',
+        'project_shares',
         'modal_value',
         'start_date',
         'finish_date',
@@ -110,10 +112,11 @@ class Project extends Model
     }
     public function lastId()
     {
+        /* @var Relation $this */
         $data = $this->select(DB::raw('MAX(id) as maxId'))
             ->first();
 
-        return $data->maxId;
+        return is_null($data->maxId) ? $data->maxId : 1;
     }
 
 
@@ -198,7 +201,18 @@ class Project extends Model
         /* @var Relation $this */
         return $this->where('id', $projectId)
             ->update([
-                'modal_value' => DB::raw("(SELECT SUM(investment_value) FROM tr_project_investor WHERE project_id = $projectId)")
+                'modal_value' => DB::raw("(
+                    SELECT SUM(tr_project_investor.investment_value)
+                    FROM tr_project_investor
+                    WHERE tr_project_investor.project_id = $projectId
+                    AND project_sk_id = (
+                        SELECT tr_project_sk.id
+                        FROM tr_project_sk
+                        WHERE tr_project_sk.project_id = $projectId
+                        ORDER BY tr_project_sk.revision DESC
+                        LIMIT 1
+                    )
+                )")
             ]);
     }
 }

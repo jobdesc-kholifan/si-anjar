@@ -13,6 +13,7 @@ class Button
     const btnIconEdit = '<i class="fa fa-edit"></i>';
     const btnIconDelete = '<i class="fa fa-trash"></i>';
     const btnIconInfo = '<i class="fa fa-info-circle"></i>';
+    const btnIconPrint = '<i class="fa fa-print"></i>';
 
     public $onclick;
 

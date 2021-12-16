@@ -93,7 +93,12 @@
                 params.data_pic = formPIC.toString();
                 return params;
             },
-            successCallback: function(res) {
+            beforeSubmit: function(form) {
+                form.setDisabled(true);
+            },
+            successCallback: function(res, form) {
+                form.setDisabled(false);
+
                 if(res.result) {
                     if(res.data.redirect !== undefined) {
                         window.location.href = res.data.redirect;
@@ -102,7 +107,9 @@
 
                 AlertNotif.toastr.response(res);
             },
-            errorCallback: function() {
+            errorCallback: function(xhr, form) {
+                form.setDisabled(false);
+
                 AlertNotif.adminlte.error(DBMessage.ERROR_SYSTEM_MESSAGE, {
                     title: DBMessage.ERROR_PROCESSING_TITLE,
                     autoHide: false

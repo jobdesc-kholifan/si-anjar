@@ -172,6 +172,7 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::group(['prefix' => 'investor'], function () {
                 Route::post('datatables', [ProjectInvestorController::class, 'datatables']);
+                Route::get('all', [ProjectInvestorController::class, 'all'])->name(DBRoutes::projectInvestorAll);
 
                 Route::get('', [ProjectInvestorController::class, 'index'])->name(DBRoutes::projectInvestor);
                 Route::get('form', [ProjectInvestorController::class, 'form']);
@@ -185,8 +186,8 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('datatables', [ProjectSKController::class, 'datatables']);
 
                 Route::get('', [ProjectSKController::class, 'index'])->name(DBRoutes::projectSK);
-                Route::get('form', [ProjectSKController::class, 'form']);
-                Route::post('', [ProjectSKController::class, 'store']);
+                Route::get('revision', [ProjectSKController::class, 'revision'])->name(DBRoutes::projectSKUpdate);
+                Route::post('revision', [ProjectSKController::class, 'store']);
             });
 
             Route::group(['prefix' => 'surkas'], function () {

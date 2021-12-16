@@ -25,7 +25,7 @@ use App\Helpers\Collections\Projects\ProjectCollection;
                         <div class="form-group">
                             <dl class="row">
                                 <dt class="col-4 col-sm-2">Proyek</dt>
-                                <dd class="col-8 col-sm-10">-</dd>
+                                <dd class="col-8 col-sm-10">{{ $project->getName() }}</dd>
                                 <dt class="col-4 col-sm-2">Total Surkas Dibagikan</dt>
                                 <dd class="col-8 col-sm-10">-</dd>
                             </dl>
@@ -70,7 +70,6 @@ use App\Helpers\Collections\Projects\ProjectCollection;
 
 @push('script-footer')
     <script src="{{ asset('dist/js/actions-v2.js') }}"></script>
-    <script src="{{ asset('dist/js/project-pic.js') }}"></script>
     <script src="{{ asset('dist/js/upload.js') }}"></script>
     <script type="text/javascript">
         let fileLampiranSurkas;
@@ -102,16 +101,9 @@ use App\Helpers\Collections\Projects\ProjectCollection;
 
             FormComponents.number.init();
         };
-        actionsSurkas.callback.form.appendData = function(params) {
-            params.project_id = "{{ $projectId }}";
-            return params;
-        };
         actionsSurkas.callback.onEdit = function(data){
             fileLampiranSurkas.set(data.file_lampiran_surkas);
         }
-        actionsSurkas.callback.onDelete = function() {
-            actionsSurkas.updateInfoProject();
-        };
         actionsSurkas.build();
     </script>
 @endpush
