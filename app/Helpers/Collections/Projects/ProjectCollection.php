@@ -60,6 +60,11 @@ class ProjectCollection extends Collection
         return $this->get('project_value');
     }
 
+    public function getSharesValue()
+    {
+        return $this->get('project_shares', 0);
+    }
+
     public function getModalValue()
     {
         return $this->get('modal_value', 0);

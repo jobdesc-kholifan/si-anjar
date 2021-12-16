@@ -30,6 +30,10 @@ String.prototype.route = function () {
     return a
 };
 
+function idr(value, decimal = null, dec_point = ',', thousands_separator = '.') {
+    return $.number(value, decimal, dec_point, thousands_separator);
+}
+
 const DBConfig = {
     DATATABLES_DOM: "<'row no-gutters align-items-center'<'col-6 d-none d-sm-block'l><'col-12 col-sm-6'f><'table-responsive't><'col-12 col-sm-6'i><'col-12 col-sm-6'p>>",
 };

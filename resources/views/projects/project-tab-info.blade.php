@@ -48,6 +48,22 @@
     </div>
     <div class="form-group">
         <div class="row justify-content-center align-items-center">
+            <label for="input-shares" class="col-12 col-sm-2 text-left text-sm-right required">Lembar Saham</label>
+            <div class="col-12 col-sm-10">
+                <input
+                    type="text"
+                    id="input-shares"
+                    class="form-control"
+                    name="project_shares"
+                    data-toggle="jquery-number"
+                    placeholder="{{ DBText::inputPlaceholder('Lembar Saham') }}"
+                    maxlength="100"
+                />
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="row justify-content-center align-items-center">
             <label for="input-start-date" class="col-12 col-sm-2 text-left text-sm-right required">Tanggal Mulai</label>
             <div class="col-12 col-sm-10">
                 <input
@@ -152,7 +168,7 @@
             <i class="fa fa-angle-right"></i>
         </button>
     @else
-        <a href="{{ route(DBRoutes::projectInvestor, [$projectId]) }}" class="btn btn-outline-primary btn-sm">
+        <a href="{{ route(DBRoutes::projectInvestor, [$projectId]) }}" onclick="return confirm('Pastikan anda sudah klik tombol simpan, jika tidak data tidak akan tersimpan. Apakah anda yakin ingin lanjut input data investor?')" class="btn btn-outline-primary btn-sm">
             <span class="mr-1">Selanjutnya</span>
             <i class="fa fa-angle-right"></i>
         </a>

@@ -54,6 +54,16 @@ class InvestorController extends Controller
         }
     }
 
+    public function search()
+    {
+        try {
+
+
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
     public function index()
     {
         try {
@@ -119,7 +129,7 @@ class InvestorController extends Controller
                 'no_ktp:No. KTP' => 'required|digits:16',
                 'npwp:NPWP' => 'required|max:100',
                 'place_of_birth:Tempat Lahir' => 'required|max:100',
-                'date_of_birth:Tanggal Lahir' => 'required|date',
+                'date_of_birth:Tanggal Lahir' => 'required|date_format:d/m/Y',
                 'religion_id:Agama' => 'required',
                 'relationship_id:Status Perkawinan' => 'required',
                 'gender_id:Jenis Kelamin' => 'required',
@@ -139,7 +149,10 @@ class InvestorController extends Controller
 
             DB::beginTransaction();
 
-            $insertInvestor = collect($req->only($this->investor->getFillable()));
+            $insertInvestor = collect($req->only($this->investor->getFillable()))
+                ->merge([
+                    'date_of_birth' => dbDate($req->get('date_of_birth')),
+                ]);
             $investor = $this->investor->create($insertInvestor->toArray());
 
             $insertBanks = [];
@@ -316,7 +329,7 @@ class InvestorController extends Controller
 
             $fileNPWP = FileUpload::upload('file_npwp');
             try {
-                $fileNPWP->setReference($types->get(\DBTypes::fileInvestorKTP), $id);
+                $fileNPWP->setReference($types->get(\DBTypes::fileInvestorNPWP), $id);
                 $fileNPWP->moveTo('app/dokumen-investor', function ($file) {
                     /* @var UploadedFile $file */
                     return sprintf("npwp-%s.%s", date('YmdHis'), $file->getClientOriginalExtension());

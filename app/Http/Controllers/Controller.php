@@ -52,13 +52,11 @@ class Controller extends BaseController
     public function errorPage(\Exception $e, $trace = false): bool
     {
         if($e->getCode() == \DBCodes::authorizedError) {
-            echo "<b>" . $e->getMessage() . "</b><br />";
-            exit;
+            echo "<b>" . $e->getMessage() . "</b>. <a href=\"" . url()->previous() . "\">Kembali</a><br />";
         }
 
         else if($e->getCode() == \DBCodes::permissionError) {
             echo "<b>" . $e->getMessage() . "</b>. <a href=\"" . url('/') . "\">Kembali ke Beranda</a><br />";
-            exit;
         }
 
         if($trace)
@@ -149,7 +147,8 @@ class Controller extends BaseController
             'integer' => ':attribute harus angka',
             'max' => ':attribute tidak boleh lebih dari :max karakter',
             'email' => 'Alamat :attribute tidak valid',
-            'date' => ':attribute harus berformat :format',
+            'date' => ':attribute tidak valid sebagai tanggal',
+            'date_format' => 'Format tanggal :attribute tidak valid, :attribute harus berformat',
             'digits' => ':attribute harus :value digit',
             'digits_between' => ':attribute harus lebih dari :min digit dan kurang dari :max digit',
         ], $messages));

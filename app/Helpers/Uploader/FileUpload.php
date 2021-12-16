@@ -74,17 +74,20 @@ class FileUpload
      * @param null $callable
      * @return FileUpload
      *
+     * @throws \Exception
      */
     public function moveTo($directory, $callable = null)
     {
         if(Request::hasFile($this->index)) {
-            foreach($this->files as $i => $file)
+            $files = is_array($this->files) ? $this->files : [$this->files];
+            foreach($files as $i => $file)
             {
                 $filename = sprintf("%s-%s.%s", date('YmdHis'), $i, $file->getClientOriginalExtension());
                 if(!is_null($callable))
                     $filename = call_user_func_array($callable, [$file, $i]);
 
-                $file->move(storage_path($directory), $filename);
+                if(!$file->move(storage_path($directory), $filename))
+                    throw new \Exception("Gagal upload file");
 
                 $this->uploadedFiles[] = (object) [
                     'file_name' => $filename,

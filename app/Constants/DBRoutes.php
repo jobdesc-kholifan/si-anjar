@@ -43,8 +43,10 @@ class DBRoutes
     const projectShow = 'project.show';
 
     const projectInvestor = 'project.investor';
+    const projectInvestorAll = 'project.investor.all';
 
     const projectSK = 'project.sk';
+    const projectSKUpdate = 'project.sk.update';
 
     const projectSurkas = 'project.surkas';
 }

@@ -15,12 +15,17 @@ class ProjectInvestor extends Model
 
     protected $fillable = [
         'project_id',
+        'project_sk_id',
         'investor_id',
         'investment_value',
+        'shares_value',
+        'shares_percentage'
     ];
 
     public $defaultSelects = [
-        'investment_value'
+        'investment_value',
+        'shares_value',
+        'shares_percentage'
     ];
 
     /**

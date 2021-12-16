@@ -1,3 +1,10 @@
+<?php
+
+use App\Helpers\Collections\Projects\ProjectCollection;
+
+/* @var ProjectCollection $project */
+
+?>
 <form>
     {{ csrf_field() }}
     <div class="modal-header">
@@ -6,7 +13,7 @@
     </div>
     <div class="modal-body">
         <div class="form-group">
-            <label for="input-porsi">Nama Proyek: -</label>
+            <label for="input-porsi">Nama Proyek: {{ $project->getName() }}</label>
         </div>
         <div class="form-group">
             <label for="input-nominal" class="required">Jumlah Surkas</label>

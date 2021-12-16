@@ -36,12 +36,6 @@ use App\Helpers\Collections\Projects\ProjectCollection;
                                         <dd class="col-8 col-sm-10" id="label-modal-lack">{{ IDR($project->getValue() - $project->getModalValue()) }}</dd>
                                     </dl>
                                 </div>
-                                <div class="form-group text-right">
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                                        <i class="fa fa-check-circle mr-1"></i>
-                                        <span>Simpan</span>
-                                    </button>
-                                </div>
                                 <div class="form-group">
                                     <div class="w-100">
                                         <table class="table table-striped table-hover w-100" id="table-project-investor">
@@ -50,10 +44,9 @@ use App\Helpers\Collections\Projects\ProjectCollection;
                                                 <th data-name="no" data-orderable="false" data-searchable="false">No</th>
                                                 <th data-data="investor.no_ktp" data-name="investor.no_ktp">No. KTP</th>
                                                 <th data-data="investor.investor_name" data-name="investor.investor_name">Nama Investor</th>
-                                                <th data-data="investment_percentage" data-name="investment_value">Lembar Saham</th>
-                                                <th data-data="investment_percentage" data-name="investment_value" class="text-right text-bold">Nominal</th>
-                                                <th data-data="investment_percentage" data-name="investment_value" class="text-center">Porsi Saham</th>
-                                                <th data-data="action" data-orderable="false" data-searchable="false" style="width: 200px">Aksi</th>
+                                                <th data-data="shares_value" data-name="shares_value">Lembar Saham</th>
+                                                <th data-data="investment_value" data-name="investment_value" class="text-right text-bold">Nominal</th>
+                                                <th data-data="shares_percentage" data-name="shares_percentage" class="text-center">Porsi Saham</th>
                                             </tr>
                                             </thead>
                                             <tbody></tbody>
@@ -80,46 +73,32 @@ use App\Helpers\Collections\Projects\ProjectCollection;
 @endsection
 
 @push('script-footer')
-    <script src="{{ asset('dist/js/project-investor.js') }}"></script>
+    <script src="{{ asset('dist/js/actions-v2.js') }}"></script>
+    <script src="{{ asset('dist/js/upload.js') }}"></script>
     <script type="text/javascript">
-
-        const projectInvestor = new ProjectInvestor('#table-project-investor', {
-            route: {
-                investor: "{{ route(DBRoutes::investor) }}"
+        const actionsSurkas = new Actions("{{ route(DBRoutes::projectInvestor, [$projectId]) }}");
+        actionsSurkas.selectors.table = '#table-project-investor';
+        actionsSurkas.datatable.params = {
+            _token: "{{ csrf_token() }}",
+        };
+        actionsSurkas.datatable.columnDefs = [
+            {
+                targets: 0,
+                width: 20,
+                render: (data, type, row, meta) => {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                },
             },
-            projectValue: {{ $project->getValue() }},
-            sharesValue: {{ $project->getSharesValue() }},
-        });
+            {
+                targets: 5,
+                render: (data) => {
+                    const $wrapper = $('<div>', {class: 'text-center'});
+                    $wrapper.html(`${data} %`);
 
-        ServiceAjax.get("{{ route(DBRoutes::projectInvestorAll, [$projectId]) }}")
-            .done(res => {
-                if(res.result) {
-                    if(res.data.length === 0)
-                        projectInvestor.add();
-
-                    projectInvestor.set(res.data);
-                }
-            })
-
-        const $form = $('#form-project').formSubmit({
-            data: function(params) {
-                params.investors = projectInvestor.toString();
-                return params;
-            },
-            beforeSubmit: function() {
-                if(confirm("Apakah data yang diinputkan sudah benar?")) {
-                    projectInvestor.validate();
-                    return projectInvestor.isValid();
-                }
-
-                return false;
-            },
-            successCallback: function(res) {
-                AlertNotif.toastr.response(res);
-
-                if(res.result)
-                    window.location.href = "{{ route(DBRoutes::projectInvestor, [$projectId]) }}";
-            },
-        });
+                    return $wrapper.get(0).outerHTML;
+                },
+            }
+        ];
+        actionsSurkas.build();
     </script>
 @endpush

@@ -6,6 +6,7 @@ use App\Helpers\Collections\Projects\ProjectCollection;
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Project;
 use App\Models\Projects\ProjectInvestor;
+use App\Models\Projects\ProjectSK;
 use App\View\Components\Button;
 use App\View\Components\IDRLabel;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -27,13 +28,31 @@ class ProjectInvestorController extends Controller
     /* @var Project|Relation */
     protected $project;
 
+    /* @var ProjectSK|Relation */
+    protected $projectSK;
+
     /* @var ProjectInvestor|Relation */
     protected $projectInvestor;
 
     public function __construct()
     {
         $this->project = new Project();
+        $this->projectSK = new ProjectSK();
         $this->projectInvestor = new ProjectInvestor();
+    }
+
+    public function all($projectId)
+    {
+        try {
+
+            $query = $this->projectInvestor->defaultWith($this->projectInvestor->defaultSelects)
+                ->where('project_id', $projectId)
+                ->where('project_sk_id', $this->projectSK->getLatestId($projectId));
+
+            return $this->jsonData($query->get());
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
     }
 
     public function index($projectId)
@@ -41,10 +60,13 @@ class ProjectInvestorController extends Controller
         try {
 
             $row = ProjectCollection::find($projectId);
+            $count = $this->projectInvestor->where('project_id', $projectId)
+                ->count();
 
-            return $this->view('project-tab-investor', [
+            return $this->view($count == 0 ? 'project-tab-investor' : 'project-tab-investor-readonly', [
                 'projectId' => $projectId,
                 'project' => $row,
+                'tabActive' => 'investor'
             ]);
         } catch (\Exception $e) {
             return $this->jsonError($e);
@@ -54,27 +76,18 @@ class ProjectInvestorController extends Controller
     public function datatables($projectId)
     {
         try {
-            $project = ProjectCollection::find($projectId);
 
+            $skId = $this->projectSK->getLatestId($projectId);
             $query = $this->projectInvestor->defaultWith($this->projectInvestor->defaultSelects)
-                ->where('project_id', $projectId);
+                ->where('project_id', $projectId)
+                ->where('project_sk_id', $skId);
 
             return datatables()->eloquent($query)
-                ->addColumn('investment_percentage', function($row) use ($project) {
-                    return ($row->investment_value/$project->getValue() * 100)."%";
+                ->addColumn('shares_value', function($row) {
+                    return number_format($row->shares_value, 0, ",", ".") . " Lembar";
                 })
                 ->addColumn('investment_value', function($row) {
                     return (new IDRLabel($row->investment_value))->render();
-                })
-                ->addColumn('action', function($data) {
-
-                    $btnEdit = (new Button("actionsInvestor.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
-                        ->render();
-
-                    $btnDelete = (new Button("actionsInvestor.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
-                        ->render();
-
-                    return \DBText::renderAction([$btnEdit, $btnDelete]);
                 })
                 ->toJson();
         } catch (\Exception $e) {
@@ -102,23 +115,35 @@ class ProjectInvestorController extends Controller
     {
         try {
 
-            $project = ProjectCollection::find($projectId);
-            $modalValue = dbIDR($req->get('investment_value'));
+            DB::beginTransaction();
 
-            if($project->getModalValue() + $modalValue > $project->getValue())
-                throw new \Exception(sprintf("Modal tidak boleh lebih dari %s", IDR($project->getValue() - $project->getModalValue())), \DBCodes::authorizedError);
+            $skId = $this->projectSK->getLatestId($projectId);
+            if(is_null($skId))
+                throw new \Exception("Tidak ditemukan SK", \DBCodes::authorizedError);
 
-            $insertProjectInvestor = collect($req->only($this->projectInvestor->getFillable()))
-                ->merge([
-                    'project_id' => $projectId,
-                    'investment_value' => $modalValue
-                ]);
-            $this->projectInvestor->create($insertProjectInvestor->toArray());
+            $investors = json_decode($req->get('investors', '[]'));
+
+            $insertInvestor = [];
+            foreach($investors as $investor) {
+
+                $insertInvestor[] = collect($investor)->only($this->projectInvestor->getFillable())
+                    ->merge([
+                        'project_id' => $projectId,
+                        'project_sk_id' => $skId,
+                        'created_at' => currentDate(),
+                        'updated_at' => currentDate(),
+                    ])->toArray();
+            }
+
+            $this->projectInvestor->insert($insertInvestor);
 
             $this->project->updateModal($projectId);
 
+            DB::commit();
+
             return $this->jsonSuccess(\DBMessages::successCreate);
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->jsonError($e);
         }
     }
