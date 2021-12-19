@@ -126,7 +126,7 @@ class InvestorController extends Controller
                 'investor_name:Nama Investor' => 'required|max:100',
                 'email:Email' => 'required|max:100|email',
                 'phone_number:No Handphone 1' => 'required|digits_between:12,20',
-                'no_ktp:No. KTP' => 'required|digits:16',
+                'no_ktp:No. KTP' => 'required|max:100',
                 'npwp:NPWP' => 'required|max:100',
                 'place_of_birth:Tempat Lahir' => 'required|max:100',
                 'date_of_birth:Tanggal Lahir' => 'required|date_format:d/m/Y',
@@ -247,6 +247,30 @@ class InvestorController extends Controller
     public function update(Request $req, $id)
     {
         try {
+            $rules = collect([
+                'investor_name:Nama Investor' => 'required|max:100',
+                'email:Email' => 'required|max:100|email',
+                'phone_number:No Handphone 1' => 'required|digits_between:12,20',
+                'no_ktp:No. KTP' => 'required|max:100',
+                'npwp:NPWP' => 'required|max:100',
+                'place_of_birth:Tempat Lahir' => 'required|max:100',
+                'date_of_birth:Tanggal Lahir' => 'required|date_format:d/m/Y',
+                'religion_id:Agama' => 'required',
+                'relationship_id:Status Perkawinan' => 'required',
+                'gender_id:Jenis Kelamin' => 'required',
+                'job_name:Pekerjaan' => 'required|max:100',
+                'emergency_name:Nama darurat' => 'required|max:100',
+                'emergency_phone_number:No. HP darurat' => 'required|digits_between:12,20',
+                'emergency_relationship:Hub Keluarga darurat' => 'required|max:100',
+            ]);
+
+            if(!$req->hasFile('file_ktp'))
+                throw new \Exception(sprintf(\DBMessages::fieldRequiredFile, 'KTP'), \DBCodes::authorizedError);
+
+            if(!$req->hasFile('file_npwp'))
+                throw new \Exception(sprintf(\DBMessages::fieldRequiredFile, 'NPWP'), \DBCodes::authorizedError);
+
+            $this->customValidate($req->all(), $rules->toArray());
 
             DB::beginTransaction();
 
