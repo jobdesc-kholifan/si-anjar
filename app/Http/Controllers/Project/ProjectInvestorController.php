@@ -73,11 +73,14 @@ class ProjectInvestorController extends Controller
         }
     }
 
-    public function datatables($projectId)
+    public function datatables(Request $req, $projectId)
     {
         try {
 
-            $skId = $this->projectSK->getLatestId($projectId);
+            $skId = $req->get('sk_id');
+            if(!$req->has('sk_id'))
+                $skId = $this->projectSK->getLatestId($projectId);
+
             $query = $this->projectInvestor->defaultWith($this->projectInvestor->defaultSelects)
                 ->where('project_id', $projectId)
                 ->where('project_sk_id', $skId);

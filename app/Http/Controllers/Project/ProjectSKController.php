@@ -72,7 +72,7 @@ class ProjectSKController extends Controller
 
                     $btnPrint = (new Button("actions.print($data->id)", Button::btnPrimary, Button::btnIconPrint))
                         ->render();
-                    $btnDetail = (new Button("actions.detail($data->id)", Button::btnPrimary, Button::btnIconInfo))
+                    $btnDetail = (new Button("actionsSK.detail($data->id)", Button::btnPrimary, Button::btnIconInfo))
                         ->setLabel("Lihat Investor")
                         ->render();
 
@@ -138,6 +138,26 @@ class ProjectSKController extends Controller
             return $this->jsonSuccess(\DBMessages::successCreate);
         } catch (\Exception $e) {
             DB::rollBack();
+            return $this->jsonError($e);
+        }
+    }
+
+    public function detail(Request $req, $projectId)
+    {
+        try {
+            $id = $req->get('id');
+            $sk = $this->projectSK->defaultWith($this->projectSK->defaultSelects)
+                ->find($id);
+
+            if(is_null($sk))
+                throw new \Exception(\DBMessages::corruptData, \DBCodes::authorizedError);
+
+            return response()->json([
+                'content' => $this->viewResponse('project-tab-sk-detail', [
+                    'sk' => $sk
+                ]),
+            ]);
+        } catch (\Exception $e) {
             return $this->jsonError($e);
         }
     }

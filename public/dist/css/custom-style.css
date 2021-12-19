@@ -52,6 +52,16 @@ h3.form-title {
     background-color: var(--primary)!important;
 }
 
+.custom-control-label::before {
+    border-color: #ccd1d7;
+    box-shadow: none;
+}
+.custom-switch .custom-control-label::after {
+    background-color: #ccd1d7;
+}
+label:not(.form-check-label):not(.custom-file-label) {
+    font-weight: normal;
+}
 @media (min-width: 991px) {
     .table-responsive {
         overflow-x: hidden;

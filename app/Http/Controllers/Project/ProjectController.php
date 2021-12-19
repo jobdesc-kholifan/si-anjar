@@ -60,7 +60,14 @@ class ProjectController extends Controller
                     return IDR($data->project_value);
                 })
                 ->editColumn('status', function($data) {
-                    return 'Belum Dimulai';
+                    $label = 'Belum Dimulai';
+                    if($data->start_date > date('Y-m-d'))
+                        $label = 'Dalam Pengerjaan';
+
+                    if($data->finish_date > date('Y-m-d'))
+                        $label = 'Selesai';
+
+                    return $label;
                 })
                 ->addColumn('action', function($data) {
 
