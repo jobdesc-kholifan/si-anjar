@@ -16,7 +16,7 @@ class PreviewController extends Controller
             if($token != env('APP_KEY_VALUE'))
                 throw new \Exception(\DBMessages::permissionRequired, \DBCodes::authorizedError);
 
-            $path = storage_path(str_replace('_', '\\', $directory) . DIRECTORY_SEPARATOR . $filename);
+            $path = storage_path(str_replace('_', '/', $directory) . DIRECTORY_SEPARATOR . $filename);
             if(!file_exists($path))
                 return response()->file($pathNotFound);
 
