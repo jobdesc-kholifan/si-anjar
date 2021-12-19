@@ -116,7 +116,7 @@ class Project extends Model
         $data = $this->select(DB::raw('MAX(id) as maxId'))
             ->first();
 
-        return is_null($data->maxId) ? $data->maxId : 1;
+        return !is_null($data->maxId) ? $data->maxId : 1;
     }
 
 

@@ -6,6 +6,8 @@
 
 use App\Helpers\Collections\Projects\ProjectCollection;
 
+$hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
+
 ?>
 @extends('skins.template')
 
@@ -36,12 +38,14 @@ use App\Helpers\Collections\Projects\ProjectCollection;
                                         <dd class="col-8 col-sm-10" id="label-modal-lack">{{ IDR($project->getValue() - $project->getModalValue()) }}</dd>
                                     </dl>
                                 </div>
+                                @if($hasUpdate)
                                 <div class="form-group text-right">
                                     <button type="submit" class="btn btn-outline-primary btn-sm">
                                         <i class="fa fa-check-circle mr-1"></i>
                                         <span>Simpan</span>
                                     </button>
                                 </div>
+                                @endif
                                 <div class="form-group">
                                     <div class="w-100">
                                         <table class="table table-striped table-hover w-100" id="table-project-investor">

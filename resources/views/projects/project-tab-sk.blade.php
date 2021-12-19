@@ -1,3 +1,8 @@
+<?php
+
+$hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
+
+?>
 @extends('skins.template')
 
 @section('content')
@@ -14,10 +19,12 @@
                             <div class="tab-pane active show fade" id="content-pic">
                                 <h4 class="pt-3 pb-2 px-2 mb-4 border-bottom">Form SK</h4>
                                 <div class="form-group text-right">
+                                    @if($countInvestor > 0 && $hasUpdate)
                                     <a href="{{ route(DBRoutes::projectSKUpdate, [$projectId]) }}" class="btn btn-outline-primary btn-sm">
                                         <i class="fa fa-plus-circle"></i>
                                         <span class="ml-2">Pembaruan SK</span>
                                     </a>
+                                    @endif
                                 </div>
                                 <div class="form-group">
                                     <div class="w-100">

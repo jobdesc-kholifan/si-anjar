@@ -44,6 +44,8 @@ class ProjectController extends Controller
     public function index()
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
+
             return $this->view('project');
         } catch (\Exception $e) {
             return $this->jsonError($e);
@@ -53,6 +55,8 @@ class ProjectController extends Controller
     public function datatables()
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
+
             $query = $this->project->defaultWith($this->project->defaultSelects);
 
             return datatables()->eloquent($query)
@@ -72,12 +76,12 @@ class ProjectController extends Controller
                 ->addColumn('action', function($data) {
 
                     $btnDelete = false;
-                    if(findPermission(\DBMenus::investor)->hasAccess(\DBFeature::update))
+                    if(findPermission(\DBMenus::project)->hasAccess(\DBFeature::update))
                         $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
                             ->render();
 
                     $btnEdit = false;
-                    if(findPermission(\DBMenus::investor)->hasAccess(\DBFeature::delete))
+                    if(findPermission(\DBMenus::project)->hasAccess(\DBFeature::delete))
                         $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
                             ->render();
 
@@ -93,6 +97,8 @@ class ProjectController extends Controller
     public function create(Request $req)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
+
             return $this->view('project-create', [
                 'tab' => $req->get('tab', 'pic'),
                 'saveNext' => true,
@@ -105,6 +111,8 @@ class ProjectController extends Controller
     public function store(Request $req)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::create);
+
             $rules = [
                 'project_name:Nama Proyek' => 'required|max:100',
                 'project_category_id:Kategori Proyek' => 'required',
@@ -126,9 +134,10 @@ class ProjectController extends Controller
 
             DB::beginTransaction();
 
+            $projectCode = sprintf("PRJ%05d", $this->project->lastId());
             $insertProject = collect($req->only($this->project->getFillable()))
                 ->merge([
-                    'project_code' => sprintf("PRJ%05d", $this->project->lastId()),
+                    'project_code' => $projectCode,
                     'start_date' => dbDate($req->get('start_date')),
                     'finish_date' => dbDate($req->get('finish_date')),
                     'project_value' => dbIDR($req->get('project_value')),
@@ -225,6 +234,8 @@ class ProjectController extends Controller
     public function show(Request $req, $projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
+
             if(!$req->ajax())
                 throw new \Exception(\DBMessages::pageNotFound, \DBCodes::authorizedError);
 
@@ -254,6 +265,8 @@ class ProjectController extends Controller
     public function edit(Request $req, $projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
+
             $tab = $req->get('tab', 'pic');
             return $this->view('project-update', [
                 'tab' => $tab,
@@ -269,6 +282,8 @@ class ProjectController extends Controller
     public function update(Request $req, $projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::update);
+
             $rules = [
                 'project_name:Nama Proyek' => 'required|max:100',
                 'project_category_id:Kategori Proyek' => 'required',
@@ -401,6 +416,7 @@ class ProjectController extends Controller
     public function destroy($projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::delete);
 
             $row = $this->project->find($projectId);
 
