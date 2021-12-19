@@ -57,7 +57,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::group(['prefix' => 'preview'], function () {
 
-        Route::get('{directory}/{token}/response/{filename}', [PreviewController::class, 'index']);
+        Route::get('{directory}/{token}/show/{filename}', [PreviewController::class, 'index']);
     });
 
     Route::group(['prefix' => 'masters'], function () {

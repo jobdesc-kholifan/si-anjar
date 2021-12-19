@@ -109,6 +109,6 @@ if (!function_exists('fileUnlink')) {
 if (!function_exists('DBImage')) {
 
     function DBImage($alias = 'preview') {
-        return DB::raw(sprintf("CONCAT('%s/',REPLACE(directory, '/', '_'), '/%s/response/', file_name) as %s", url('preview'), env('APP_KEY_VALUE'), $alias));
+        return DB::raw(sprintf("CONCAT('%s/',REPLACE(directory, '/', '_'), '/%s/show/', file_name) as %s", url('preview'), env('APP_KEY_VALUE'), $alias));
     }
 }
