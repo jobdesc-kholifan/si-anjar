@@ -44,6 +44,7 @@ class ProjectInvestorController extends Controller
     public function all($projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
             $query = $this->projectInvestor->defaultWith($this->projectInvestor->defaultSelects)
                 ->where('project_id', $projectId)
@@ -58,6 +59,7 @@ class ProjectInvestorController extends Controller
     public function index($projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
             $row = ProjectCollection::find($projectId);
             $count = $this->projectInvestor->where('project_id', $projectId)
@@ -76,6 +78,7 @@ class ProjectInvestorController extends Controller
     public function datatables(Request $req, $projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
             $skId = $req->get('sk_id');
             if(!$req->has('sk_id'))
@@ -101,6 +104,7 @@ class ProjectInvestorController extends Controller
     public function form($projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
             $project = ProjectCollection::find($projectId);
 
@@ -117,6 +121,7 @@ class ProjectInvestorController extends Controller
     public function store(Request $req, $projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::create);
 
             DB::beginTransaction();
 
@@ -154,6 +159,7 @@ class ProjectInvestorController extends Controller
     public function show($projectId, $id)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
             $row = $this->projectInvestor->defaultWith($this->projectInvestor->defaultSelects)
                 ->find($id);
@@ -170,6 +176,8 @@ class ProjectInvestorController extends Controller
     public function update(Request $req, $projectId, $id)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::update);
+
             $project = ProjectCollection::find($projectId);
 
             $row = $this->projectInvestor->defaultWith($this->projectInvestor->defaultSelects)
@@ -201,6 +209,7 @@ class ProjectInvestorController extends Controller
     public function destroy($projectId, $id)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::delete);
 
             $row = $this->projectInvestor->find($id);
 

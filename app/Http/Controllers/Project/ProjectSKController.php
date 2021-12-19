@@ -48,13 +48,19 @@ class ProjectSKController extends Controller
     public function index($projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
             $project = ProjectCollection::find($projectId);
+
+            $skId = $this->projectSK->getLatestId($projectId);
+            $countInvestor = $this->projectInvestor->where('project_sk_id', $skId)
+                ->count();
 
             return $this->view('project-tab-sk', [
                 'projectId' => $projectId,
                 'project' => $project,
-                'tabActive' => 'sk'
+                'tabActive' => 'sk',
+                'countInvestor' => $countInvestor,
             ]);
         } catch (\Exception $e) {
             return $this->errorPage($e);
@@ -64,6 +70,8 @@ class ProjectSKController extends Controller
     public function datatables($projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
+
             $query = $this->projectSK->defaultWith($this->projectSK->defaultSelects)
                 ->where('project_id', $projectId);
 
@@ -87,6 +95,7 @@ class ProjectSKController extends Controller
     public function revision($projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::update);
 
             $row = ProjectCollection::find($projectId);
 
@@ -103,6 +112,7 @@ class ProjectSKController extends Controller
     public function store(Request $req, $projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::create);
 
             DB::beginTransaction();
 
@@ -145,6 +155,8 @@ class ProjectSKController extends Controller
     public function detail(Request $req, $projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
+
             $id = $req->get('id');
             $sk = $this->projectSK->defaultWith($this->projectSK->defaultSelects)
                 ->find($id);

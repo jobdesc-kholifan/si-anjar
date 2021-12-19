@@ -30,6 +30,7 @@ class ProjectSurkasController extends Controller
     public function index($projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
             $project = ProjectCollection::find($projectId);
 
@@ -46,6 +47,8 @@ class ProjectSurkasController extends Controller
     public function datatables($projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
+
             $query = $this->projectSurkas->defaultWith($this->projectSurkas->defaultSelects)
                 ->where('project_id', $projectId);
 
@@ -54,13 +57,13 @@ class ProjectSurkasController extends Controller
                     return (new IDRLabel($row->surkas_value))->render();
                 })
                 ->addColumn('action', function ($data) {
-                    // $btnDelete = false;
-                    // if(findPermission(\DBMenus::surkas)->hasAccess(\DBFeature::update))
+                    $btnDelete = false;
+                    if(findPermission(\DBMenus::project)->hasAccess(\DBFeature::delete))
                     $btnDelete = (new Button("actionsSurkas.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
                         ->render();
 
-                    // $btnEdit = false;
-                    // if(findPermission(\DBMenus::surkas)->hasAccess(\DBFeature::delete))
+                    $btnEdit = false;
+                    if(findPermission(\DBMenus::project)->hasAccess(\DBFeature::update))
                     $btnEdit = (new Button("actionsSurkas.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
                         ->render();
 
@@ -75,6 +78,7 @@ class ProjectSurkasController extends Controller
     public function form($projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
             $project = ProjectCollection::find($projectId);
 
@@ -91,6 +95,7 @@ class ProjectSurkasController extends Controller
     public function store(Request $req, $projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::create);
 
             $rules = [
                 'surkas_value:Nilai Proyek' => 'required',
@@ -141,6 +146,8 @@ class ProjectSurkasController extends Controller
     public function show($projectId, $id)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
+
             $row = $this->projectSurkas->defaultQuery()
                 ->with([
                     'file_lampiran_surkas' => function ($query) {
@@ -161,6 +168,8 @@ class ProjectSurkasController extends Controller
     public function edit(Request $req, $projectId)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
+
             return $this->view('project-update', [
                 'tab' => $req->get('tab', 'pic'),
                 'projectId' => $projectId,
@@ -174,6 +183,7 @@ class ProjectSurkasController extends Controller
     public function update(Request $req, $projectid, $id)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::update);
 
             $rules = [
                 'surkas_value:Nilai Proyek' => 'required',
@@ -221,6 +231,7 @@ class ProjectSurkasController extends Controller
     public function destroy($projectid, $id)
     {
         try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::delete);
 
             $row = $this->projectSurkas->find($id);
 

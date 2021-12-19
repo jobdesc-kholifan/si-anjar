@@ -1,3 +1,8 @@
+<?php
+
+$hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
+
+?>
 <h4 class="pt-3 pb-2 px-2 border-bottom">Form Proyek</h4>
 <div class="pt-3">
     <div class="form-group">
@@ -157,7 +162,7 @@
         <i class="fa fa-angle-left"></i>
         <span class="ml-1">Sebelumnya</span>
     </button>
-    @if(!$saveNext)
+    @if(!$saveNext && $hasUpdate)
         <button type="submit" class="btn btn-primary btn-sm">
             <span>Simpan</span>
         </button>

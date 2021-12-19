@@ -6,6 +6,7 @@
 
 use App\Helpers\Collections\Projects\ProjectCollection;
 
+$hasCreate = findPermission(DBMenus::project)->hasAccess(DBFeature::create);
 ?>
 @extends('skins.template')
 
@@ -31,10 +32,12 @@ use App\Helpers\Collections\Projects\ProjectCollection;
                             </dl>
                         </div>
                         <div class="form-group text-right">
+                            @if($hasCreate)
                             <button type="button" class="btn btn-outline-primary btn-sm" onclick="actionsSurkas.create()">
                                 <i class="fa fa-plus-circle"></i>
                                 <span class="ml-2">Tambah Surkas</span>
                             </button>
+                            @endif
                         </div>
                         <div class="form-group">
                             <div class="w-100">
