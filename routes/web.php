@@ -53,6 +53,7 @@ Route::group(['middleware' => 'auth'], function () {
     })->name(DBRoutes::authLogout);
 
     Route::get('/', [AppController::class, 'index']);
+    Route::get('/features', [AppController::class, 'features']);
 
     Route::group(['prefix' => 'preview'], function () {
 
@@ -184,6 +185,7 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::group(['prefix' => 'sk'], function () {
                 Route::post('datatables', [ProjectSKController::class, 'datatables']);
+                Route::get('detail', [ProjectSKController::class, 'detail']);
 
                 Route::get('', [ProjectSKController::class, 'index'])->name(DBRoutes::projectSK);
                 Route::get('revision', [ProjectSKController::class, 'revision'])->name(DBRoutes::projectSKUpdate);

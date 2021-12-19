@@ -68,7 +68,7 @@ class MenuFeatureController extends Controller
     public function store(Request $req, $id)
     {
         try {
-            findPermission(\DBMenus::securityMenu)->hasAccessOrFail('add-feature');
+            findPermission(\DBMenus::securityMenu)->hasAccessOrFail('create-feature');
 
             $insertFeature = collect($req->only($this->menuFeature->getFillable()))
                 ->merge([

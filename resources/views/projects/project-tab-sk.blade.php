@@ -57,8 +57,11 @@
     <script src="{{ asset('dist/js/actions-v2.js') }}"></script>
     <script src="{{ asset('dist/js/upload.js') }}"></script>
     <script type="text/javascript">
+        let actionsSKInvestor;
+
         const projectValue = {{ $project->getValue() }};
         const actionsSK = new Actions("{{ route(DBRoutes::projectSK, [$projectId]) }}");
+
         actionsSK.selectors.table = '#table-project-sk';
         actionsSK.datatable.params = {
             _token: "{{ csrf_token() }}",
@@ -72,6 +75,42 @@
                 },
             }
         ];
+        actionsSK.detail = function(id) {
+            $.createModal({
+                url: '{{ url()->current() }}/detail',
+                data: {
+                    id: id
+                },
+                modalSize: 'modal-xl',
+                onLoadComplete: function(res, modal) {
+                    actionsSKInvestor = new Actions("{{ route(DBRoutes::projectInvestor, [$projectId]) }}");
+                    actionsSKInvestor.selectors.table = '#table-project-investor';
+                    actionsSKInvestor.datatable.params = {
+                        _token: "{{ csrf_token() }}",
+                        sk_id: id,
+                    };
+                    actionsSKInvestor.datatable.columnDefs = [
+                        {
+                            targets: 0,
+                            width: 20,
+                            render: (data, type, row, meta) => {
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            },
+                        },
+                        {
+                            targets: 5,
+                            render: (data) => {
+                                const $wrapper = $('<div>', {class: 'text-center'});
+                                $wrapper.html(`${data} %`);
+
+                                return $wrapper.get(0).outerHTML;
+                            },
+                        }
+                    ];
+                    actionsSKInvestor.build();
+                },
+            }).open();
+        };
         actionsSK.build();
     </script>
 @endpush

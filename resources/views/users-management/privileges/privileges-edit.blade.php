@@ -52,7 +52,7 @@ $hasAccessUpdate = findPermission(DBMenus::usersRole)->hasAccess(DBFeature::upda
                             </div>
                         </div>
                         <div class="">
-                            <table class="table" id="table-privileges"></table>
+                            <table class="table table-striped table-hover" id="table-privileges"></table>
                         </div>
                     </form>
                 </div>
@@ -72,11 +72,15 @@ $hasAccessUpdate = findPermission(DBMenus::usersRole)->hasAccess(DBFeature::upda
         const $spinner = $('#spinner');
         const $tablePrivileges = $("#table-privileges");
 
-        const menuCollection = new MenuCollection($tablePrivileges);
+        const menuCollection = new MenuCollection($tablePrivileges, {
+            slugs: {
+                view: "{{ DBFeature::view }}",
+            }
+        });
 
         $form.formSubmit({
             data: function(params) {
-                params.menus = JSON.stringify(menuCollection.items);
+                params.menus = menuCollection.toString();
                 return params;
             },
             successCallback: function(res) {
