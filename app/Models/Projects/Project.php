@@ -127,7 +127,7 @@ class Project extends Model
 
     public function data_investor()
     {
-        return $this->hasMany(ProjectPIC::class, 'project_id', 'id');
+        return $this->hasMany(ProjectInvestor::class, 'project_id', 'id');
     }
 
     public function data_sk()

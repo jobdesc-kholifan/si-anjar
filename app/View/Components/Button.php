@@ -9,6 +9,7 @@ class Button
     const btnDanger = 'btn-outline-danger';
     const btnSuccess = 'btn-outline-success';
     const btnInfo = 'btn-info';
+    const btnLinkPrimary = 'btn-link';
 
     const btnIconEdit = '<i class="fa fa-edit"></i>';
     const btnIconDelete = '<i class="fa fa-trash"></i>';
@@ -23,22 +24,32 @@ class Button
 
     public $label;
 
+    public $size;
+
+    public $align;
+
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($onclick, $classname, $icon = null)
+    public function __construct($onclick, $classname, $icon = null, $size = 'btn-xs')
     {
         $this->onclick = $onclick;
         $this->classname = $classname;
         $this->icon = $icon;
+        $this->size = $size;
     }
 
     public function setLabel($label)
     {
         $this->label = $label;
         return $this;
+    }
+
+    public function setAlign($align)
+    {
+        $this->align = $align;
     }
 
     /**
@@ -53,6 +64,8 @@ class Button
             'classname' => $this->classname,
             'icon' => $this->icon,
             'label' => $this->label,
+            'size' => $this->size,
+            'align' => $this->align,
         ]);
     }
 }

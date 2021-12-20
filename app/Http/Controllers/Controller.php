@@ -53,14 +53,19 @@ class Controller extends BaseController
     {
         if($e->getCode() == \DBCodes::authorizedError) {
             echo "<b>" . $e->getMessage() . "</b>. <a href=\"" . url()->previous() . "\">Kembali</a><br />";
+            if(!env('APP_DEBUG'))
+                exit;
         }
 
         else if($e->getCode() == \DBCodes::permissionError) {
             echo "<b>" . $e->getMessage() . "</b>. <a href=\"" . url('/') . "\">Kembali ke Beranda</a><br />";
+            if(!env('APP_DEBUG'))
+                exit;
         }
 
         if($trace)
             print_r($e->getTraceAsString());
+
         return false;
     }
 

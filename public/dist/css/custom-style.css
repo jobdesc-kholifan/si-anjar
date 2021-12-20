@@ -62,6 +62,11 @@ h3.form-title {
 label:not(.form-check-label):not(.custom-file-label) {
     font-weight: normal;
 }
+.btn-link,
+.btn-link:hover,
+.btn-link:focus {
+    text-decoration: underline;
+}
 @media (min-width: 991px) {
     .table-responsive {
         overflow-x: hidden;

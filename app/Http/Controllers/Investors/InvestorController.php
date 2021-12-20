@@ -7,7 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Investors\Investor;
 use App\Models\Investors\InvestorBank;
 use App\Models\Masters\File;
+use App\Models\Projects\Project;
+use App\Models\Projects\ProjectInvestor;
 use App\View\Components\Button;
+use App\View\Components\IDRLabel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,10 +31,18 @@ class InvestorController extends Controller
     /* @var InvestorBank|Relation */
     protected $investorBank;
 
+    /* @var Project|Relation */
+    protected $project;
+
+    /* @var ProjectInvestor|Relation */
+    protected $projectInvestor;
+
     public function __construct()
     {
         $this->investor = new Investor();
         $this->investorBank = new InvestorBank();
+        $this->project = new Project();
+        $this->projectInvestor = new ProjectInvestor();
     }
 
     public function select(Request $req)
@@ -83,6 +94,18 @@ class InvestorController extends Controller
             return datatables()->eloquent($query)
                 ->editColumn('created_at', function($data) {
                     return date('d/m/Y', strtotime($data->created_at));
+                })
+                ->addColumn('total_project', function($data) {
+                    $showDetail = new Button("actions.showProject($data->id)", Button::btnLinkPrimary, null, 'btn-sm');
+                    $showDetail->setAlign('text-center');
+                    $showDetail->setLabel($data->count_project . " Proyek");
+                    return $showDetail->render();
+                })
+                ->addColumn('total_investment', function($data) {
+                    $showDetail = new Button("actions.showInvestment($data->id)", Button::btnPrimary);
+                    $showDetail->setAlign('text-right');
+                    $showDetail->setLabel(IDR($data->count_investment));
+                    return $showDetail->render();
                 })
                 ->addColumn('action', function($data) {
 
@@ -386,6 +409,114 @@ class InvestorController extends Controller
             $row->delete();
 
             return $this->jsonSuccess(\DBMessages::successDelete);
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
+    public function showProject(Request $req)
+    {
+        try {
+            return response()->json([
+                'content' => $this->viewResponse('modal-project'),
+            ]);
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
+    public function datatablesProject(Request $req)
+    {
+        try {
+            $id = $req->get('id');
+            $query = $this->project->defaultWith($this->project->defaultSelects)
+                ->whereHas('data_investor', function($query) use ($id) {
+                    /* @var Relation $query */
+                    $query->where('investor_id', $id)
+                        ->whereRaw('project_sk_id = (
+                            SELECT tr_project_sk.id
+                            FROM tr_project_sk
+                            WHERE tr_project_sk.project_id = tr_project_investor.project_id
+                            ORDER BY tr_project_sk.revision DESC
+                            LIMIT 1
+                        )');
+                });
+
+            return datatables()->eloquent($query)
+                ->editColumn('project_value', function($data) {
+                    return IDR($data->project_value);
+                })
+                ->editColumn('status', function($data) {
+                    $label = 'Belum Dimulai';
+                    if($data->start_date > date('Y-m-d'))
+                        $label = 'Dalam Pengerjaan';
+
+                    if($data->finish_date > date('Y-m-d'))
+                        $label = 'Selesai';
+
+                    return $label;
+                })
+                ->addColumn('action', function($data) {
+
+                    $btnInfo = false;
+                    if(findPermission(\DBMenus::project)->hasAccess(\DBFeature::view))
+                        $btnInfo = (new Button("actionsProject.showDetailProject($data->id)", Button::btnPrimary, Button::btnIconInfo))
+                            ->setLabel("Lihat Detail")
+                            ->render();
+
+                    return \DBText::renderAction([$btnInfo]);
+                })
+                ->toJson();
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
+    public function showInvestment(Request $req)
+    {
+        try {
+            return response()->json([
+                'content' => $this->viewResponse('modal-investment'),
+            ]);
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
+    public function datatablesInvestment(Request $req)
+    {
+        try {
+            $id = $req->get('id');
+
+            $query = $this->projectInvestor->defaultWith($this->projectInvestor->defaultSelects)
+                ->where('investor_id', $id)
+                ->whereRaw('project_sk_id = (
+                    SELECT tr_project_sk.id
+                    FROM tr_project_sk
+                    WHERE tr_project_sk.project_id = tr_project_investor.project_id
+                    ORDER BY tr_project_sk.revision DESC
+                    LIMIT 1
+                )')
+                ->addSelect('project_id');
+
+            return datatables()->eloquent($query)
+                ->addColumn('shares_value', function($row) {
+                    return number_format($row->shares_value, 0, ",", ".") . " Lembar";
+                })
+                ->addColumn('investment_value', function($row) {
+                    return (new IDRLabel($row->investment_value))->render();
+                })
+                ->addColumn('action', function($data) {
+
+                    $btnInfo = false;
+                    if(findPermission(\DBMenus::project)->hasAccess(\DBFeature::view))
+                        $btnInfo = (new Button("actionsInvestment.showDetailInvestment($data->project_id)", Button::btnPrimary, Button::btnIconInfo))
+                            ->setLabel("Lihat Detail")
+                            ->render();
+
+                    return \DBText::renderAction([$btnInfo]);
+                })
+                ->toJson();
         } catch (\Exception $e) {
             return $this->jsonError($e);
         }
