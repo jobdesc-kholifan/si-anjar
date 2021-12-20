@@ -31,8 +31,8 @@ $hasAccessCreate = findPermission(DBMenus::investor)->hasAccess(DBFeature::creat
                                 <th data-data="investor_name" data-name="investor_name">Nama Investor</th>
                                 <th data-data="created_at" data-name="created_at">Tgl Bergabung</th>
                                 <th data-data="phone_number" data-name="phone_number">No. Handphone</th>
-                                <th data-data="phone_number" data-name="phone_number">Jumlah Proyek</th>
-                                <th data-data="phone_number" data-name="phone_number">Total Investasi</th>
+                                <th data-data="total_project" data-searchable="false" data-orderable="false" class="text-center">Jumlah Proyek</th>
+                                <th data-data="total_investment" data-searchable="false" data-orderable="false" class="text-right">Total Investasi</th>
                                 <th data-data="action" data-orderable="false" data-searchable="false" style="width: 200px">Aksi</th>
                             </tr>
                             </thead>
@@ -49,6 +49,7 @@ $hasAccessCreate = findPermission(DBMenus::investor)->hasAccess(DBFeature::creat
     <script src="{{ asset('dist/js/investor-bank.js') }}"></script>
     <script src="{{ asset('dist/js/upload.js') }}"></script>
     <script type="text/javascript">
+        let actionsProject, actionsInvestment;
         let formBank, fileKTP, fileNPWP;
         const actions = new Actions("{{ url()->current() }}");
         actions.datatable.params = {
@@ -115,7 +116,72 @@ $hasAccessCreate = findPermission(DBMenus::investor)->hasAccess(DBFeature::creat
         actions.callback.form.appendData = function(params) {
             params.banks = formBank.toString();
             return params;
-        }
+        };
+        actions.showProject = function(id) {
+            $.createModal({
+                url: "{{ url()->current() }}/show-project",
+                data: {id: id},
+                modalSize: 'modal-xl',
+                onLoadComplete: (res) => {
+                    actionsProject = new Actions("{{ url()->current() }}/show-project");
+                    actionsProject.selectors.table = "#table-project-investor";
+                    actionsProject.datatable.params = {
+                        _token: "{{ csrf_token() }}",
+                        id: id,
+                    };
+                    actionsProject.datatable.columnDefs = [
+                        {
+                            targets: 0,
+                            width: 20,
+                            render: (data, type, row, meta) => {
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            },
+                        }
+                    ];
+                    actionsProject.showDetailProject = function(id) {
+                        window.location.href = "{{ route(DBRoutes::projectEdit, ['__id__']) }}?tab=proyek".route({id: id});
+                    };
+                    actionsProject.build();
+                }
+            }).open();
+        };
+        actions.showInvestment = function(id) {
+            $.createModal({
+                url: "{{ url()->current() }}/show-investment",
+                data: {id: id},
+                modalSize: 'modal-xl',
+                onLoadComplete: (res) => {
+                    actionsInvestment = new Actions("{{ url()->current() }}/show-investment");
+                    actionsInvestment.selectors.table = "#table-investment-investor";
+                    actionsInvestment.datatable.params = {
+                        _token: "{{ csrf_token() }}",
+                        id: id,
+                    };
+                    actionsInvestment.datatable.columnDefs = [
+                        {
+                            targets: 0,
+                            width: 20,
+                            render: (data, type, row, meta) => {
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            },
+                        },
+                        {
+                            targets: 5,
+                            render: (data) => {
+                                const $wrapper = $('<div>', {class: 'text-center'});
+                                $wrapper.html(`${data} %`);
+
+                                return $wrapper.get(0).outerHTML;
+                            },
+                        }
+                    ];
+                    actionsInvestment.showDetailInvestment = function(id) {
+                        window.location.href = "{{ route(DBRoutes::projectInvestor, ['__id__']) }}".route({id: id});
+                    };
+                    actionsInvestment.build();
+                }
+            }).open();
+        };
         actions.build();
     </script>
 @endpush

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class Investor extends Model
 {
@@ -70,7 +71,7 @@ class Investor extends Model
     {
         return Carbon::createFromTimeString($value)
             ->setTimezone(env('APP_TIMEZONE'))
-            ->format('d/m/Y H:i:s');
+            ->format('Y-m-d H:i:s');
     }
 
     public function getDateOfBirthAttribute($value)
@@ -141,7 +142,33 @@ class Investor extends Model
                         ->addSelect('investor_id');
                 },
             ])
-            ->addSelect('created_at');
+            ->addSelect([
+                'created_at',
+                DB::raw(sprintf("(
+                    SELECT COALESCE(SUM(investment_value), 0)
+                    FROM tr_project_investor
+                    WHERE investor_id = %s.id
+                    AND tr_project_investor.project_sk_id = (
+                        SELECT tr_project_sk.id
+                        FROM tr_project_sk
+                        WHERE tr_project_sk.project_id = tr_project_investor.project_id
+                        ORDER BY tr_project_sk.revision DESC
+                        LIMIT 1
+                    )
+                ) as count_investment", $this->getTable())),
+                DB::raw(sprintf("(
+                    SELECT COALESCE(COUNT(tr_project_investor.id), 0)
+                    FROM tr_project_investor
+                    WHERE investor_id = %s.id
+                    AND tr_project_investor.project_sk_id = (
+                        SELECT tr_project_sk.id
+                        FROM tr_project_sk
+                        WHERE tr_project_sk.project_id = tr_project_investor.project_id
+                        ORDER BY tr_project_sk.revision DESC
+                        LIMIT 1
+                    )
+                ) as count_project", $this->getTable()))
+            ]);
     }
 
     public function gender()
@@ -181,6 +208,4 @@ class Investor extends Model
                 $query->where('slug', \DBTypes::fileInvestorNPWP);
             });
     }
-
-
 }

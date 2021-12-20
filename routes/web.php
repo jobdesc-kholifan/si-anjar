@@ -149,6 +149,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['prefix' => 'investor'], function () {
         Route::post('datatables', [InvestorController::class, 'datatables']);
         Route::get('select', [InvestorController::class, 'select'])->name(DBRoutes::investorSelect);
+        Route::get('show-project', [InvestorController::class, 'showProject']);
+        Route::post('show-project/datatables', [InvestorController::class, 'datatablesProject']);
+        Route::get('show-investment', [InvestorController::class, 'showInvestment']);
+        Route::post('show-investment/datatables', [InvestorController::class, 'datatablesInvestment']);
 
         Route::get('', [InvestorController::class, 'index'])->name(DBRoutes::investor);
         Route::get('form', [InvestorController::class, 'form']);

@@ -6,6 +6,7 @@ use App\Models\Investors\Investor;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\DB;
 
 class ProjectInvestor extends Model
 {
@@ -77,5 +78,21 @@ class ProjectInvestor extends Model
     public function investor()
     {
         return $this->hasOne(Investor::class, 'id', 'investor_id');
+    }
+
+    public function countByInvestor($investorid)
+    {
+        return $this->select(DB::raw("COALESCE(COUNT(id), 0) as count_project"))
+            ->where('investor_id', $investorid)
+            ->first()
+            ->count_project;
+    }
+
+    public function countInvestmentByInvestor($investorid)
+    {
+        return $this->select(DB::raw("COALESCE(SUM(investment_value), 0) as count_investment"))
+            ->where('investor_id', $investorid)
+            ->first()
+            ->count_investment;
     }
 }
