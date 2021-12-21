@@ -73,25 +73,27 @@ class ProjectSKController extends Controller
         try {
             findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
+            $skId = $this->projectSK->getLatestId($projectId, false);
+
             $query = $this->projectSK->defaultWith($this->projectSK->defaultSelects)
                 ->where('project_id', $projectId);
 
             return datatables()->eloquent($query)
-                ->addColumn('action', function($data) {
+                ->addColumn('action', function($data) use ($skId) {
 
                     $btnShowDraft = "";
-                    if($data->is_draft)
+                    if($data->is_draft && $data->id == $skId)
                         $btnShowDraft = (new Button("actionsSK.showDraft($data->id)", Button::btnSecondary, Button::btnIconFile))
                             ->setLabel("Tampilkan Draft")
                             ->render();
 
                     $btnPrint = "";
-                    if(!$data->is_draft)
+                    if(!$data->is_draft || $data->id != $skId)
                         $btnPrint = (new Button("actions.print($data->id)", Button::btnPrimary, Button::btnIconPrint))
                             ->render();
 
                     $btnDetail = "";
-                    if(!$data->is_draft)
+                    if(!$data->is_draft || $data->id != $skId)
                         $btnDetail = (new Button("actionsSK.detail($data->id)", Button::btnPrimary, Button::btnIconInfo))
                             ->setLabel("Lihat Investor")
                             ->render();
