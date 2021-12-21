@@ -73,7 +73,7 @@ class ProjectSKController extends Controller
         try {
             findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
-            $skId = $this->projectSK->getLatestId($projectId, false);
+            $skId = $this->projectSK->getLatestId($projectId, true);
 
             $query = $this->projectSK->defaultWith($this->projectSK->defaultSelects)
                 ->where('project_id', $projectId);
