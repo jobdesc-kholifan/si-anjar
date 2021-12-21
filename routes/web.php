@@ -12,6 +12,7 @@ use App\Http\Controllers\Project\ProjectController;
 use App\Http\Controllers\Project\ProjectInvestorController;
 use App\Http\Controllers\Project\ProjectSKController;
 use App\Http\Controllers\Project\ProjectSurkasController;
+use App\Http\Controllers\SK\SKController;
 use App\Http\Controllers\UsersManagement\UsersController;
 use App\Http\Controllers\Security\MenuController;
 use App\Http\Controllers\Security\MenuFeatureController;
@@ -170,6 +171,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('create', [ProjectController::class, 'store']);
 
         Route::group(['prefix' => '{projectId}'], function () {
+
             Route::get('', [ProjectController::class, 'show'])->name(DBRoutes::projectShow);
             Route::get('edit', [ProjectController::class, 'edit'])->name(DBRoutes::projectEdit);
             Route::post('edit', [ProjectController::class, 'update']);
@@ -177,7 +179,7 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::group(['prefix' => 'investor'], function () {
                 Route::post('datatables', [ProjectInvestorController::class, 'datatables']);
-                Route::get('all', [ProjectInvestorController::class, 'all'])->name(DBRoutes::projectInvestorAll);
+                Route::get('all', [ProjectInvestorController::class, 'all'])->name(DBRoutes::projectInvestorAll);\
                 Route::get('draft', [ProjectInvestorController::class, 'draft']);
                 Route::post('draft', [ProjectInvestorController::class, 'store']);
 
@@ -190,12 +192,15 @@ Route::group(['middleware' => 'auth'], function () {
             });
 
             Route::group(['prefix' => 'sk'], function () {
+                Route::get('', [ProjectSKController::class, 'index'])->name(DBRoutes::projectSK);
                 Route::post('datatables', [ProjectSKController::class, 'datatables']);
                 Route::get('detail', [ProjectSKController::class, 'detail']);
 
-                Route::get('', [ProjectSKController::class, 'index'])->name(DBRoutes::projectSK);
                 Route::get('revision', [ProjectSKController::class, 'revision'])->name(DBRoutes::projectSKUpdate);
                 Route::post('revision', [ProjectSKController::class, 'store']);
+
+                Route::get('form', [ProjectSKController::class, 'form']);
+                Route::post('', [ProjectSKController::class, 'store']);
             });
 
             Route::group(['prefix' => 'surkas'], function () {
@@ -212,6 +217,15 @@ Route::group(['middleware' => 'auth'], function () {
                 });
             });
         });
+    });
+
+    Route::group(['prefix' => 'sk'], function () {
+        Route::post('datatables', [SKController::class, 'datatables']);
+
+        Route::get('', [SKController::class, 'index'])->name(DBRoutes::SK);
+        Route::get('show-sk', [SKController::class, 'showSK']);
+        Route::post('show-sk/datatables', [SKController::class, 'datatablesSK']);
+        Route::get('show-project', [SKController::class, 'showProject']);
     });
 
     Route::group(['prefix' => 'security'], function () {

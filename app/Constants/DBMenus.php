@@ -21,6 +21,7 @@ class DBMenus
     const investor = 'investor';
 
     const project = 'project';
+    const SK = 'sk';
 
     const surkas = 'surkas';
 }

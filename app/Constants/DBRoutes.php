@@ -49,4 +49,6 @@ class DBRoutes
     const projectSKUpdate = 'project.sk.update';
 
     const projectSurkas = 'project.surkas';
+    
+    const SK = 'sk';
 }
