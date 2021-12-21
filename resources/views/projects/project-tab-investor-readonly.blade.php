@@ -21,7 +21,10 @@ use App\Helpers\Collections\Projects\ProjectCollection;
                         @include('projects.project-tab-menu')
                         <div class="tab-content">
                             <div class="tab-pane active show fade" id="content-pic">
-                                <h4 class="pt-3 pb-2 px-2 mb-4 border-bottom">Form Investor</h4>
+                                <h4 class="pt-3 pb-2 px-2 mb-4 border-bottom">Form Investor
+                                    @if(!empty($noSK))
+                                        - {{ $noSK }}
+                                    @endif</h4>
                                 <div class="form-group">
                                     <dl class="row">
                                         <dt class="col-4 col-sm-2">Proyek</dt>

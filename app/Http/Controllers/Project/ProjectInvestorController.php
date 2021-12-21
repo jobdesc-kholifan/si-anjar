@@ -69,10 +69,17 @@ class ProjectInvestorController extends Controller
 
             $skId = $this->projectSK->getLatestId($projectId, false);
 
+            $noSK = "";
+            if(!is_null($skId)) {
+                $sk = $this->projectSK->find($skId);
+                $noSK = "Revision - $sk->revision";
+            }
+
             return $this->view(is_null($skId) ? 'project-tab-investor' : 'project-tab-investor-readonly', [
                 'projectId' => $projectId,
                 'project' => $row,
                 'tabActive' => 'investor',
+                'noSK' => $noSK,
                 'isDraft' => $count > 0 || !is_null($skId),
             ]);
         } catch (\Exception $e) {
