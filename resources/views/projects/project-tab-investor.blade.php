@@ -23,14 +23,19 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                         @include('projects.project-tab-menu')
                         <div class="tab-content">
                             <div class="tab-pane active show fade" id="content-pic">
-                                <h4 class="pt-3 pb-2 px-2 mb-4 border-bottom">Form Investor</h4>
+                                <h4 class="pt-3 pb-2 px-2 mb-4 border-bottom">
+                                    Form Investor
+                                    @if($isDraft)
+                                        <div class="btn btn-primary btn-xs rounded-pill px-2 ml-1">Draft</div>
+                                    @endif
+                                </h4>
                                 <div class="form-group">
                                     <dl class="row">
                                         <dt class="col-4 col-sm-2">Proyek</dt>
                                         <dd class="col-8 col-sm-10">{{ $project->getName() }}</dd>
                                         <dt class="col-4 col-sm-2">Nilai Proyek</dt>
                                         <dd class="col-8 col-sm-10">{{ IDR($project->getValue()) }}</dd>
-                                        <dt class="col-4 col-sm-2">Lembar Saham</dt>
+                                        <dt class="col-4 col-sm-2">Jumlah Lembar Saham</dt>
                                         <dd class="col-8 col-sm-10">{{ number_format($project->getSharesValue(), 0, ",", ".") }} Lembar</dd>
                                         <dt class="col-4 col-sm-2">Modal Disetor</dt>
                                         <dd class="col-8 col-sm-10" id="label-modal-value">{{ IDR($project->getModalValue()) }}</dd>
@@ -39,12 +44,22 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                                     </dl>
                                 </div>
                                 @if($hasUpdate)
-                                <div class="form-group text-right">
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                                        <i class="fa fa-check-circle mr-1"></i>
-                                        <span>Simpan</span>
-                                    </button>
-                                </div>
+                                    <div class="form-group d-flex justify-content-end align-items-center">
+                                        @if($tabActive == 'sk')
+                                            <a href="{{ route(DBRoutes::projectSK, [$projectId]) }}" class="btn btn-outline-secondary btn-sm mr-1">
+                                                <i class="fa fa-angle-left mr-1"></i>
+                                                <span>Kembali ke Halaman SK</span>
+                                            </a>
+                                        @endif
+                                        <button type="button" class="btn btn-outline-secondary btn-sm mr-1" onclick="actions.setDraft()">
+                                            <i class="fa fa-file-alt mr-1"></i>
+                                            <span>Simpan Sebagai Draft</span>
+                                        </button>
+                                        <button type="submit" class="btn btn-primary btn-sm" id="submit-form">
+                                            <i class="fa fa-check-circle mr-1"></i>
+                                            <span>Simpan</span>
+                                        </button>
+                                    </div>
                                 @endif
                                 <div class="form-group">
                                     <div class="w-100">
@@ -95,7 +110,14 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
             sharesValue: {{ $project->getSharesValue() }},
         });
 
-        ServiceAjax.get("{{ route(DBRoutes::projectInvestorAll, [$projectId]) }}")
+        const actions = {
+            setDraft: function() {
+                projectInvestor.options.isDraft = true;
+                $('#submit-form').click();
+            }
+        };
+
+        ServiceAjax.get("{{ route(DBRoutes::projectInvestorAll, [$projectId]) }}", {data: {isDraft: '{{ $isDraft }}'}})
             .done(res => {
                 if(res.result) {
                     if(res.data.length === 0)
@@ -108,15 +130,20 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
         const $form = $('#form-project').formSubmit({
             data: function(params) {
                 params.investors = projectInvestor.toString();
+                params.isDraft = projectInvestor.options.isDraft;
                 return params;
             },
             beforeSubmit: function() {
-                if(confirm("Apakah data yang diinputkan sudah benar?")) {
-                    projectInvestor.validate();
-                    return projectInvestor.isValid();
+                if(!projectInvestor.options.isDraft) {
+                    if(confirm("Apakah data yang diinputkan sudah benar?")) {
+                        projectInvestor.validate();
+                        return projectInvestor.isValid();
+                    }
+
+                    return false;
                 }
 
-                return false;
+                projectInvestor.validate();
             },
             successCallback: function(res) {
                 AlertNotif.toastr.response(res);

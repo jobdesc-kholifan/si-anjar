@@ -68,6 +68,13 @@ class Project extends Model
             ->format('d/m/Y');
     }
 
+    public function getFinishDateAttribute($value)
+    {
+        return Carbon::createFromTimestamp(strtotime($value))
+            ->setTimezone(env('APP_TIMEZONE'))
+            ->format('d/m/Y');
+    }
+
     /**
      * static function yang digunakan ketika memanggil with biar tidak perlu
      * dituliskan lagi

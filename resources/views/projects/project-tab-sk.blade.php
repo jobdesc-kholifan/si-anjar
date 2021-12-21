@@ -70,6 +70,7 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
         const actionsSK = new Actions("{{ route(DBRoutes::projectSK, [$projectId]) }}");
 
         actionsSK.selectors.table = '#table-project-sk';
+        actionsSK.datatable.order = [[1, 'desc']];
         actionsSK.datatable.params = {
             _token: "{{ csrf_token() }}",
         };
@@ -79,6 +80,17 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                 width: 20,
                 render: (data, type, row, meta) => {
                     return meta.row + meta.settings._iDisplayStart + 1;
+                },
+            },
+            {
+                targets: 1,
+                render: (data, type, row, meta) => {
+                    const $wrapper = $('<div>');
+                    $wrapper.append(data);
+                    if(row.is_draft) {
+                        $wrapper.append($('<div>', {class: 'badge badge-primary badge-pill font-weight-normal ml-2'}).html("Draft"));
+                    }
+                    return $wrapper.get(0).outerHTML;
                 },
             }
         ];
@@ -117,6 +129,9 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                     actionsSKInvestor.build();
                 },
             }).open();
+        };
+        actionsSK.showDraft = function(id) {
+            window.location.href = "{{ route(DBRoutes::projectInvestor, [$projectId]) }}/draft";
         };
         actionsSK.build();
     </script>

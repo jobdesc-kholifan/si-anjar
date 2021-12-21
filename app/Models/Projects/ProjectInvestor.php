@@ -80,6 +80,11 @@ class ProjectInvestor extends Model
         return $this->hasOne(Investor::class, 'id', 'investor_id');
     }
 
+    public function data_sk()
+    {
+        return $this->hasOne(ProjectSK::class, 'id', 'project_sk_id');
+    }
+
     public function countByInvestor($investorid)
     {
         return $this->select(DB::raw("COALESCE(COUNT(id), 0) as count_project"))

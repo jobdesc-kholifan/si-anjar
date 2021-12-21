@@ -1,6 +1,10 @@
 +function($) {
 
     const ModalOptions = function(selector, options) {
+        this.title = options !== undefined && options.title !== undefined ? options.title : undefined;
+        if(this.title === undefined && selector.hasModalData('title'))
+            this.title = selector.modalData('title');
+
         this.url = options !== undefined && options.url !== undefined ? options.url : undefined;
         if(this.url === undefined && selector.hasModalData('url'))
             this.url = selector.modalData('url');
@@ -160,18 +164,31 @@
         this.content = this.dialog.find(this.selector.content);
     };
 
-    ModalContext.prototype.buildContentHeader = function() {
+    ModalContext.prototype.buildContentHeader = function(title) {
         if(this.content.find(this.selector.header).length === 0)
             this.content.append($('<div>', {class: this.classes.header}));
 
         this.header = this.content.find(this.selector.header);
+
+        if(title !== undefined)
+            this.header.append($('<h3>', {class: 'card-title'}).html(title));
+
+        if(this.options.closeButton)
+            this.header.append($('<span>', {class: this.classes.buttonClose, 'data-dismiss': 'modal'}).html('&times;'));
+
+        return this;
     };
 
-    ModalContext.prototype.buildContentBody = function() {
+    ModalContext.prototype.buildContentBody = function(element) {
         if(this.content.find(this.selector.body).length === 0)
             this.content.append($('<div>', {class: this.classes.body}));
 
         this.body = this.content.find(this.selector.body);
+
+        if(element !== undefined)
+            this.body.append(element);
+
+        return this;
     };
 
     ModalContext.prototype.buildContentFooter = function() {
@@ -179,6 +196,8 @@
             this.content.append($('<div>', {class: this.classes.footer}));
 
         this.footer = this.content.find(this.selector.footer);
+
+        return this;
     };
 
     ModalContext.prototype.buildFromResponse = function(res) {
@@ -381,6 +400,14 @@
             return new FormSubmit(this.find('form'), options);
         };
     };
+
+    LoadModal.prototype.getContext = function() {
+        this.context.build();
+
+        this.context.modal.modal('show');
+
+        return this.context;
+    }
 
     LoadModal.prototype.open = function(options) {
         this.context.build();

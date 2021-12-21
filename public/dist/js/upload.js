@@ -8,6 +8,7 @@
         this.files = options !== undefined && options.files !== undefined ? options.files : [];
 
         this.getMimeType = options !== undefined && options.getMimeType !== undefined ? options.getMimeType : (file) => file.mimetype;
+        this.getFileName = options !== undefined && options.getFileName !== undefined ? options.getFileName : (file) => file.file_name;
         this.getThumbnail = options !== undefined && options.getThumbnail !== undefined ? options.getThumbnail : (file) => file.thumbnail;
         this.getPreview = options !== undefined && options.getPreview !== undefined ? options.getPreview : (file) => file.image;
         this.getDesc = options !== undefined && options.getDesc !== undefined ? options.getDesc : (file) => file.image;
@@ -47,7 +48,7 @@
             else this.$.remove();
 
             if(this.__upload.$wrapper.children().length === 0
-                && !this.__upload.options.multiple)
+                || !this.__upload.options.multiple)
                 this.__upload.add();
         });
     };
@@ -69,28 +70,103 @@
     };
 
     FormUpload.prototype.render = function(file) {
-        const $preview = $('<div>', {class: 'image-canvas'});
         if(file.type.indexOf('image') !== -1) {
+            const that = this;
+            that.preview.attr('data-lightbox', this.__upload.options.name);
+            const $preview = $('<div>', {class: 'image-canvas'});
             const imageReader = new FileReader();
             imageReader.readAsDataURL(file);
             imageReader.onloadend = function() {
                 $preview.css({backgroundImage: `url(${this.result})`});
+                that.preview.attr('href', this.result);
             };
+            this.$form.append($preview);
         }
 
-        this.$form.append($preview);
+        else if(file.type.indexOf('pdf') !== -1) {
+            const $preview = $('<embed>');
+            const imageReader = new FileReader();
+            imageReader.readAsDataURL(file);
+            imageReader.onloadend = function() {
+                $preview.attr('src', `${this.result}#view=FitH&scrollbar=0&toolbar=0&navpanes=0`);
+            };
+
+            const width = this.$.width(), height = this.$.height();
+            setTimeout(() => $preview.css({width: width, height: height}), 100);
+
+            this.preview.click(() => {
+                const imageReader = new FileReader();
+                imageReader.readAsDataURL(file);
+                imageReader.onloadend = function() {
+                    const embeded = $('<embed>', {src: `${this.result}#view=FitH&scrollbar=0&toolbar=0&navpanes=0`})
+                        .css(({height: 'calc(100vh - 150px)', width: '100%'}));
+
+                    $.createModal({
+                        modalSize: 'modal-lg',
+                        closeButton: true
+                    }).getContext().buildContentHeader(file.name)
+                        .buildContentBody(embeded).body.addClass('p-0');
+                };
+            });
+
+            this.$form.append($preview);
+        }
+
+        else {
+            const $preview = $('<div>', {class: 'image-canvas'});
+            $preview.html(file.name);
+
+            this.$form.append($preview);
+        }
+
         this.button.addClass('d-none');
         this.actions.removeClass('d-none');
 
         this.filename.val(file.name);
+        this.preview.data('file', file);
     };
 
-    FormUpload.prototype.renderImage = function(file) {
-        const $preview = $('<div>', {class: 'image-canvas'});
-        const imageURL = this.__upload.options.getPreview(file);
-        $preview.css({backgroundImage: `url(${imageURL})`});
+    FormUpload.prototype.renderFromJson = function(file) {
+        const mimeType = this.__upload.options.getMimeType(file);
 
-        this.$form.append($preview);
+        if(mimeType.indexOf('image') !== -1) {
+            const that = this;
+            that.preview.attr('data-lightbox', this.__upload.options.name);
+            const $preview = $('<div>', {class: 'image-canvas'});
+            const preview = this.__upload.options.getPreview(file);
+
+            $preview.css({backgroundImage: `url(${preview})`});
+            that.preview.attr('href', preview);
+            this.$form.append($preview);
+        }
+
+        else if(mimeType.indexOf('pdf') !== -1) {
+            const preview = this.__upload.options.getPreview(file);
+            const $preview = $('<embed>', {src: preview});
+
+            const width = this.$.width(), height = this.$.height();
+            setTimeout(() => $preview.css({width: width, height: height}), 0);
+
+            this.preview.click(() => {
+                const embeded = $('<embed>', {src: `${preview}#view=FitH&scrollbar=0&toolbar=0&navpanes=0`})
+                    .css(({height: 'calc(100vh - 150px)', width: '100%'}));
+
+                $.createModal({
+                    modalSize: 'modal-lg',
+                    closeButton: true
+                }).getContext().buildContentHeader(file.name)
+                    .buildContentBody(embeded).body.addClass('p-0');
+            });
+
+            this.$form.append($preview);
+        }
+
+        else {
+            const $preview = $('<div>', {class: 'image-canvas'});
+            $preview.html(this.__upload.options.getFileName(file));
+
+            this.$form.append($preview);
+        }
 
         this.button.addClass('d-none');
         this.actions.removeClass('d-none');
@@ -163,32 +239,35 @@
         let documents = Array.isArray(document) ? document : [document];
         documents.forEach(document => {
             const $form = this.add();
-            $form.data('form').id.val(document.id);
 
-            const mimeType = this.options.getMimeType(document);
-            if(mimeType !== undefined) {
-                if(mimeType.indexOf('image/') !== -1) {
-                    $form.data('form').renderImage(document);
-                }
+            if(document !== null && document.id !== undefined) {
+                $form.data('form').id.val(document.id);
+                $form.data('form').renderFromJson(document);
+
+                if(this.options.showFileName)
+                    $form.data('form').$.append(this.$formFileName.clone());
+
+                const $description = $(this.$description.clone());
+                $description.attr('name', `${this.options.name.replace('[]', '')}_desc_update[]`);
+
+                const description = this.options.getDesc(document);
+                if(description !== undefined)
+                    $description.val(description);
+
+                if(this.options.withDescription)
+                    $form.data('form').$.append($description);
             }
-
-            if(this.options.showFileName)
-                $form.data('form').$.append(this.$formFileName.clone());
-
-            const $description = $(this.$description.clone());
-            $description.attr('name', `${this.options.name.replace('[]', '')}_desc_update[]`);
-
-            const description = this.options.getDesc(document);
-            if(description !== undefined)
-                $description.val(description);
-
-            if(this.options.withDescription)
-                $form.data('form').$.append($description);
         });
 
         if(this.options.multiple)
             this.add();
     }
+
+    Upload.prototype.clear = function() {
+        this.$wrapper.find('[type=file]').each((i, input) => {
+            const $input = $(input).val(null);
+        })
+    };
 
     $.fn.upload = function(options) {
         let $this = $(this);

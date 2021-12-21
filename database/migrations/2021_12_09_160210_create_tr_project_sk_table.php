@@ -19,6 +19,7 @@ class CreateTrProjectSkTable extends Migration
             $table->integer('revision');
             $table->string('no_sk', 30);
             $table->timestamp('printed_at')->nullable();
+            $table->boolean('is_draft')->nullable();
 
             $table->timestamps();
         });

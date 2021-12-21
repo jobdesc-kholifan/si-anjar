@@ -41,14 +41,15 @@ class ProjectInvestorController extends Controller
         $this->projectInvestor = new ProjectInvestor();
     }
 
-    public function all($projectId)
+    public function all(Request $req, $projectId)
     {
         try {
             findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
+            $skId = $this->projectSK->getLatestId($projectId, $req->get('isDraft', false));
             $query = $this->projectInvestor->defaultWith($this->projectInvestor->defaultSelects)
                 ->where('project_id', $projectId)
-                ->where('project_sk_id', $this->projectSK->getLatestId($projectId));
+                ->where('project_sk_id', $skId);
 
             return $this->jsonData($query->get());
         } catch (\Exception $e) {
@@ -62,13 +63,17 @@ class ProjectInvestorController extends Controller
             findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
             $row = ProjectCollection::find($projectId);
+
             $count = $this->projectInvestor->where('project_id', $projectId)
                 ->count();
 
-            return $this->view($count == 0 ? 'project-tab-investor' : 'project-tab-investor-readonly', [
+            $skId = $this->projectSK->getLatestId($projectId, false);
+
+            return $this->view(is_null($skId) ? 'project-tab-investor' : 'project-tab-investor-readonly', [
                 'projectId' => $projectId,
                 'project' => $row,
-                'tabActive' => 'investor'
+                'tabActive' => 'investor',
+                'isDraft' => $count > 0 || !is_null($skId),
             ]);
         } catch (\Exception $e) {
             return $this->jsonError($e);
@@ -82,7 +87,7 @@ class ProjectInvestorController extends Controller
 
             $skId = $req->get('sk_id');
             if(!$req->has('sk_id'))
-                $skId = $this->projectSK->getLatestId($projectId);
+                $skId = $this->projectSK->getLatestId($projectId, false);
 
             $query = $this->projectInvestor->defaultWith($this->projectInvestor->defaultSelects)
                 ->where('project_id', $projectId)
@@ -118,6 +123,24 @@ class ProjectInvestorController extends Controller
         }
     }
 
+    public function draft($projectId)
+    {
+        try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
+
+            $row = ProjectCollection::find($projectId);
+
+            return $this->view( 'project-tab-investor', [
+                'projectId' => $projectId,
+                'project' => $row,
+                'tabActive' => 'investor',
+                'isDraft' => true,
+            ]);
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
     public function store(Request $req, $projectId)
     {
         try {
@@ -125,9 +148,26 @@ class ProjectInvestorController extends Controller
 
             DB::beginTransaction();
 
+            $isDraft = $req->get('isDraft');
+
+            $project = ProjectCollection::find($projectId);
+
             $skId = $this->projectSK->getLatestId($projectId);
-            if(is_null($skId))
-                throw new \Exception("Tidak ditemukan SK", \DBCodes::authorizedError);
+
+            if(!is_null($skId)) {
+                $this->projectInvestor->where('project_sk_id', $skId)
+                    ->delete();
+                $this->projectSK->find($skId)->delete();
+            }
+
+            $revision = $this->projectSK->lastRevision($projectId);
+            $sk = $this->projectSK->create([
+                'project_id' => $projectId,
+                'revision' => $revision,
+                'no_sk' => sprintf("SK-%s", $project->getCode()),
+                'is_draft' => $isDraft,
+            ]);
+            $skId = $sk->id;
 
             $investors = json_decode($req->get('investors', '[]'));
 
@@ -145,7 +185,8 @@ class ProjectInvestorController extends Controller
 
             $this->projectInvestor->insert($insertInvestor);
 
-            $this->project->updateModal($projectId);
+            if(!$isDraft)
+                $this->project->updateModal($projectId);
 
             DB::commit();
 

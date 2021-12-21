@@ -5,6 +5,7 @@ const ProjectInvestorOptions = function(options = {}) {
     };
     this.projectValue = options.projectValue ? options.projectValue : 0;
     this.sharesValue = options.sharesValue ? options.sharesValue : 0;
+    this.isDraft = false;
 };
 
 const DataProjectInvestor = function(value = {}) {
@@ -57,6 +58,8 @@ ProjectInvestorForm.prototype.init = function() {
         this.$.data('data').shares_percentage = percentage;
         this.$.data('data').shares_value = this.$inputShares.val();
         this.$.data('data').investment_value = nominal;
+
+        this.__form.isValid();
     });
 
     this.$selectInvestor.change(() => {
@@ -81,16 +84,26 @@ ProjectInvestorForm.prototype.init = function() {
             this.$.data('data').investor_id = this.$selectInvestor.val();
             this.$.data('data').investor = {id: this.$selectInvestor.val(), text: this.$selectInvestor.find('option:selected').text()};
         }
+
+        this.__form.isValid();
     });
 
     this.$btnDelete.click(() => {
-        if(this.__form.$body.children().length > 0) {
+        if(this.__form.$body.children().length > 1) {
             if(this.$.data('data').id > 0) {
                 this.$.addClass('d-none');
                 this.$.data('data').deleted = true;
             }
 
             else this.$.remove();
+        } else {
+            this.$inputShares.val(null);
+            this.$inputNoKTP.empty();
+            this.$selectInvestor.val(null).text(null);
+            this.$percentage.html('0 %');
+            this.$invesmentValue.html('Rp. 0');
+            this.$selectInvestor.closest('td').find('small').empty();
+            this.$inputShares.closest('td').find('small').empty();
         }
 
         this.__form.$body.children().last().data('form').$btnAdd.removeClass('d-none');
@@ -143,6 +156,8 @@ const ProjectInvestor = function(selector, options) {
     this.$body = $(this.$.find('tbody'));
 
     this.options = new ProjectInvestorOptions(options);
+    this.$labelModalValue = $('#label-modal-value');
+    this.$labelModalLack = $('#label-modal-lack');
 
     this.$form = $('<tr>').append(
         $('<td>').append($('<span>', {'data-action': 'nomor'})),
@@ -201,6 +216,8 @@ ProjectInvestor.prototype.set = function(values) {
         $form.data('data', new DataProjectInvestor(value));
         $form.data('form').update();
     });
+
+    this.isValid();
 };
 
 ProjectInvestor.prototype.isValid = function() {
@@ -236,6 +253,15 @@ ProjectInvestor.prototype.isValid = function() {
         modalValue += data.investment_value;
     }
 
+    const priceShares = this.options.sharesValue/this.options.projectValue;
+    const shares = modalValue*priceShares;
+
+    const kekurangan = this.options.projectValue - modalValue;
+    const sharesKekurangan = this.options.sharesValue-shares;
+
+    this.$labelModalValue.html(`Rp. ${$.number(modalValue, null, ',', '.')} / ${$.number(shares, null, ",", '.')} Lembar`);
+    this.$labelModalLack.html(`Rp. ${$.number(kekurangan, null, ',', '.')} / ${$.number(sharesKekurangan, null, ',', '.')} Lembar`);
+
     if(modalValue !== this.options.projectValue)
         isValid = false;
 
@@ -243,27 +269,29 @@ ProjectInvestor.prototype.isValid = function() {
 };
 
 ProjectInvestor.prototype.validate = function() {
-    const children = this.$body.children();
+    if(!this.options.isDraft) {
+        const children = this.$body.children();
 
-    let modalValue = 0;
-    let sharesValue = this.options.sharesValue;
-    for(let i = 0; i < children.length; i++) {
-        const $item = $(children[i]);
+        let modalValue = 0;
+        let sharesValue = this.options.sharesValue;
+        for(let i = 0; i < children.length; i++) {
+            const $item = $(children[i]);
 
-        const data = $item.data('data');
-        const form = $item.data('form');
+            const data = $item.data('data');
+            const form = $item.data('form');
 
-        if(modalValue + data.investment_value > this.options.projectValue) {
-            form.$inputShares.closest('td').find('small')
-                .html(`Jumlah lembar maksimal yang disa digunakan adalah ${idr(sharesValue)} lembar`);
+            if(modalValue + data.investment_value > this.options.projectValue) {
+                form.$inputShares.closest('td').find('small')
+                    .html(`Jumlah lembar maksimal yang disa digunakan adalah ${idr(sharesValue)} lembar`);
+            }
+
+            modalValue += data.investment_value;
+            sharesValue -= data.shares_value;
         }
 
-        modalValue += data.investment_value;
-        sharesValue -= data.shares_value;
+        if(modalValue !== 0 && modalValue < this.options.projectValue)
+            AlertNotif.toastr.error("Jumlah modal belum mencukupi kebutuhan");
     }
-
-    if(modalValue !== 0 && modalValue < this.options.projectValue)
-        AlertNotif.toastr.error("Jumlah modal belum mencukupi kebutuhan");
 }
 
 ProjectInvestor.prototype.countOf = function() {

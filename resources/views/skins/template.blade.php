@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="{{ asset('plugins/toastr/toastr.min.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/daterangepicker/daterangepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/lightbox/css/lightbox.min.css') }}">
     <link rel="stylesheet" href="{{ asset('dist/css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ asset('dist/css/custom-style.css') }}">
     @stack('style')
@@ -37,6 +38,7 @@
 <script src="{{ asset('plugins/select2/js/select2.min.js') }}"></script>
 <script src="{{ asset('plugins/moment/moment.min.js') }}"></script>
 <script src="{{ asset('plugins/daterangepicker/daterangepicker.js') }}"></script>
+<script src="{{ asset('plugins/lightbox/js/lightbox.min.js') }}"></script>
 <script src="{{ asset('dist/js/adminlte.min.js') }}"></script>
 <script src="{{ asset('dist/js/load.modal.js') }}"></script>
 <script src="{{ asset('dist/js/jquery-classes.js') }}"></script>

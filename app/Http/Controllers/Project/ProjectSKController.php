@@ -11,6 +11,7 @@ use App\View\Components\Button;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
 
 class ProjectSKController extends Controller
 {
@@ -52,7 +53,7 @@ class ProjectSKController extends Controller
 
             $project = ProjectCollection::find($projectId);
 
-            $skId = $this->projectSK->getLatestId($projectId);
+            $skId = $this->projectSK->getLatestId($projectId, false);
             $countInvestor = $this->projectInvestor->where('project_sk_id', $skId)
                 ->count();
 
@@ -78,13 +79,24 @@ class ProjectSKController extends Controller
             return datatables()->eloquent($query)
                 ->addColumn('action', function($data) {
 
-                    $btnPrint = (new Button("actions.print($data->id)", Button::btnPrimary, Button::btnIconPrint))
-                        ->render();
-                    $btnDetail = (new Button("actionsSK.detail($data->id)", Button::btnPrimary, Button::btnIconInfo))
-                        ->setLabel("Lihat Investor")
-                        ->render();
+                    $btnShowDraft = "";
+                    if($data->is_draft)
+                        $btnShowDraft = (new Button("actionsSK.showDraft($data->id)", Button::btnSecondary, Button::btnIconFile))
+                            ->setLabel("Tampilkan Draft")
+                            ->render();
 
-                    return \DBText::renderAction([$btnDetail, $btnPrint]);
+                    $btnPrint = "";
+                    if(!$data->is_draft)
+                        $btnPrint = (new Button("actions.print($data->id)", Button::btnPrimary, Button::btnIconPrint))
+                            ->render();
+
+                    $btnDetail = "";
+                    if(!$data->is_draft)
+                        $btnDetail = (new Button("actionsSK.detail($data->id)", Button::btnPrimary, Button::btnIconInfo))
+                            ->setLabel("Lihat Investor")
+                            ->render();
+
+                    return \DBText::renderAction([$btnShowDraft, $btnDetail, $btnPrint]);
                 })
                 ->toJson();
         } catch (\Exception $e) {
@@ -102,7 +114,8 @@ class ProjectSKController extends Controller
             return $this->view('project-tab-investor', [
                 'projectId' => $projectId,
                 'project' => $row,
-                'tabActive' => 'sk'
+                'tabActive' => 'sk',
+                'isDraft' => false,
             ]);
         } catch (\Exception $e) {
             return $this->jsonError($e);
@@ -116,6 +129,7 @@ class ProjectSKController extends Controller
 
             DB::beginTransaction();
 
+            $isDraft = $req->get('isDraft');
             $revision = $this->projectSK->lastRevision($projectId) + 1;
             $project = ProjectCollection::find($projectId);
 
@@ -123,6 +137,7 @@ class ProjectSKController extends Controller
                 'project_id' => $projectId,
                 'revision' => $revision,
                 'no_sk' => sprintf("SK-%s-rev%03d", $project->getCode(), $revision),
+                'is_draft' => $isDraft,
             ]);
 
             $investors = json_decode($req->get('investors', '[]'));
@@ -141,7 +156,8 @@ class ProjectSKController extends Controller
 
             $this->projectInvestor->insert($insertInvestor);
 
-            $this->project->updateModal($projectId);
+            if(!$isDraft)
+                $this->project->updateModal($projectId);
 
             DB::commit();
 

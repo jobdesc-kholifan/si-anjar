@@ -87,7 +87,8 @@ class TypesController extends Controller
                 ->whereHas('parent', function($query) use ($slug) {
                     /* @var Relation $query */
                     $query->where('slug', $slug);
-                });
+                })
+                ->addSelect('description');
 
             return datatables()->eloquent($query)
                 ->addColumn('action', function($data) use ($slug) {

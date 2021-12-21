@@ -53,7 +53,7 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
     </div>
     <div class="form-group">
         <div class="row justify-content-center align-items-center">
-            <label for="input-shares" class="col-12 col-sm-2 text-left text-sm-right required">Lembar Saham</label>
+            <label for="input-shares" class="col-12 col-sm-2 text-left text-sm-right required">Jumlah Lembar Saham</label>
             <div class="col-12 col-sm-10">
                 <input
                     type="text"
@@ -64,6 +64,7 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                     placeholder="{{ DBText::inputPlaceholder('Lembar Saham') }}"
                     maxlength="100"
                 />
+                <small id="harga-perlembar">Harga per lembar Rp. 100.000</small>
             </div>
         </div>
     </div>
@@ -146,13 +147,13 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
     </div>
     <div class="form-group">
         <div class="row justify-content-center align-items-start">
-            <label for="file-bukti-transfer" class="col-12 col-sm-2 text-left text-sm-right mt-2 required">Bukti Transfer Proyek</label>
+            <label for="file-bukti-transfer" class="col-12 col-sm-2 text-left text-sm-right mt-2">Bukti Transfer Proyek</label>
             <div class="col-12 col-sm-10" id="file-bukti-transfer"></div>
         </div>
     </div>
     <div class="form-group">
         <div class="row justify-content-center align-items-start">
-            <label for="file-lampiran" class="col-12 col-sm-2 text-left text-sm-right required">Lampiran</label>
+            <label for="file-lampiran" class="col-12 col-sm-2 text-left text-sm-right">Lampiran</label>
             <div class="col-12 col-sm-10" id="file-lampiran-project"></div>
         </div>
     </div>

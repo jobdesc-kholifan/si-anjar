@@ -9,7 +9,7 @@ use App\Helpers\Collections\Config\ConfigCollection;
 ?>
 <div class="p-3">
     <div class="form-group">
-        <label for="input-no-ktp" class="required">No. KTP</label>
+        <label for="input-no-ktp">No. KTP</label>
         <input
             type="text"
             id="input-no-ktp"
@@ -20,7 +20,7 @@ use App\Helpers\Collections\Config\ConfigCollection;
         />
     </div>
     <div class="form-group">
-        <label for="input-npwp" class="required">NPWP</label>
+        <label for="input-npwp">NPWP</label>
         <input
             type="text"
             id="input-npwp"
