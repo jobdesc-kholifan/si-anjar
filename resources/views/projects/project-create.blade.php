@@ -56,17 +56,17 @@
         const fileProposal = $('#file-proposal');
         fileProposal.upload({
             name: 'file_proposal',
-            allowed: ['image/*'],
+            allowed: ['application/pdf'],
         });
 
         const fileBuktiTransfer = $('#file-bukti-transfer');
         fileBuktiTransfer.upload({
             name: 'file_bukti_transfer',
-            allowed: ['image/*'],
+            allowed: ['image/*', 'application/pdf'],
         });
 
-        const fileLampiranProject = $('#file-lampiran-project');
-        fileLampiranProject.upload({
+        const fileAttachment = $('#file-lampiran-project');
+        fileAttachment.upload({
             name: 'file_lampiran[]',
             allowed: ['image/*'],
             multiple: true,
@@ -102,25 +102,22 @@
             }
         });
 
-        {{--const actionsInvestor = new Actions("{{ route(DBRoutes::projectInvestor) }}");--}}
-        {{--actionsInvestor.selectors.table = '#table-project-investor';--}}
-        {{--actionsInvestor.datatable.params = {--}}
-        {{--    _token: "{{ csrf_token() }}",--}}
-        {{--};--}}
-        {{--actionsInvestor.build();--}}
+        const $inputValue = $('#input-value');
+        const $inputShares = $('#input-shares');
+        const $labelPrice = $('#harga-perlembar');
 
-        {{--const actionsSK = new Actions("{{ route(DBRoutes::projectSK) }}");--}}
-        {{--actionsSK.selectors.table = '#table-project-sk';--}}
-        {{--actionsSK.datatable.params = {--}}
-        {{--    _token: "{{ csrf_token() }}",--}}
-        {{--};--}}
-        {{--actionsSK.build();--}}
+        const actions = {
+            init: function() {
+                $inputValue.donetyping(() => actions.calcuclate(), 0);
+                $inputShares.donetyping(() => actions.calcuclate(), 0);
 
-        {{--const actionsSurkas = new Actions("{{ route(DBRoutes::projectSurkas) }}");--}}
-        {{--actionsSurkas.selectors.table = '#table-project-surkas';--}}
-        {{--actionsSurkas.datatable.params = {--}}
-        {{--    _token: "{{ csrf_token() }}",--}}
-        {{--};--}}
-        {{--actionsSurkas.build();--}}
+                actions.calcuclate();
+            },
+            calcuclate: function() {
+                const price = parseInt($inputValue.val())/parseInt($inputShares.val());
+                $labelPrice.html(`Harga per lembar Rp. ${$.number(price)}`);
+            }
+        };
+        actions.init();
     </script>
 @endpush

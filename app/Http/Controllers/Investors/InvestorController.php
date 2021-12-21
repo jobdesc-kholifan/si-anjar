@@ -13,6 +13,7 @@ use App\View\Components\Button;
 use App\View\Components\IDRLabel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -45,6 +46,27 @@ class InvestorController extends Controller
         $this->projectInvestor = new ProjectInvestor();
     }
 
+    /**
+     * @return Collection
+     * */
+    protected function rules()
+    {
+        return collect([
+            'investor_name:Nama Investor' => 'required|max:100',
+            'email:Email' => 'required|max:100|email',
+            'phone_number:No Handphone 1' => 'required|digits_between:10,20',
+            'place_of_birth:Tempat Lahir' => 'required|max:100',
+            'date_of_birth:Tanggal Lahir' => 'required|date_format:d/m/Y',
+            'religion_id:Agama' => 'required',
+            'relationship_id:Status Perkawinan' => 'required',
+            'gender_id:Jenis Kelamin' => 'required',
+            'job_name:Pekerjaan' => 'required|max:100',
+            'emergency_name:Nama darurat' => 'required|max:100',
+            'emergency_phone_number:No. HP darurat' => 'required|digits_between:10,20',
+            'emergency_relationship:Hub Keluarga darurat' => 'required|max:100',
+        ]);
+    }
+
     public function select(Request $req)
     {
         try {
@@ -60,16 +82,6 @@ class InvestorController extends Controller
                 $json[] = ['id' => $db->id, 'text' => $db->investor_name];
 
             return response()->json($json);
-        } catch (\Exception $e) {
-            return $this->jsonError($e);
-        }
-    }
-
-    public function search()
-    {
-        try {
-
-
         } catch (\Exception $e) {
             return $this->jsonError($e);
         }
@@ -145,30 +157,13 @@ class InvestorController extends Controller
     public function store(Request $req)
     {
         try {
-            $rules = collect([
-                'investor_name:Nama Investor' => 'required|max:100',
-                'email:Email' => 'required|max:100|email',
-                'phone_number:No Handphone 1' => 'required|digits_between:12,20',
-                'no_ktp:No. KTP' => 'required|max:100',
-                'npwp:NPWP' => 'required|max:100',
-                'place_of_birth:Tempat Lahir' => 'required|max:100',
-                'date_of_birth:Tanggal Lahir' => 'required|date_format:d/m/Y',
-                'religion_id:Agama' => 'required',
-                'relationship_id:Status Perkawinan' => 'required',
-                'gender_id:Jenis Kelamin' => 'required',
-                'job_name:Pekerjaan' => 'required|max:100',
-                'emergency_name:Nama darurat' => 'required|max:100',
-                'emergency_phone_number:No. HP darurat' => 'required|digits_between:12,20',
-                'emergency_relationship:Hub Keluarga darurat' => 'required|max:100',
-            ]);
-
             if(!$req->hasFile('file_ktp'))
                 throw new \Exception(sprintf(\DBMessages::fieldRequiredFile, 'KTP'), \DBCodes::authorizedError);
 
             if(!$req->hasFile('file_npwp'))
                 throw new \Exception(sprintf(\DBMessages::fieldRequiredFile, 'NPWP'), \DBCodes::authorizedError);
 
-            $this->customValidate($req->all(), $rules->toArray());
+            $this->customValidate($req->all(), $this->rules()->toArray());
 
             DB::beginTransaction();
 
@@ -270,22 +265,6 @@ class InvestorController extends Controller
     public function update(Request $req, $id)
     {
         try {
-            $rules = collect([
-                'investor_name:Nama Investor' => 'required|max:100',
-                'email:Email' => 'required|max:100|email',
-                'phone_number:No Handphone 1' => 'required|digits_between:12,20',
-                'no_ktp:No. KTP' => 'required|max:100',
-                'npwp:NPWP' => 'required|max:100',
-                'place_of_birth:Tempat Lahir' => 'required|max:100',
-                'date_of_birth:Tanggal Lahir' => 'required|date_format:d/m/Y',
-                'religion_id:Agama' => 'required',
-                'relationship_id:Status Perkawinan' => 'required',
-                'gender_id:Jenis Kelamin' => 'required',
-                'job_name:Pekerjaan' => 'required|max:100',
-                'emergency_name:Nama darurat' => 'required|max:100',
-                'emergency_phone_number:No. HP darurat' => 'required|digits_between:12,20',
-                'emergency_relationship:Hub Keluarga darurat' => 'required|max:100',
-            ]);
 
             if(!$req->hasFile('file_ktp'))
                 throw new \Exception(sprintf(\DBMessages::fieldRequiredFile, 'KTP'), \DBCodes::authorizedError);
@@ -293,7 +272,7 @@ class InvestorController extends Controller
             if(!$req->hasFile('file_npwp'))
                 throw new \Exception(sprintf(\DBMessages::fieldRequiredFile, 'NPWP'), \DBCodes::authorizedError);
 
-            $this->customValidate($req->all(), $rules->toArray());
+            $this->customValidate($req->all(), $this->rules()->toArray());
 
             DB::beginTransaction();
 
@@ -414,7 +393,7 @@ class InvestorController extends Controller
         }
     }
 
-    public function showProject(Request $req)
+    public function showProject()
     {
         try {
             return response()->json([
@@ -472,7 +451,7 @@ class InvestorController extends Controller
         }
     }
 
-    public function showInvestment(Request $req)
+    public function showInvestment()
     {
         try {
             return response()->json([

@@ -17,13 +17,15 @@ class ProjectSK extends Model
         'project_id',
         'revision',
         'no_sk',
-        'printed_at'
+        'printed_at',
+        'is_draft'
     ];
 
     public $defaultSelects = [
         'revision',
         'no_sk',
-        'printed_at'
+        'printed_at',
+        'is_draft'
     ];
 
     /**
@@ -79,11 +81,12 @@ class ProjectSK extends Model
         return !is_null($row->last_revision) ? $row->last_revision : 0;
     }
 
-    public function getLatestId($projectId)
+    public function getLatestId($projectId, $isDraft = true)
     {
         /* @var Relation $this */
         $row = $this->select('id')
             ->where('project_id', $projectId)
+            ->where('is_draft', $isDraft ? 't' : 'f')
             ->orderBy('revision', 'desc')
             ->first();
 

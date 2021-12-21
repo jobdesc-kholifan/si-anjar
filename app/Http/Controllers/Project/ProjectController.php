@@ -11,6 +11,7 @@ use App\Models\Projects\ProjectSK;
 use App\View\Components\Button;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -41,6 +42,23 @@ class ProjectController extends Controller
         $this->projectPIC = new ProjectPIC();
     }
 
+    /**
+     * @return Collection
+     * */
+    protected function rules()
+    {
+        return collect([
+            'project_name:Nama Proyek' => 'required|max:100',
+            'project_category_id:Kategori Proyek' => 'required',
+            'project_value:Nilai Proyek' => 'required',
+            'project_shares:Lembar Saham' => 'required',
+            'start_date:Tanggal Mulai' => 'required',
+            'finish_date:Tanggal Berakhir' => 'required',
+            'estimate_profit_value:Proyeksi Keuntungan' => 'required',
+            'estimate_profit_id:Perhitungan Keuntungan' => 'required',
+        ]);
+    }
+
     public function index()
     {
         try {
@@ -65,10 +83,10 @@ class ProjectController extends Controller
                 })
                 ->editColumn('status', function($data) {
                     $label = 'Belum Dimulai';
-                    if($data->start_date > date('Y-m-d'))
-                        $label = 'Dalam Pengerjaan';
 
-                    if($data->finish_date > date('Y-m-d'))
+                    if(date('Y-m-d') >= dbDate($data->start_date) && date('Y-m-d') <= dbDate($data->finish_date))
+                        $label = 'Dalam Pengerjaan';
+                    else if(date('Y-m-d') > dbDate($data->finish_date))
                         $label = 'Selesai';
 
                     return $label;
@@ -113,24 +131,10 @@ class ProjectController extends Controller
         try {
             findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::create);
 
-            $rules = [
-                'project_name:Nama Proyek' => 'required|max:100',
-                'project_category_id:Kategori Proyek' => 'required',
-                'project_value:Nilai Proyek' => 'required',
-                'project_shares:Lembar Saham' => 'required',
-                'start_date:Tanggal Mulai' => 'required',
-                'finish_date:Tanggal Berakhir' => 'required',
-                'estimate_profit_value:Proyeksi Keuntungan' => 'required',
-                'estimate_profit_id:Perhitungan Keuntungan' => 'required',
-            ];
-
-            $this->customValidate($req->all(), $rules);
+            $this->customValidate($req->all(), $this->rules()->toArray());
 
             if(!$req->hasFile('file_proposal'))
                 throw new \Exception(sprintf(\DBMessages::fieldRequiredFile, 'Proposal Proyek'), \DBCodes::authorizedError);
-
-            if(!$req->hasFile('file_bukti_transfer'))
-                throw new \Exception(sprintf(\DBMessages::fieldRequiredFile, 'Bukti Transfer Proyek'), \DBCodes::authorizedError);
 
             DB::beginTransaction();
 
@@ -145,13 +149,6 @@ class ProjectController extends Controller
                     'estimate_profit_value' => dbIDR($req->get('estimate_profit_value')),
                 ]);
             $project = $this->project->create($insertProject->toArray());
-
-            $revision = $this->projectSK->lastRevision($project->id);
-            $this->projectSK->create([
-                'project_id' => $project->id,
-                'revision' => $revision,
-                'no_sk' => sprintf("SK-%s", $project->project_code),
-            ]);
 
             $insertPIC = [];
             $dataPIC = json_decode($req->get('data_pic', '[]'));
@@ -284,18 +281,7 @@ class ProjectController extends Controller
         try {
             findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::update);
 
-            $rules = [
-                'project_name:Nama Proyek' => 'required|max:100',
-                'project_category_id:Kategori Proyek' => 'required',
-                'project_value:Nilai Proyek' => 'required',
-                'project_shares:Lembar Saham' => 'required',
-                'start_date:Tanggal Mulai' => 'required',
-                'finish_date:Tanggal Berakhir' => 'required',
-                'estimate_profit_value:Proyeksi Keuntungan' => 'required',
-                'estimate_profit_id:Perhitungan Keuntungan' => 'required',
-            ];
-
-            $this->customValidate($req->all(), $rules);
+            $this->customValidate($req->all(), $this->rules()->toArray());
 
             DB::beginTransaction();
 

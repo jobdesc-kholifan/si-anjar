@@ -40,7 +40,7 @@
         const fileProposal = $('#file-proposal');
         fileProposal.upload({
             name: 'file_proposal',
-            allowed: ['image/*'],
+            allowed: ['application/pdf'],
             getMimeType: (file) => file.mime_type,
             getPreview: (file) => file.preview
         });
@@ -48,7 +48,7 @@
         const fileBuktiTransfer = $('#file-bukti-transfer');
         fileBuktiTransfer.upload({
             name: 'file_bukti_transfer',
-            allowed: ['image/*'],
+            allowed: ['image/*', 'application/pdf'],
             getMimeType: (file) => file.mime_type,
             getPreview: (file) => file.preview
         });
@@ -85,6 +85,8 @@
 
                         }
                     });
+
+                    actions.calcuclate();
                 } else window.location.href = "{{ route(DBRoutes::project) }}";
             });
 
@@ -100,9 +102,7 @@
                 form.setDisabled(false);
 
                 if(res.result) {
-                    if(res.data.redirect !== undefined) {
-                        window.location.href = res.data.redirect;
-                    }
+                    window.location.reload();
                 }
 
                 AlertNotif.toastr.response(res);
@@ -116,5 +116,21 @@
                 });
             }
         });
+
+        const $inputValue = $('#input-value');
+        const $inputShares = $('#input-shares');
+        const $labelPrice = $('#harga-perlembar');
+
+        const actions = {
+            init: function() {
+                $inputValue.donetyping(() => actions.calcuclate(), 0);
+                $inputShares.donetyping(() => actions.calcuclate(), 0);
+            },
+            calcuclate: function() {
+                const price = parseInt($inputValue.val())/parseInt($inputShares.val());
+                $labelPrice.html(`Harga per lembar Rp. ${$.number(price, null, ",", ".")}`);
+            }
+        };
+        actions.init();
     </script>
 @endpush
