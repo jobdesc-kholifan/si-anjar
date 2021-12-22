@@ -28,7 +28,7 @@
 @push('script-footer')
     <script src="{{ asset('dist/js/actions-v2.js') }}"></script>
     <script src="{{ asset('dist/js/project-pic.js') }}"></script>
-    <script src="{{ asset('dist/js/upload.js') }}"></script>
+    <script src="{{ asset('dist/js/upload-v2.js') }}"></script>
     <script type="text/javascript">
         FormComponents.daterangepicker.init();
         FormComponents.select2.init();

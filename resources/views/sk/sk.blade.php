@@ -31,7 +31,7 @@
 @push('script-footer')
     <script src="{{ asset('dist/js/actions-v2.js') }}"></script>
     <script src="{{ asset('dist/js/investor-bank.js') }}"></script>
-    <script src="{{ asset('dist/js/upload.js') }}"></script>
+    <script src="{{ asset('dist/js/upload-v2.js') }}"></script>
     <script type="text/javascript">
         let actionsProjectSK;
         const actions = new Actions("{{ url()->current() }}");
@@ -47,7 +47,7 @@
                 },
             }
         ];
-        
+
         actions.showProject = function(id) {
             $.createModal({
                 url: '{{ url()->current() }}/show-project',
@@ -56,7 +56,7 @@
                 },
             }).open();
         };
-        
+
         actions.showSK = function(id) {
             $.createModal({
                 url: "{{ url()->current() }}/show-sk",

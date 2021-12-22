@@ -73,7 +73,7 @@ $hasCreate = findPermission(DBMenus::project)->hasAccess(DBFeature::create);
 
 @push('script-footer')
     <script src="{{ asset('dist/js/actions-v2.js') }}"></script>
-    <script src="{{ asset('dist/js/upload.js') }}"></script>
+    <script src="{{ asset('dist/js/upload-v2.js') }}"></script>
     <script type="text/javascript">
         let fileLampiranSurkas;
         const projectValue = {{ $project->getValue() }};

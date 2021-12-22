@@ -77,7 +77,7 @@ use App\Helpers\Collections\Projects\ProjectCollection;
 
 @push('script-footer')
     <script src="{{ asset('dist/js/actions-v2.js') }}"></script>
-    <script src="{{ asset('dist/js/upload.js') }}"></script>
+    <script src="{{ asset('dist/js/upload-v2.js') }}"></script>
     <script type="text/javascript">
         const actionsSurkas = new Actions("{{ route(DBRoutes::projectInvestor, [$projectId]) }}");
         actionsSurkas.selectors.table = '#table-project-investor';
