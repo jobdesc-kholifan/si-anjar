@@ -427,10 +427,10 @@ class InvestorController extends Controller
                 })
                 ->editColumn('status', function($data) {
                     $label = 'Belum Dimulai';
-                    if($data->start_date > date('Y-m-d'))
-                        $label = 'Dalam Pengerjaan';
 
-                    if($data->finish_date > date('Y-m-d'))
+                    if(date('Y-m-d') >= dbDate($data->start_date) && date('Y-m-d') <= dbDate($data->finish_date))
+                        $label = 'Dalam Pengerjaan';
+                    else if(date('Y-m-d') > dbDate($data->finish_date))
                         $label = 'Selesai';
 
                     return $label;
