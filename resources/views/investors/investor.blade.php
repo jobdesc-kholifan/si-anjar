@@ -47,7 +47,7 @@ $hasAccessCreate = findPermission(DBMenus::investor)->hasAccess(DBFeature::creat
 @push('script-footer')
     <script src="{{ asset('dist/js/actions-v2.js') }}"></script>
     <script src="{{ asset('dist/js/investor-bank.js') }}"></script>
-    <script src="{{ asset('dist/js/upload.js') }}"></script>
+    <script src="{{ asset('dist/js/upload-v2.js') }}"></script>
     <script type="text/javascript">
         let actionsProject, actionsInvestment;
         let formBank, fileKTP, fileNPWP;

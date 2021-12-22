@@ -179,7 +179,7 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::group(['prefix' => 'investor'], function () {
                 Route::post('datatables', [ProjectInvestorController::class, 'datatables']);
-                Route::get('all', [ProjectInvestorController::class, 'all'])->name(DBRoutes::projectInvestorAll);\
+                Route::get('all', [ProjectInvestorController::class, 'all'])->name(DBRoutes::projectInvestorAll);
                 Route::get('draft', [ProjectInvestorController::class, 'draft']);
                 Route::post('draft', [ProjectInvestorController::class, 'store']);
 

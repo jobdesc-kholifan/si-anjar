@@ -24,7 +24,7 @@
 
 @push('script-footer')
     <script src="{{ asset('dist/js/actions-v2.js') }}"></script>
-    <script src="{{ asset('dist/js/upload.js') }}"></script>
+    <script src="{{ asset('dist/js/upload-v2.js') }}"></script>
     <script type="text/javascript">
         const projectValue = {{ $project->getValue() }};
         const actionsSK = new Actions("{{ route(DBRoutes::projectSK, [$projectId]) }}");
