@@ -5,6 +5,7 @@ use App\Http\Controllers\Addresses\ProvinceController;
 use App\Http\Controllers\API\PreviewController;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Investors\InvestorController;
 use App\Http\Controllers\Masters\BankController;
 use App\Http\Controllers\Masters\TypesController;
@@ -59,6 +60,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['prefix' => 'preview'], function () {
 
         Route::get('{directory}/{token}/show/{filename}', [PreviewController::class, 'index']);
+    });
+
+    Route::group(['prefix' => 'dashboard'], function() {
+
+        Route::get('investor', [DashboardController::class, 'investor'])->name(DBRoutes::dashboardInvestor);
+        Route::get('project', [DashboardController::class, 'project'])->name(DBRoutes::dashboardProject);
     });
 
     Route::group(['prefix' => 'masters'], function () {

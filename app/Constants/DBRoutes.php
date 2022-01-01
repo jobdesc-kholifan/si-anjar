@@ -3,6 +3,9 @@
 class DBRoutes
 {
 
+    const dashboardInvestor = 'dashbaord.investor';
+    const dashboardProject = 'dashboard.project';
+
     const profile = 'profile';
 
     const authLogin = 'auth.login';
@@ -49,6 +52,6 @@ class DBRoutes
     const projectSKUpdate = 'project.sk.update';
 
     const projectSurkas = 'project.surkas';
-    
+
     const SK = 'sk';
 }
