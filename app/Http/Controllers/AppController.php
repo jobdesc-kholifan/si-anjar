@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 class AppController extends Controller
 {
 
+    protected $title = "Dashboard";
+
     public function index()
     {
         try {
