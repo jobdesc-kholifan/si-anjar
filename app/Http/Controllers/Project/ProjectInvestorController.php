@@ -18,7 +18,7 @@ class ProjectInvestorController extends Controller
 {
 
     protected $viewPath = "projects";
-    protected $route = [\DBRoutes::project];
+    protected $route = [\DBRoutes::staticProject, \DBRoutes::project];
     protected $title = "Project Investor";
 
     protected $breadcrumbs = [

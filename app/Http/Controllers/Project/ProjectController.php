@@ -19,7 +19,7 @@ class ProjectController extends Controller
 {
 
     protected $viewPath = "projects";
-    protected $route = [\DBRoutes::project];
+    protected $route = [\DBRoutes::staticProject, \DBRoutes::project];
     protected $title = "Proyek";
 
     protected $breadcrumbs = [
