@@ -18,14 +18,14 @@ class SKController extends Controller
 
     protected $viewPath = 'sk';
     protected $title = "SK";
-    protected $route = [\DBRoutes::SK];
+    protected $route = [\DBRoutes::staticProject, \DBRoutes::SK];
 
     protected $breadcrumbs = [
         ['label' => 'SK', 'active' => true]
     ];
 
 
-    /* @var Investor|Relation */
+    /* @var SK|Relation */
     protected $SK;
 
     /* @var Project|Relation */
@@ -149,7 +149,7 @@ class SKController extends Controller
                     }
                 ])
                 ->find($req->get('id'));
-                
+
             if (is_null($row))
                 throw new \Exception(\DBMessages::corruptData, \DBCodes::authorizedError);
 

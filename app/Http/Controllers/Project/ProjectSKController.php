@@ -18,7 +18,7 @@ class ProjectSKController extends Controller
 
     protected $viewPath = "projects";
     protected $title = "SK";
-    protected $route = [\DBMenus::project];
+    protected $route = [\DBRoutes::staticProject, \DBRoutes::project];
 
 
     protected $defaultParams = [

@@ -23,31 +23,29 @@
                     <dd class="col-sm-6">{{ $project->estimate_profit_value . ' - ' . $project->estimate_profit->name }}</dd>
                     <dt class="col-sm-6">Proposal Proyek</dt>
                     <dd class="col-sm-6" id="file-proposal">
-                        @if ($project->file_proposal->mime_type == 'application/pdf')
-                            <a href="{{ $project->file_proposal->preview }}">
+                        @if(!is_null($project->file_proposal))
+                            @if ($project->file_proposal->mime_type == 'application/pdf')
+                                <a href="{{ $project->file_proposal->preview }}" target="_blank">{{ $project->file_proposal->file_name }}</a>
+                            @else
                                 <div style="width: 150px; height: 200px; background-color: #f1f1f1; border-radius: 5px; display: flex; justify-content: center; align-items: center; background-position: center; background-repeat: no-repeat; background-size: 100% auto; background-image:url({{ $project->file_proposal->preview }})"></div>
-                            </a>
-                        @else
-                            <div style="width: 150px; height: 200px; background-color: #f1f1f1; border-radius: 5px; display: flex; justify-content: center; align-items: center; background-position: center; background-repeat: no-repeat; background-size: 100% auto; background-image:url({{ $project->file_proposal->preview }})"></div>
+                            @endif
                         @endif
                     </dd>
                     <dt class="col-sm-6">Bukti Transfer Proyek</dt>
                     <dd class="col-sm-6" id="file-bukti-transfer">
-                        @if ($project->file_bukti_transfer->mime_type == 'application/pdf')
-                            <a href="{{ $project->file_bukti_transfer->preview }}">
+                        @if(!is_null($project->file_bukti_transfer))
+                            @if ($project->file_bukti_transfer->mime_type == 'application/pdf')
+                                <a href="{{ $project->file_bukti_transfer->preview }}" target="_blank">{{ $project->file_bukti_transfer->file_name }}</a>
+                            @else
                                 <div style="width: 150px; height: 200px; background-color: #f1f1f1; border-radius: 5px; display: flex; justify-content: center; align-items: center; background-position: center; background-repeat: no-repeat; background-size: 100% auto;background-image:url({{ $project->file_bukti_transfer->preview }})"></div>
-                            </a>
-                        @else
-                            <div style="width: 150px; height: 200px; background-color: #f1f1f1; border-radius: 5px; display: flex; justify-content: center; align-items: center; background-position: center; background-repeat: no-repeat; background-size: 100% auto;background-image:url({{ $project->file_bukti_transfer->preview }})"></div>
+                            @endif
                         @endif
                     </dd>
                     <dt class="col-sm-6">Lampiran</dt>
                     <dd class="col-sm-6" id="file-lampiran-project">
-                        @foreach ($project->file_attachment as $lampiran)  
+                        @foreach ($project->file_attachment as $lampiran)
                             @if ($lampiran->mime_type == 'application/pdf')
-                                <a href="{{ $lampiran->preview }}">
-                                    <div style="width: 150px; height: 200px; background-color: #f1f1f1; border-radius: 5px; display: flex; justify-content: center; align-items: center; background-position: center; margin-bottom: 10px; background-repeat: no-repeat; background-size: 100% auto; background-image:url({{ $lampiran->preview }})"></div>
-                                </a>
+                                <a href="{{ $lampiran->preview }}" target="_blank">{{ $lampiran->file_name }}</a>
                             @else
                                 <div style="width: 150px; height: 200px; background-color: #f1f1f1; border-radius: 5px; display: flex; justify-content: center; align-items: center; background-position: center; margin-bottom: 10px; background-repeat: no-repeat; background-size: 100% auto; background-image:url({{ $lampiran->preview }})"></div>
                             @endif
