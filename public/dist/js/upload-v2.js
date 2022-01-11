@@ -1,11 +1,14 @@
 +function($) {
-    const UploadConfig = function(options) {
+    const UploadConfig = function(options, elm) {
         this.allowed = options !== undefined && options.allowed !== undefined ? options.allowed : [];
         this.multiple = options !== undefined && options.multiple !== undefined ? options.multiple : false;
         this.showFileName = options !== undefined && options.showFileName !== undefined ? options.showFileName : false;
         this.withDescription = options !== undefined && options.withDescription !== undefined ? options.withDescription : false;
         this.name = options !== undefined && options.name !== undefined ? options.name : null;
-        this.files = options !== undefined && options.files !== undefined ? options.files : [];
+        this.files = options !== undefined && options.files !== undefined ? options.files : null;
+        if(this.files == null && elm.data('files') !== undefined)
+            this.files = elm.data('files');
+        this.readOnly = options !== undefined && options.readOnly !== undefined ? options.readOnly : false;
 
         this.getMimeType = options !== undefined && options.getMimeType !== undefined ? options.getMimeType : (file) => file.mimetype;
         this.getFileName = options !== undefined && options.getFileName !== undefined ? options.getFileName : (file) => file.file_name;
@@ -178,7 +181,7 @@
         this.$wrapper = $('<div>', {class: 'wrapper-upload'});
         this.$.append(this.$wrapper);
 
-        this.options = new UploadConfig(options);
+        this.options = new UploadConfig(options, this.$);
 
         this.$form = $('<div>').append(
             $('<div>', {class: 'mb-1 form-upload'}).append(
@@ -212,7 +215,9 @@
             'data-action': 'description',
         });
 
-        this.add();
+        if(this.options.files !== null)
+            this.set(this.options.files);
+        else if(!this.options.readOnly) this.add();
     };
 
     Upload.prototype.add = function() {
@@ -226,6 +231,11 @@
         form.init();
 
         $form.data('form', form);
+
+        if(this.options.readOnly) {
+            form.remove.addClass('d-none');
+            form.preview.append($('<span>', {class: 'ml-1 font-weight-normal'}).html('Lihat Detail'));
+        }
 
         return $form;
     };
@@ -258,14 +268,13 @@
                     $form.data('form').$.append($description);
             }
         });
-
-        if(this.options.multiple)
+        if(this.options.multiple && !this.options.readOnly)
             this.add();
     }
 
     Upload.prototype.clear = function() {
         this.$wrapper.find('[type=file]').each((i, input) => {
-            const $input = $(input).val(null);
+            $(input).val(null);
         })
     };
 

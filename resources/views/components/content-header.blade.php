@@ -17,6 +17,8 @@
                         <li class="breadcrumb-item{{$isBreadcrumbActive($breadcrumb)}}">
                             @if(!empty($breadcrumb['link']))
                                 <a href="{{$breadcrumb['link']}}">{{ $breadcrumbLabel($breadcrumb) }}</a>
+                            @elseif(!empty($breadcrumb['route']))
+                                <a href="{{route($breadcrumb['route'])}}">{{ $breadcrumbLabel($breadcrumb) }}</a>
                             @else
                                 {{ $breadcrumbLabel($breadcrumb) }}
                             @endif

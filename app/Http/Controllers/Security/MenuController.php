@@ -93,9 +93,11 @@ class MenuController extends Controller
                 ->addColumn('action', function($data) {
 
                     $btnEdit = false;
-                    if(findPermission(\DBMenus::securityMenu)->hasAccess(\DBFeature::update))
-                        $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
+                    if(findPermission(\DBMenus::securityMenu)->hasAccess(\DBFeature::update)) {
+                        $link = route(\DBRoutes::securityMenuEdit, [$data->id]);
+                        $btnEdit = (new Button("actions.openLink('$link')", Button::btnPrimary, Button::btnIconEdit))
                             ->render();
+                    }
 
                     $btnDelete = false;
                     if(findPermission(\DBMenus::securityMenu)->hasAccess(\DBFeature::delete))

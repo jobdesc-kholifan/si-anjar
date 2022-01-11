@@ -114,8 +114,8 @@
                 actions.calcuclate();
             },
             calcuclate: function() {
-                const price = parseInt($inputValue.val())/parseInt($inputShares.val());
-                $labelPrice.html(`Harga per lembar Rp. ${$.number(price)}`);
+                const price = parseFloat($inputValue.val())/parseFloat($inputShares.val());
+                $labelPrice.html($('<span>', {class: 'text-bold'}).html(`${$.number((Math.round(price * 100)/100), null, '', '.')} lembar saham`));
             }
         };
         actions.init();

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Investors;
 
+use App\Documents\Excel\ExportInvestor;
+use App\Documents\Excel\ImportInvestor;
 use App\Helpers\Uploader\FileUpload;
 use App\Http\Controllers\Controller;
 use App\Models\Investors\Investor;
@@ -15,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class InvestorController extends Controller
@@ -438,10 +441,12 @@ class InvestorController extends Controller
                 ->addColumn('action', function($data) {
 
                     $btnInfo = false;
-                    if(findPermission(\DBMenus::project)->hasAccess(\DBFeature::view))
-                        $btnInfo = (new Button("actionsProject.showDetailProject($data->id)", Button::btnPrimary, Button::btnIconInfo))
+                    if(findPermission(\DBMenus::project)->hasAccess(\DBFeature::view)) {
+                        $link = route(\DBRoutes::projectEdit, [$data->id]) . "?tab=proyek";
+                        $btnInfo = (new Button("actionsProject.openLink('$link')", Button::btnPrimary, Button::btnIconInfo))
                             ->setLabel("Lihat Detail")
                             ->render();
+                    }
 
                     return \DBText::renderAction([$btnInfo]);
                 })
@@ -488,14 +493,58 @@ class InvestorController extends Controller
                 ->addColumn('action', function($data) {
 
                     $btnInfo = false;
-                    if(findPermission(\DBMenus::project)->hasAccess(\DBFeature::view))
-                        $btnInfo = (new Button("actionsInvestment.showDetailInvestment($data->project_id)", Button::btnPrimary, Button::btnIconInfo))
+                    if(findPermission(\DBMenus::project)->hasAccess(\DBFeature::view)) {
+                        $link = route(\DBRoutes::projectInvestor, [$data->project_id]);
+                        $btnInfo = (new Button("actionsInvestment.openLink('$link')", Button::btnPrimary, Button::btnIconInfo))
                             ->setLabel("Lihat Detail")
                             ->render();
+                    }
 
                     return \DBText::renderAction([$btnInfo]);
                 })
                 ->toJson();
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
+    public function downloadTemplateExcel()
+    {
+        try {
+            $document = new ExportInvestor();
+            return Excel::download($document, 'template-investor.xlsx');
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
+    public function exportToExcel()
+    {
+        try {
+            $query = $this->investor->defaultQuery();
+
+            $document = new ExportInvestor();
+            $document->setData($query->get());
+
+            return Excel::download($document, 'data-investor.xlsx');
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
+    public function importFromExcel(Request $req)
+    {
+        try {
+            set_time_limit(0);
+
+            $excelData = Excel::toArray(null, $req->file('file-import'));
+
+            if(count($excelData[0]) > 1) {
+                $importDocument = new ImportInvestor($excelData[0]);
+                $importDocument->save();
+            }
+
+            return $this->jsonSuccess(\DBMessages::successImport);
         } catch (\Exception $e) {
             return $this->jsonError($e);
         }

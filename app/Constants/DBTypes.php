@@ -34,4 +34,13 @@ class DBTypes
     const fileProjectBuktiTransfer = 'file-proj-bukti-tf';
     const fileProjectAttachment = 'file-proj-attachment';
     const fileSurkasAttachment = 'file-surkas-attachment';
+    const fileSignatureSK = 'file-signature-sk';
+
+    const statusSK = 'status-sk';
+    const statusSKWaiting = 'status-sk-waiting';
+    const statusSKApproved = 'status-sk-approved';
+
+    const statusSurkas = 'status-surkas';
+    const statusSurkasWaiting = 'status-surkas-waiting';
+    const statusSurkasApproved = 'status-surkas-approved';
 }

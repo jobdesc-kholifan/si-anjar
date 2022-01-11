@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers\Project;
 
+use App\Documents\PDF\PDFDocumentSK;
+use App\Helpers\Collections\Projects\PayloadDocumentSK;
 use App\Helpers\Collections\Projects\ProjectCollection;
+use App\Helpers\Collections\Projects\ProjectSKCollection;
+use App\Helpers\Uploader\FileUpload;
 use App\Http\Controllers\Controller;
 use App\Models\Projects\Project;
 use App\Models\Projects\ProjectInvestor;
@@ -12,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ProjectSKController extends Controller
 {
@@ -35,7 +40,7 @@ class ProjectSKController extends Controller
     protected $projectSK;
 
     protected $breadcrumbs = [
-        ['label' => 'Project'],
+        ['label' => 'Project', 'route' => \DBRoutes::project],
         ['label' => 'SK', 'active' => true]
     ];
 
@@ -73,32 +78,39 @@ class ProjectSKController extends Controller
         try {
             findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
-            $skId = $this->projectSK->getLatestId($projectId, true);
-
             $query = $this->projectSK->defaultWith($this->projectSK->defaultSelects)
                 ->where('project_id', $projectId);
 
             return datatables()->eloquent($query)
-                ->addColumn('action', function($data) use ($skId) {
+                ->addColumn('action', function($data) use ($projectId) {
 
                     $btnShowDraft = "";
-                    if($data->is_draft && $data->id == $skId)
-                        $btnShowDraft = (new Button("actionsSK.showDraft($data->id)", Button::btnSecondary, Button::btnIconFile))
+                    if($data->is_draft) {
+                        $link = route(\DBRoutes::projectInvestor, [$projectId]);
+                        $btnShowDraft = (new Button("actionsSK.openLink('$link')", Button::btnSecondary, Button::btnIconFile))
                             ->setLabel("Tampilkan Draft")
                             ->render();
+                    }
 
                     $btnPrint = "";
-                    if(!$data->is_draft || $data->id != $skId)
-                        $btnPrint = (new Button("actions.print($data->id)", Button::btnPrimary, Button::btnIconPrint))
+                    if(!$data->is_draft && !is_null($data->status) && $data->status->slug = \DBTypes::statusSKApproved)
+                        $btnPrint = (new Button("actionsSK.print($data->id)", Button::btnPrimary, Button::btnIconPrint))
                             ->render();
 
                     $btnDetail = "";
-                    if(!$data->is_draft || $data->id != $skId)
+                    if(!$data->is_draft)
                         $btnDetail = (new Button("actionsSK.detail($data->id)", Button::btnPrimary, Button::btnIconInfo))
                             ->setLabel("Lihat Investor")
                             ->render();
 
-                    return \DBText::renderAction([$btnShowDraft, $btnDetail, $btnPrint]);
+                    $btnApproved = "";
+                    if(!$data->is_draft && !is_null($data->status) && $data->status->slug == \DBTypes::statusSKWaiting
+                        && findPermission(\DBMenus::project)->hasAccess(\DBFeature::approvedSK))
+                        $btnApproved = (new Button("actionsSK.approved($data->id)", Button::btnSuccess, Button::btnIconApproved))
+                            ->setLabel("Setujui SK")
+                            ->render();
+
+                    return \DBText::renderAction([$btnApproved, $btnShowDraft, $btnDetail, $btnPrint]);
                 })
                 ->toJson();
         } catch (\Exception $e) {
@@ -135,11 +147,20 @@ class ProjectSKController extends Controller
             $revision = $this->projectSK->lastRevision($projectId) + 1;
             $project = ProjectCollection::find($projectId);
 
+            $config = findConfig()->in([\DBTypes::statusSKWaiting, \DBTypes::statusSKApproved]);
+
+            $status = $config->get(\DBTypes::statusSKWaiting);
+
+            $hasApprovedSK = findPermission(\DBMenus::project)->hasAccess(\DBFeature::approvedSK);
+            if($hasApprovedSK)
+                $status = $config->get(\DBTypes::statusSKApproved);
+
             $sk = $this->projectSK->create([
                 'project_id' => $projectId,
                 'revision' => $revision,
                 'no_sk' => sprintf("SK-%s-rev%03d", $project->getCode(), $revision),
                 'is_draft' => $isDraft,
+                'status_id' => $status->getId(),
             ]);
 
             $investors = json_decode($req->get('investors', '[]'));
@@ -158,7 +179,7 @@ class ProjectSKController extends Controller
 
             $this->projectInvestor->insert($insertInvestor);
 
-            if(!$isDraft)
+            if($isDraft == 'false')
                 $this->project->updateModal($projectId);
 
             DB::commit();
@@ -187,6 +208,131 @@ class ProjectSKController extends Controller
                     'sk' => $sk
                 ]),
             ]);
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
+    public function approved(Request $req)
+    {
+        try {
+            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::approvedSK);
+
+            $row = $this->projectSK->find($req->get('id'));
+
+            if(is_null($row))
+                throw new \Exception(\DBMessages::corruptData, \DBCodes::authorizedError);
+
+            $config = findConfig()->in([\DBTypes::statusSKApproved]);
+
+            $row->update([
+                'status_id' => $config->get(\DBTypes::statusSKApproved)->getId(),
+            ]);
+
+            return $this->jsonSuccess(\DBMessages::success);
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
+    public function formPrintPDF(Request $req, $projectId)
+    {
+        try {
+            $project = ProjectCollection::find($projectId);
+
+            $row = $this->projectSK->defaultWith($this->projectSK->defaultSelects)
+                ->find($req->get('id'));
+
+            if(is_null($row))
+                throw new \Exception(\DBMessages::corruptData, \DBCodes::authorizedError);
+
+            $sk = new ProjectSKCollection($row);
+
+            return response()->json([
+                'content' => $this->viewResponse('project-tab-sk-print', [
+                    'project' => $project,
+                    'sk' => $sk
+                ]),
+            ]);
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
+    public function savePrintPDF(Request $req, $projectId)
+    {
+        try {
+            $skId = $req->get('id');
+            $row = $this->projectSK->find($skId);
+
+            if(is_null($row))
+                throw new \Exception(\DBMessages::corruptData, \DBCodes::authorizedError);
+
+            $sk = new ProjectSKCollection($row);
+            $json = collect($req->only(PDFDocumentSK::$structure));
+            $json->put('signature', $sk->getPdfPayload()->getSignatureJson());
+
+            if($req->hasFile('file_ttd')) {
+                $types = findConfig()->in([\DBTypes::fileSignatureSK]);
+
+                $fileTTD = FileUpload::upload('file_ttd');
+
+                try {
+                    $fileTTD->setReference($types->get(\DBTypes::fileSignatureSK), $skId);
+                    $fileTTD->moveTo('app/signature/sk', function ($file, $skId) {
+                        /* @var UploadedFile $file */
+                        return sprintf("signature-%s-id.%s", $skId, $file->getClientOriginalExtension());
+                    });
+
+                    $json->put('signature', $fileTTD->getFileInfo()->toJson());
+                } catch (\Exception $e) {
+                    $fileTTD->rollBack();
+                    return $this->jsonError($e);
+                }
+            }
+
+            $row->update([
+                'printed_at' => currentDate(),
+                'pdf_payload' => json_encode($json->toArray())
+            ]);
+
+            return $this->jsonSuccess(\DBMessages::success, [
+                'redirect' => route(\DBRoutes::projectSKPrint, [$projectId]),
+            ]);
+        } catch (\Exception $e) {
+            return $this->jsonError($e);
+        }
+    }
+
+    public function printPDF($projectId)
+    {
+        try {
+
+            $sk = $this->projectSK->getLatestReleased($projectId);
+
+            $skId = $sk->getId();
+            $rowProject = $this->project->defaultQuery()
+                ->with([
+                    'data_investor' => function($query) use ($skId) {
+                        ProjectInvestor::foreignWith($query)
+                            ->where('project_sk_id', $skId)
+                            ->addSelect('project_id');
+                    }
+                ])
+                ->find($projectId);
+
+            if(is_null($rowProject))
+                throw new \Exception(\DBMessages::corruptData, \DBCodes::authorizedError);
+
+            $project = new ProjectCollection($rowProject);
+
+            $document = new PDFDocumentSK();
+            $document->setProject($project);
+            $document->setSK($sk);
+            $document->build();
+            $document->response();
+
+            return true;
         } catch (\Exception $e) {
             return $this->jsonError($e);
         }

@@ -1,6 +1,8 @@
 <?php
 
 $hasAccessCreate = findPermission(DBMenus::investor)->hasAccess(DBFeature::create);
+$hasAccessExport = findPermission(DBMenus::investor)->hasAccess(DBFeature::exportExcel);
+$hasAccessImport = findPermission(DBMenus::investor)->hasAccess(DBFeature::importExcel);
 
 ?>
 @extends('skins.template')
@@ -13,9 +15,25 @@ $hasAccessCreate = findPermission(DBMenus::investor)->hasAccess(DBFeature::creat
                 <div class="card-header">
                     <h3 class="card-title">Data {{ $title }}</h3>
                     <div class="card-actions">
+                        @if($hasAccessImport)
+                        <a href="{{ route(DBRoutes::investorTemplateExcel) }}" target="_blank" class="btn btn-outline-secondary btn-sm mr-1">
+                            <i class="fa fa-file-download mr-1"></i>
+                            <span>Download Template</span>
+                        </a>
+                        <button type="button" class="btn btn-outline-success btn-sm mr-1" onclick="actions.importExcel()">
+                            <i class="fa fa-file-upload mr-1"></i>
+                            <span>Import Excel</span>
+                        </button>
+                        @endif
+                        @if($hasAccessExport)
+                        <a href="{{ route(DBRoutes::investorExportExcel) }}" target="_blank" class="btn btn-outline-success btn-sm mr-1">
+                            <i class="fa fa-file-excel mr-1"></i>
+                            <span>Export Excel</span>
+                        </a>
+                        @endif
                         @if($hasAccessCreate)
                             <button type="button" class="btn btn-outline-primary btn-sm" onclick="actions.create()">
-                                <i class="fa fa-plus"></i>
+                                <i class="fa fa-plus mr-1"></i>
                                 <span>Tambah</span>
                             </button>
                         @endif
@@ -106,7 +124,7 @@ $hasAccessCreate = findPermission(DBMenus::investor)->hasAccess(DBFeature::creat
             else if(key === 'gender_id') {
                 form.find(`[name=${key}]`).each((i, option) => {
                     const $option = $(option);
-                    if($option.attr('value') === value.toString()) {
+                    if(value !== null && $option.attr('value') === value.toString()) {
                         $option.prop('checked', true);
                     }
                 });
@@ -138,9 +156,6 @@ $hasAccessCreate = findPermission(DBMenus::investor)->hasAccess(DBFeature::creat
                             },
                         }
                     ];
-                    actionsProject.showDetailProject = function(id) {
-                        window.location.href = "{{ route(DBRoutes::projectEdit, ['__id__']) }}?tab=proyek".route({id: id});
-                    };
                     actionsProject.build();
                 }
             }).open();
@@ -175,9 +190,6 @@ $hasAccessCreate = findPermission(DBMenus::investor)->hasAccess(DBFeature::creat
                             },
                         }
                     ];
-                    actionsInvestment.showDetailInvestment = function(id) {
-                        window.location.href = "{{ route(DBRoutes::projectInvestor, ['__id__']) }}".route({id: id});
-                    };
                     actionsInvestment.build();
                 }
             }).open();

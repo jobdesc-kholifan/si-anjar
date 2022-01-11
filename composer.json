@@ -7,12 +7,14 @@
     "require": {
         "php": "^7.3|^8.0",
         "ext-json": "*",
+        "codedge/laravel-fpdf": "^1.8",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "intervention/image": "^2.7",
         "laravel/framework": "^8.40",
         "laravel/tinker": "^2.5",
+        "maatwebsite/excel": "^3.1",
         "yajra/laravel-datatables-oracle": "^9.18"
     },
     "require-dev": {

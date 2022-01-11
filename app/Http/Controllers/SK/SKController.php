@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\SK;
 
+use App\Helpers\Collections\Projects\ProjectCollection;
+use App\Helpers\Collections\Projects\ProjectSKCollection;
 use App\Http\Controllers\Controller;
-use App\Models\SK\SK;
 use App\Models\Projects\Project;
 use App\Models\Projects\ProjectSK;
 use App\Models\Authorization\User;
@@ -21,12 +22,9 @@ class SKController extends Controller
     protected $route = [\DBRoutes::staticProject, \DBRoutes::SK];
 
     protected $breadcrumbs = [
-        ['label' => 'SK', 'active' => true]
+        ['label' => 'Proyek', 'link' => \DBMenus::project],
+        ['label' => 'Surkas', 'active' => true],
     ];
-
-
-    /* @var SK|Relation */
-    protected $SK;
 
     /* @var Project|Relation */
     protected $project;
@@ -39,7 +37,6 @@ class SKController extends Controller
 
     public function __construct()
     {
-        $this->SK = new SK();
         $this->project = new Project();
         $this->projectSK = new projectSK();
         $this->user = new User();
@@ -48,8 +45,6 @@ class SKController extends Controller
     public function index()
     {
         try {
-            $this->breadcrumbs[] = ['label' => 'Investor', 'active' => true];
-
             return $this->view('sk');
         } catch (\Exception $e) {
             return $this->jsonError($e);
@@ -59,14 +54,14 @@ class SKController extends Controller
     public function datatables()
     {
         try {
-            $query = $this->SK->defaultQuery();
+            $query = $this->projectSK->withProject();
 
             return datatables()->eloquent($query)
                 ->editColumn('printed_at', function ($data) {
-                    return date('d/m/Y', strtotime($data->printed_at));
+                    return !empty($data->printed_at) ? dbDate($data->printed_at, 'd/m/Y H:i:s') : null;
                 })
                 ->addColumn('no_sk', function ($data) {
-                    $showDetailSK = new Button("actions.showSK($data->project_id)", Button::btnLinkPrimary, null, 'btn-md');
+                    $showDetailSK = new Button("actions.showSK($data->id)", Button::btnLinkPrimary, null, 'btn-md');
                     $showDetailSK->setAlign('text-left');
                     $showDetailSK->setLabel($data->no_sk);
 
@@ -75,22 +70,19 @@ class SKController extends Controller
                 ->addColumn('project.project_name', function ($data) {
                     $showDetail = new Button("actions.showProject($data->project_id)", Button::btnLinkPrimary, null, 'btn-md');
                     $showDetail->setAlign('text-left');
-                    $showDetail->setLabel($data->project->project_name . "");
+                    $showDetail->setLabel($data->project->project_name);
 
                     return $showDetail->render();
                 })
                 ->addColumn('action', function ($data) {
-                    $btnDelete = false;
-                    if (findPermission(\DBMenus::investor)->hasAccess(\DBFeature::update))
-                        $btnDelete = (new Button("actions.delete($data->id)", Button::btnDanger, Button::btnIconDelete))
-                            ->render();
+                    $linkPrint = route(\DBRoutes::projectSKPrint, [$data->project_id]);
+                    $btnPrint = (new Button("actions.openLink('$linkPrint', '_blank')", Button::btnPrimary, Button::btnIconPrint))
+                        ->render();
+                    $btnDetail = (new Button("actions.showInvestor($data->project_id, $data->id)", Button::btnPrimary, Button::btnIconInfo))
+                        ->setLabel("Lihat Investor")
+                        ->render();
 
-                    $btnEdit = false;
-                    if (findPermission(\DBMenus::investor)->hasAccess(\DBFeature::delete))
-                        $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
-                            ->render();
-
-                    return \DBText::renderAction([$btnEdit, $btnDelete]);
+                    return \DBText::renderAction([$btnDetail, $btnPrint]);
                 })
                 ->toJson();
         } catch (\Exception $e) {
@@ -101,33 +93,19 @@ class SKController extends Controller
     public function showSK(Request $req)
     {
         try {
+            $row = $this->projectSK->defaultWith($this->projectSK->defaultSelects)
+                ->find($req->get('id'));
+
+            if(is_null($row))
+                throw new \Exception(\DBMessages::corruptData, \DBCodes::authorizedError);
+
+            $sk = new ProjectSKCollection($row);
+
             return response()->json([
-                'content' => $this->viewResponse('modal-projectsk'),
+                'content' => $this->viewResponse('modal-sk', [
+                    'sk' => $sk
+                ]),
             ]);
-        } catch (\Exception $e) {
-            return $this->jsonError($e);
-        }
-    }
-
-    public function datatablesSK(Request $req)
-    {
-        try {
-            $id = $req->get('id');
-            $query = $this->projectSK->defaultWith($this->projectSK->defaultSelects)
-                ->where('project_id', $id);
-
-            return datatables()->eloquent($query)
-                ->addColumn('action', function ($data) {
-
-                    $btnPrint = (new Button("actionsProjectSK.print($data->id)", Button::btnPrimary, Button::btnIconPrint))
-                        ->render();
-                    $btnDetail = (new Button("actionsProjectSK.showDetailProject($data->id)", Button::btnPrimary, Button::btnIconInfo))
-                        ->setLabel("Lihat Investor")
-                        ->render();
-
-                    return \DBText::renderAction([$btnDetail, $btnPrint]);
-                })
-                ->toJson();
         } catch (\Exception $e) {
             return $this->jsonError($e);
         }
@@ -153,9 +131,12 @@ class SKController extends Controller
             if (is_null($row))
                 throw new \Exception(\DBMessages::corruptData, \DBCodes::authorizedError);
 
+            $project = new ProjectCollection($row);
+            $project->getFileAttachment();
+
             return response()->json([
                 'content' => $this->viewResponse('modal-project', [
-                    'project' => $row,
+                    'project' => $project,
                 ]),
             ]);
         } catch (\Exception $e) {

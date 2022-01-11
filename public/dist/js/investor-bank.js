@@ -123,16 +123,16 @@ const FormBank = function(selector, options = {}) {
                 'data-action': 'input-atasnama',
             })
         ),
-        $('<div>', {class: 'text-right'}).append(
-            $('<button>', {type: 'button', class: 'btn btn-outline-danger btn-sm mr-1', 'data-action': 'button-remove'}).append(
-                $('<i>', {class: 'fa fa-trash'}),
-                $('<span>', {class: 'ml-2'}).text('Hapus')
-            ),
-            $('<button>', {type: 'button', class: 'btn btn-outline-primary btn-sm', 'data-action': 'button-add'}).append(
-                $('<i>', {class: 'fa fa-plus-circle'}),
-                $('<span>', {class: 'ml-2'}).text('Tambah')
-            )
-        )
+        // $('<div>', {class: 'text-right'}).append(
+        //     $('<button>', {type: 'button', class: 'btn btn-outline-danger btn-sm mr-1', 'data-action': 'button-remove'}).append(
+        //         $('<i>', {class: 'fa fa-trash'}),
+        //         $('<span>', {class: 'ml-2'}).text('Hapus')
+        //     ),
+        //     $('<button>', {type: 'button', class: 'btn btn-outline-primary btn-sm', 'data-action': 'button-add'}).append(
+        //         $('<i>', {class: 'fa fa-plus-circle'}),
+        //         $('<span>', {class: 'ml-2'}).text('Tambah')
+        //     )
+        // )
     );
 };
 

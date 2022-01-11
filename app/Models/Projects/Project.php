@@ -215,7 +215,9 @@ class Project extends Model
                     AND project_sk_id = (
                         SELECT tr_project_sk.id
                         FROM tr_project_sk
+                        JOIN ms_configs status ON status.id = tr_project_sk.status_id
                         WHERE tr_project_sk.project_id = $projectId
+                        AND status.slug = '" . \DBTypes::statusSKApproved . "'
                         ORDER BY tr_project_sk.revision DESC
                         LIMIT 1
                     )

@@ -14,10 +14,10 @@ $hasAccessCreate = findPermission(DBMenus::project)->hasAccess(DBFeature::view);
                     <h3 class="card-title">Data {{ $title }}</h3>
                     <div class="card-actions">
                         @if($hasAccessCreate)
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="actions.create()">
+                            <a href="{{ route(DBRoutes::projectCreate) }}" type="button" class="btn btn-outline-primary btn-sm">
                                 <i class="fa fa-plus"></i>
                                 <span>Tambah</span>
-                            </button>
+                            </a>
                         @endif
                     </div>
                 </div>
@@ -60,13 +60,6 @@ $hasAccessCreate = findPermission(DBMenus::project)->hasAccess(DBFeature::view);
                 },
             }
         ];
-        actions.create = function() {
-            window.location.href = "{{ route(DBRoutes::projectCreate) }}"
-        };
-        actions.edit = function(id) {
-            window.location.href = "{{ route(DBRoutes::projectEdit, ['__id__']) }}".route({id: id});
-        }
-
         actions.build();
     </script>
 @endpush

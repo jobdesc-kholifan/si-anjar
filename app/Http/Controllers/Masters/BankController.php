@@ -39,7 +39,8 @@ class BankController extends Controller
                     /* @var Relation $query */
                     $query->where(DB::raw('TRIM(LOWER(bank_name))'), 'like', "%$searchValue%")
                         ->orWhere(DB::raw('TRIM(LOWER(bank_code))'), 'like', "%$searchValue%");
-                });
+                })
+                ->orderBy('bank_name');
 
             $json = [];
             foreach($query->get() as $db)
@@ -109,7 +110,7 @@ class BankController extends Controller
             findPermission(\DBMenus::masterBank)->hasAccessOrFail(\DBFeature::create);
 
             $rules = collect([
-                'bank_code:Kode Bank' => 'required|max:15',
+                'bank_code:Kode Bank' => 'required|max:25',
                 'bank_name:Nama Bank' => 'required|max:100',
             ]);
 
@@ -148,7 +149,7 @@ class BankController extends Controller
             findPermission(\DBMenus::masterBank)->hasAccessOrFail(\DBFeature::update);
 
             $rules = collect([
-                'bank_code:Kode Bank' => 'required|max:15',
+                'bank_code:Kode Bank' => 'required|max:25',
                 'bank_name:Nama Bank' => 'required|max:100',
             ]);
 

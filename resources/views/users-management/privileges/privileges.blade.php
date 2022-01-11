@@ -56,9 +56,6 @@ $hasAccessCreate = findPermission(DBMenus::usersRole)->hasAccess(DBFeature::crea
                 },
             }
         ];
-        actions.edit = function(id) {
-            window.location.href = "{{ route(DBRoutes::usersRoleEdit, ['__id__']) }}".route({id: id});
-        };
 
         actions.build();
     </script>

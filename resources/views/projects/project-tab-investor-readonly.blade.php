@@ -31,8 +31,8 @@ use App\Helpers\Collections\Projects\ProjectCollection;
                                         <dd class="col-8 col-sm-10">{{ $project->getName() }}</dd>
                                         <dt class="col-4 col-sm-2">Nilai Proyek</dt>
                                         <dd class="col-8 col-sm-10">{{ IDR($project->getValue()) }}</dd>
-                                        <dt class="col-4 col-sm-2">Lembar Saham</dt>
-                                        <dd class="col-8 col-sm-10">{{ number_format($project->getSharesValue(), 0, ",", ".") }} Lembar</dd>
+                                        <dt class="col-4 col-sm-2">Harga Per Lembar Saham</dt>
+                                        <dd class="col-8 col-sm-10">{{ IDR($project->getSharesValue()) }} Lembar</dd>
                                         <dt class="col-4 col-sm-2">Modal Disetor</dt>
                                         <dd class="col-8 col-sm-10" id="label-modal-value">{{ IDR($project->getModalValue()) }}</dd>
                                         <dt class="col-4 col-sm-2">Kekurangan Modal Disetor</dt>
@@ -47,8 +47,8 @@ use App\Helpers\Collections\Projects\ProjectCollection;
                                                 <th data-name="no" data-orderable="false" data-searchable="false">No</th>
                                                 <th data-data="investor.no_ktp" data-name="investor.no_ktp">No. KTP</th>
                                                 <th data-data="investor.investor_name" data-name="investor.investor_name">Nama Investor</th>
-                                                <th data-data="shares_value" data-name="shares_value">Lembar Saham</th>
-                                                <th data-data="investment_value" data-name="investment_value" class="text-right text-bold">Nominal</th>
+                                                <th data-data="investment_value" data-name="shares_value" class="text-right text-bold">Nominal</th>
+                                                <th data-data="shares_value" data-name="investment_value" class="text-center">Jumlah Lembar Saham</th>
                                                 <th data-data="shares_percentage" data-name="shares_percentage" class="text-center">Porsi Saham</th>
                                             </tr>
                                             </thead>
@@ -90,6 +90,15 @@ use App\Helpers\Collections\Projects\ProjectCollection;
                 width: 20,
                 render: (data, type, row, meta) => {
                     return meta.row + meta.settings._iDisplayStart + 1;
+                },
+            },
+            {
+                targets: 4,
+                render: (data) => {
+                    const $wrapper = $('<div>', {class: 'text-center'});
+                    $wrapper.html(data);
+
+                    return $wrapper.get(0).outerHTML;
                 },
             },
             {

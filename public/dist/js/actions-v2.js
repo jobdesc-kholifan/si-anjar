@@ -189,6 +189,7 @@ const Actions = function(url) {
         update: null,
         delete: null,
         datatable: null,
+        importExcel: null,
     };
 
     this.callback = {
@@ -276,4 +277,40 @@ Actions.prototype.delete = function(id) {
             } else modal.close();
         },
     }).show();
+};
+
+Actions.prototype.openLink = function(link, target = null) {
+    if(target == null)
+        window.location.href = link;
+    else window.open(link, target);
+};
+
+Actions.prototype.importExcel = function() {
+    const $fileImport = $('<input>', {type: 'file', accept: '.xlsx'});
+    $fileImport.click();
+
+    $fileImport.change(() => {
+        const formData = new FormData();
+        formData.append('file-import', $fileImport.get(0).files[0]);
+
+        const loading = $.createLoading();
+        loading.show();
+
+        ServiceAjax.post(this.routes.importExcel != null ? this.routes.importExcel : `${this.routes.index}/import-excel`, {
+            processData: false,
+            contentType: false,
+            data: formData,
+            success: (res) => {
+                AlertNotif.toastr.response(res);
+                this.datatable.reload();
+                loading.close();
+            },
+            error: function() {
+                AlertNotif.adminlte.error(DBMessage.ERROR_SYSTEM_MESSAGE, {
+                    title: DBMessage.ERROR_SYSTEM_TITLE
+                });
+                loading.close();
+            }
+        });
+    });
 };

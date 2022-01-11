@@ -71,9 +71,11 @@ class PrivilegesController extends Controller
                             ->render();
 
                     $btnEdit = false;
-                    if(findPermission(\DBMenus::usersRole)->hasAccess(\DBFeature::delete))
-                        $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
+                    if(findPermission(\DBMenus::usersRole)->hasAccess(\DBFeature::delete)) {
+                        $link = route(\DBRoutes::usersRoleEdit, [$data->id]);
+                        $btnEdit = (new Button("actions.openLink('$link')", Button::btnPrimary, Button::btnIconEdit))
                             ->render();
+                    }
 
                     return \DBText::renderAction([$btnEdit, $btnDelete]);
                 })

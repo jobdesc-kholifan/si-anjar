@@ -71,4 +71,14 @@ class FileCollection extends Collection
     {
         return $this->get('mime_type');
     }
+
+    public function getPreview()
+    {
+        return $this->get('preview');
+    }
+
+    public function toJson()
+    {
+        return json_encode($this->toData());
+    }
 }
