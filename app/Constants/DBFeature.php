@@ -10,4 +10,7 @@ class DBFeature
 
     const importExcel = 'import-excel';
     const exportExcel = 'export-excel';
+
+    const approvedSK = 'approved-sk';
+    const approvedSurkas = 'approved-surkas';
 }

@@ -13,7 +13,7 @@
                 class="form-control"
                 name="bank_code"
                 placeholder="{{ DBText::inputPlaceholder('Kode Bank') }}"
-                maxlength="15"
+                maxlength="25"
                 required
             />
         </div>

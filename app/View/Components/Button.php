@@ -17,6 +17,9 @@ class Button
     const btnIconInfo = '<i class="fa fa-info-circle"></i>';
     const btnIconPrint = '<i class="fa fa-print"></i>';
     const btnIconFile = '<i class="fa fa-file-alt"></i>';
+    const btnIconApproved = '<i class="fa fa-check"></i>';
+    const btnIconFileDownload = '<i class="fa fa-file-download"></i>';
+    const btnIconFileExcel = '<i class="fa fa-file-excel"></i>';
 
     public $onclick;
 

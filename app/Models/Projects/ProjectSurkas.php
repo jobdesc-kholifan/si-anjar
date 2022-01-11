@@ -18,13 +18,20 @@ class ProjectSurkas extends Model
 
     protected $fillable = [
         'project_id',
+        'surkas_no',
         'surkas_value',
         'surkas_date',
+        'description',
+        'other_description',
+        'status_id',
     ];
 
     public $defaultSelects = [
+        'surkas_no',
         'surkas_value',
         'surkas_date',
+        'description',
+        'other_description',
     ];
 
     protected static function boot()
@@ -73,7 +80,11 @@ class ProjectSurkas extends Model
      * */
     private function _defaultWith($query, $selects = [])
     {
-        return $query->with([])->select('id')->addSelect($selects);
+        return $query->with([
+            'status' => function($query) {
+                Config::foreignWith($query);
+            }
+        ])->select('tr_project_surkas.id', 'tr_project_surkas.status_id')->addSelect($selects);
     }
 
     /**
@@ -89,13 +100,22 @@ class ProjectSurkas extends Model
         return $this->_defaultWith(is_null($query) ? $this : $query, $selects);
     }
 
+    public function project()
+    {
+        return $this->belongsTo(Project::class, 'project_id', 'id');
+    }
+
+    public function status()
+    {
+        return $this->hasOne(Config::class, 'id', 'status_id');
+    }
 
     public function lastId()
     {
-        $data = $this->select(DB::raw('MAX(id) as maxId'))
+        $data = $this->select(DB::raw('MAX(id) as maxid'))
             ->first();
 
-        return $data->maxId;
+        return !is_null($data->maxid) ? $data->maxid : 1;
     }
 
     public function defaultQuery()
@@ -111,5 +131,21 @@ class ProjectSurkas extends Model
                 $query->where('slug', \DBTypes::fileSurkasAttachment);
             })
             ->orderBy('id');
+    }
+
+    public function totalSurkas($projectId = null)
+    {
+        /* @var Relation $this */
+        $query = $this->select(DB::raw('SUM(surkas_value) as total'))
+            ->whereHas('status', function($query) {
+                /* @var Relation $query */
+                $query->where('slug', \DBTypes::statusSurkasApproved);
+            });
+
+        if(!is_null($projectId))
+            $query->where('project_id', $projectId);
+
+        $row = $query->first();
+        return !is_null($row->total) ? $row->total : 0;
     }
 }

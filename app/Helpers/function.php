@@ -34,9 +34,13 @@ if(!function_exists('currentDate')) {
 
 if(!function_exists('dbDate')) {
 
-    function dbDate($date) {
-        $newDate = str_replace("/", "-", $date);
-        return date('Y-m-d', strtotime($newDate));
+    function dbDate($date, $format = 'Y-m-d') {
+        if(!empty($date)) {
+            $newDate = str_replace("/", "-", $date);
+            return date($format, strtotime($newDate));
+        }
+
+        return date($format);
     }
 }
 
@@ -111,4 +115,30 @@ if (!function_exists('DBImage')) {
     function DBImage($alias = 'preview') {
         return DB::raw(sprintf("CONCAT('%s/',REPLACE(directory, '/', '_'), '/%s/show/', file_name) as %s", url('preview'), env('APP_KEY_VALUE'), $alias));
     }
+}
+
+if(!function_exists('configKey')) {
+
+    function configKey($value) {
+        $slug = trim(strtolower(preg_replace('/\s+/', '', $value)));
+        return sprintf("usr-%s", $slug);
+    }
+}
+
+function hex2dec($color = "#000000"){
+    $tbl_color = array();
+    $tbl_color['R']=hexdec(substr($color, 1, 2));
+    $tbl_color['G']=hexdec(substr($color, 3, 2));
+    $tbl_color['B']=hexdec(substr($color, 5, 2));
+    return $tbl_color;
+}
+
+function px2mm($px){
+    return $px*25.4/72;
+}
+
+function txtentities($html){
+    $trans = get_html_translation_table(HTML_ENTITIES);
+    $trans = array_flip($trans);
+    return strtr($html, $trans);
 }

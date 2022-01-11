@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 <div class="col-sm-12 col-md-12 col-lg-3">
-                    <div class="info-box shadow" data-toggle="box-dashboard" data-url="">
+                    <div class="info-box shadow" data-toggle="box-dashboard" data-url="{{ route(DBRoutes::dashboardSurkas) }}">
                         <span class="info-box-icon bg-fuchsia"><i class="fa fa-calendar-alt"></i></span>
 
                         <div class="info-box-content">

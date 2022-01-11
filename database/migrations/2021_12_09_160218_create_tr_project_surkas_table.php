@@ -16,8 +16,11 @@ class CreateTrProjectSurkasTable extends Migration
         Schema::create('tr_project_surkas', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('project_id');
+            $table->string('surkas_no', 30);
             $table->double('surkas_value', 18, 2);
             $table->date('surkas_date');
+            $table->text('description')->nullable();
+            $table->text('other_description')->nullable();
 
             $table->timestamps();
         });

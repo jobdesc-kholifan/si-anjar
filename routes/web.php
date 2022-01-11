@@ -14,6 +14,7 @@ use App\Http\Controllers\Project\ProjectInvestorController;
 use App\Http\Controllers\Project\ProjectSKController;
 use App\Http\Controllers\Project\ProjectSurkasController;
 use App\Http\Controllers\SK\SKController;
+use App\Http\Controllers\Surkas\SurkasController;
 use App\Http\Controllers\UsersManagement\UsersController;
 use App\Http\Controllers\Security\MenuController;
 use App\Http\Controllers\Security\MenuFeatureController;
@@ -66,6 +67,7 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::get('investor', [DashboardController::class, 'investor'])->name(DBRoutes::dashboardInvestor);
         Route::get('project', [DashboardController::class, 'project'])->name(DBRoutes::dashboardProject);
+        Route::get('surkas', [DashboardController::class, 'surkas'])->name(DBRoutes::dashboardSurkas);
     });
 
     Route::group(['prefix' => 'masters'], function () {
@@ -161,6 +163,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('show-project/datatables', [InvestorController::class, 'datatablesProject']);
         Route::get('show-investment', [InvestorController::class, 'showInvestment']);
         Route::post('show-investment/datatables', [InvestorController::class, 'datatablesInvestment']);
+        Route::get('download-template-excel', [InvestorController::class, 'downloadTemplateExcel'])->name(DBRoutes::investorTemplateExcel);
+        Route::get('export-excel', [InvestorController::class, 'exportToExcel'])->name(DBRoutes::investorExportExcel);
+        Route::post('import-excel', [InvestorController::class, 'importFromExcel'])->name(DBRoutes::investorImportExcel);
 
         Route::get('', [InvestorController::class, 'index'])->name(DBRoutes::investor);
         Route::get('form', [InvestorController::class, 'form']);
@@ -202,6 +207,10 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::get('', [ProjectSKController::class, 'index'])->name(DBRoutes::projectSK);
                 Route::post('datatables', [ProjectSKController::class, 'datatables']);
                 Route::get('detail', [ProjectSKController::class, 'detail']);
+                Route::post('approved', [ProjectSKController::class, 'approved']);
+                Route::get('print-pdf', [ProjectSKController::class, 'printPDF'])->name(DBRoutes::projectSKPrint);
+                Route::get('form-print-pdf', [ProjectSKController::class, 'formPrintPDF']);
+                Route::post('form-print-pdf', [ProjectSKController::class, 'savePrintPDF']);
 
                 Route::get('revision', [ProjectSKController::class, 'revision'])->name(DBRoutes::projectSKUpdate);
                 Route::post('revision', [ProjectSKController::class, 'store']);
@@ -212,6 +221,10 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::group(['prefix' => 'surkas'], function () {
                 Route::post('datatables', [ProjectSurkasController::class, 'datatables']);
+                Route::get('total', [ProjectSurkasController::class, 'totalSurkas'])->name(DBRoutes::projectSurkasTotal);
+                Route::get('export-excel', [ProjectSurkasController::class, 'exportExcel'])->name(DBRoutes::projectSurkasExportExcel);
+                Route::post('approved', [ProjectSurkasController::class, 'approved']);
+                Route::get('detail', [ProjectSurkasController::class, 'detail']);
 
                 Route::get('', [ProjectSurkasController::class, 'index'])->name(DBRoutes::projectSurkas);
                 Route::get('form', [ProjectSurkasController::class, 'form']);
@@ -231,8 +244,16 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::get('', [SKController::class, 'index'])->name(DBRoutes::SK);
         Route::get('show-sk', [SKController::class, 'showSK']);
-        Route::post('show-sk/datatables', [SKController::class, 'datatablesSK']);
-        Route::get('show-project', [SKController::class, 'showProject']);
+        Route::get('show-project', [SKController::class, 'showProject'])->name(DBRoutes::projectDetail);
+    });
+
+    Route::group(['prefix' => 'surkas'], function () {
+        Route::post('datatables', [SurkasController::class, 'datatables']);
+
+        Route::get('', [SurkasController::class, 'index'])->name(DBRoutes::SK);
+        Route::get('show-sk', [SurkasController::class, 'showSK']);
+        Route::post('show-sk/datatables', [SurkasController::class, 'datatablesSK']);
+        Route::get('show-project', [SurkasController::class, 'showProject']);
     });
 
     Route::group(['prefix' => 'security'], function () {
@@ -244,7 +265,7 @@ Route::group(['middleware' => 'auth'], function () {
 
             Route::get('', [MenuController::class, 'index'])->name(DBRoutes::securityMenu);
             Route::post('', [MenuController::class, 'store']);
-            Route::get('{id}', [MenuController::class, 'edit']);
+            Route::get('{id}', [MenuController::class, 'edit'])->name(DBRoutes::securityMenuEdit);
             Route::post('{id}', [MenuController::class, 'update']);
             Route::delete('{id}', [MenuController::class, 'destroy']);
 

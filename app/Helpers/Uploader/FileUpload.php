@@ -3,6 +3,7 @@
 namespace App\Helpers\Uploader;
 
 use App\Helpers\Collections\Config\ConfigCollection;
+use App\Helpers\Collections\Files\FileArray;
 use App\Helpers\Collections\Files\FileCollection;
 use App\Models\Masters\File;
 use Illuminate\Support\Facades\File as SupportFile;
@@ -98,6 +99,36 @@ class FileUpload
         }
 
         return $this;
+    }
+
+    /**
+     * @return FileArray
+     * */
+    public function getFileInfo()
+    {
+        return new FileArray(collect($this->uploadedFiles)->map(function($file, $i) {
+            /* @var UploadedFile $binaryFile */
+            $binaryFile = $file->file;
+
+            $description = $this->descCreate[$i] ?? null;
+
+            return (object) [
+                'id' => $i,
+                'ref_type_id' => $this->refType->getId(),
+                'ref_id' => $this->refId,
+                'directory' => $file->directory,
+                'file_name' => $file->file_name,
+                'file_size' => SupportFile::size(storage_path($file->directory) . DIRECTORY_SEPARATOR . $file->file_name),
+                'mime_type' => $binaryFile->getClientMimeType(),
+                'description' => $description,
+                'preview' => sprintf("%s/%s/%s/show/%s",
+                    url('preview'),
+                    str_replace('/', '_', $file->directory),
+                    env('APP_KEY_VALUE'),
+                    $file->file_name,
+                ),
+            ];
+        })->toArray());
     }
 
     /**

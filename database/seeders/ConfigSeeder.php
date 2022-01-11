@@ -117,5 +117,25 @@ class ConfigSeeder extends Seeder
             ['parent_id' => $type->id, 'slug' => DBTypes::projectValueNominal, 'name' => 'Rp', 'created_at' => currentDate(), 'updated_at' => currentDate()],
             ['parent_id' => $type->id, 'slug' => DBTypes::projectValuePercentage, 'name' => '%', 'created_at' => currentDate(), 'updated_at' => currentDate()],
         ]);
+
+        $type = $this->config->create([
+            'slug' => DBTypes::statusSK,
+            'name' => 'Status SK',
+        ]);
+
+        $this->config->insert([
+            ['parent_id' => $type->id, 'slug' => DBTypes::statusSKWaiting, 'name' => 'Menunggu Konfirmasi', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+            ['parent_id' => $type->id, 'slug' => DBTypes::statusSKApproved, 'name' => 'Telah Disetujui', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+        ]);
+
+        $type = $this->config->create([
+            'slug' => DBTypes::statusSurkas,
+            'name' => 'Status Surkas',
+        ]);
+
+        $this->config->insert([
+            ['parent_id' => $type->id, 'slug' => DBTypes::statusSurkasWaiting, 'name' => 'Menunggu Konfirmasi', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+            ['parent_id' => $type->id, 'slug' => DBTypes::statusSurkasApproved, 'name' => 'Telah Disetujui', 'created_at' => currentDate(), 'updated_at' => currentDate()],
+        ]);
     }
 }

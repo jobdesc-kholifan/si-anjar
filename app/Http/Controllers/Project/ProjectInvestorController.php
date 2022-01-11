@@ -22,7 +22,8 @@ class ProjectInvestorController extends Controller
     protected $title = "Project Investor";
 
     protected $breadcrumbs = [
-        ['label' => 'Project', 'active' => true],
+        ['label' => 'Project', 'route' => \DBMenus::project],
+        ['label' => 'Investor', 'active' => true]
     ];
 
     /* @var Project|Relation */
@@ -67,7 +68,7 @@ class ProjectInvestorController extends Controller
             $count = $this->projectInvestor->where('project_id', $projectId)
                 ->count();
 
-            $skId = $this->projectSK->getLatestId($projectId, false);
+            $skId = $this->projectSK->getLatestReleasedId($projectId);
 
             $noSK = "";
             if(!is_null($skId)) {
@@ -94,7 +95,7 @@ class ProjectInvestorController extends Controller
 
             $skId = $req->get('sk_id');
             if(!$req->has('sk_id'))
-                $skId = $this->projectSK->getLatestId($projectId, false);
+                $skId = $this->projectSK->getLatestReleasedId($projectId);
 
             $query = $this->projectInvestor->defaultWith($this->projectInvestor->defaultSelects)
                 ->where('project_id', $projectId)
@@ -167,12 +168,21 @@ class ProjectInvestorController extends Controller
                 $this->projectSK->find($skId)->delete();
             }
 
+            $config = findConfig()->in([\DBTypes::statusSKWaiting, \DBTypes::statusSKApproved]);
+
+            $status = $config->get(\DBTypes::statusSKWaiting);
+
+            $hasApprovedSK = findPermission(\DBMenus::project)->hasAccess(\DBFeature::approvedSK);
+            if($hasApprovedSK)
+                $status = $config->get(\DBTypes::statusSKApproved);
+
             $revision = $this->projectSK->lastRevision($projectId);
             $sk = $this->projectSK->create([
                 'project_id' => $projectId,
                 'revision' => $revision,
                 'no_sk' => sprintf("SK-%s", $project->getCode()),
                 'is_draft' => $isDraft,
+                'status_id' => $status->getId(),
             ]);
             $skId = $sk->id;
 
@@ -192,7 +202,7 @@ class ProjectInvestorController extends Controller
 
             $this->projectInvestor->insert($insertInvestor);
 
-            if(!$isDraft)
+            if($isDraft == 'false')
                 $this->project->updateModal($projectId);
 
             DB::commit();

@@ -28,7 +28,7 @@ $hasCreate = findPermission(DBMenus::project)->hasAccess(DBFeature::create);
                                 <dt class="col-4 col-sm-2">Proyek</dt>
                                 <dd class="col-8 col-sm-10">{{ $project->getName() }}</dd>
                                 <dt class="col-4 col-sm-2">Total Surkas Dibagikan</dt>
-                                <dd class="col-8 col-sm-10">-</dd>
+                                <dd class="col-8 col-sm-10" data-name="total">Rp. 0</dd>
                             </dl>
                         </div>
                         <div class="form-group text-right">
@@ -44,9 +44,10 @@ $hasCreate = findPermission(DBMenus::project)->hasAccess(DBFeature::create);
                                 <table class="table table-striped table-hover w-100" id="table-project-surkas">
                                     <thead>
                                         <tr>
-                                            <th data-name="no" data-orderable="false" data-searchable="false">No</th>
+                                            <th data-data="surkas_no" data-name="surkas_no">No. Surkas</th>
                                             <th data-data="surkas_date" data-name="surkas_date">Tanggal Surkas</th>
                                             <th data-data="surkas_value" data-name="surkas_value">Jumlah</th>
+                                            <th data-data="status.name" data-name="status.name">Status</th>
                                             <th data-data="action" data-orderable="false" data-searchable="false" style="width: 200px">Aksi</th>
                                         </tr>
                                     </thead>
@@ -76,21 +77,14 @@ $hasCreate = findPermission(DBMenus::project)->hasAccess(DBFeature::create);
     <script src="{{ asset('dist/js/upload-v2.js') }}"></script>
     <script type="text/javascript">
         let fileLampiranSurkas;
+        const $total = $('[data-name=total]');
         const projectValue = {{ $project->getValue() }};
         const actionsSurkas = new Actions("{{ route(DBRoutes::projectSurkas, [$projectId]) }}");
         actionsSurkas.selectors.table = '#table-project-surkas';
         actionsSurkas.datatable.params = {
             _token: "{{ csrf_token() }}",
         };
-        actionsSurkas.datatable.columnDefs = [
-            {
-                targets: 0,
-                width: 20,
-                render: (data, type, row, meta) => {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                },
-            }
-        ];
+        actionsSurkas.datatable.order = [[0, 'desc']];
         actionsSurkas.callback.modal.onLoadComplete = function() {
             fileLampiranSurkas = $('#file-lampiran-surkas').upload({
                 name: 'file_lampiran_surkas[]',
@@ -106,7 +100,60 @@ $hasCreate = findPermission(DBMenus::project)->hasAccess(DBFeature::create);
         };
         actionsSurkas.callback.onEdit = function(data){
             fileLampiranSurkas.set(data.file_lampiran_surkas);
+        };
+        actionsSurkas.callback.form.onSuccessCallback = function() {
+            actionsSurkas.totalSurkas();
+        };
+        actionsSurkas.callback.onDelete = function(data) {
+            actionsSurkas.totalSurkas();
         }
+        actionsSurkas.totalSurkas = function() {
+            ServiceAjax.get("{{ route(DBRoutes::projectSurkasTotal, [$projectId]) }}")
+                .done((res) => {
+                    if(res.result) {
+                        $total.html(res.data);
+                    }
+                })
+        };
+        actionsSurkas.approved = function(id) {
+            $.confirmModal({
+                onChange: (value, modal) => {
+                    if(value) {
+                        modal.disabled(true);
+                        ServiceAjax.post(`{{ route(DBRoutes::projectSurkas, [$projectId]) }}/approved`, {
+                            data: {id: id},
+                        }).done((res) => {
+                            if(res.result) {
+                                modal.close();
+                                actionsSurkas.datatable.reload();
+                            }
+
+                            modal.disabled(false);
+                            AlertNotif.toastr.response(res);
+                        });
+                    } else modal.close();
+                },
+            }).show();
+        };
+        actionsSurkas.detail = function(id) {
+            $.createModal({
+                url: '{{ url()->current() }}/detail',
+                data: {id: id},
+                onLoadComplete: function(res) {
+                    $('#file-lampiran').upload({
+                        name: 'file_lampiran[]',
+                        allowed: ['image/*'],
+                        multiple: true,
+                        withDescription: true,
+                        readOnly: true,
+                        getMimeType: (file) => file.mime_type,
+                        getPreview: (file) => file.preview,
+                        getDesc: (file) => file.description
+                    });
+                }
+            }).open();
+        };
         actionsSurkas.build();
+        actionsSurkas.totalSurkas();
     </script>
 @endpush

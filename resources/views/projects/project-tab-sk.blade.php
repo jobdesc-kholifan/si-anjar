@@ -35,6 +35,7 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                                                 <th data-data="revision" data-name="revision">Pembaruan Ke</th>
                                                 <th data-data="no_sk" data-name="no_sk">No SK</th>
                                                 <th data-data="printed_at" data-name="printed_at">Tanggal Cetak</th>
+                                                <th data-data="status.name" data-name="status.name">Status</th>
                                                 <th data-data="action" data-orderable="false" data-searchable="false" style="width: 200px">Aksi</th>
                                             </tr>
                                             </thead>
@@ -64,7 +65,7 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
     <script src="{{ asset('dist/js/actions-v2.js') }}"></script>
     <script src="{{ asset('dist/js/upload-v2.js') }}"></script>
     <script type="text/javascript">
-        let actionsSKInvestor;
+        let actionsSKInvestor, fileTTDSK;
 
         const projectValue = {{ $project->getValue() }};
         const actionsSK = new Actions("{{ route(DBRoutes::projectSK, [$projectId]) }}");
@@ -130,8 +131,57 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                 },
             }).open();
         };
-        actionsSK.showDraft = function(id) {
-            window.location.href = "{{ route(DBRoutes::projectInvestor, [$projectId]) }}/draft";
+        actionsSK.approved = function(id) {
+            $.confirmModal({
+                onChange: (value, modal) => {
+                    if(value) {
+                        modal.disabled(true);
+                        ServiceAjax.post(`{{ route(DBRoutes::projectSK, [$projectId]) }}/approved`, {
+                            data: {id: id},
+                        }).done((res) => {
+                            if(res.result) {
+                                modal.close();
+                                actionsSK.datatable.reload();
+                            }
+
+                            modal.disabled(false);
+                            AlertNotif.toastr.response(res);
+                        });
+                    } else modal.close();
+                },
+            }).show();
+        };
+        actionsSK.print = function(id) {
+            $.createModal({
+                url: '{{ url()->current() }}/form-print-pdf',
+                data: {id: id},
+                onLoadComplete: function(res, modal) {
+                    fileTTDSK = $('#file-ttd-sk').upload({
+                        name: 'file_ttd',
+                        allowed: ['image/png'],
+                        multiple: false,
+                        getMimeType: (file) => file.mime_type,
+                        getPreview: (file) => file.preview,
+                    });
+
+                    FormComponents.daterangepicker.init();
+
+                    modal.form().submit({
+                        data: {id: id},
+                        successCallback: (res) => {
+                            AlertNotif.toastr.response(res);
+
+                            if(res.result) {
+                                modal.close();
+                                if(res.data.redirect !== undefined) {
+                                    actionsSK.openLink(res.data.redirect, '_blank');
+                                    actionsSK.datatable.reload();
+                                }
+                            }
+                        }
+                    });
+                },
+            }).open();
         };
         actionsSK.build();
     </script>

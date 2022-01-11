@@ -5,6 +5,8 @@ class DBText
 
     const noAction = '<i>Tidak ada aksi tersedia</i>';
 
+    const inputPlaceholderIDR = "Rp. 0";
+
     static public function renderAction($roles)
     {
         $action = false;

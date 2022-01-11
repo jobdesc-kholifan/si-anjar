@@ -53,10 +53,6 @@
                 },
             }
         ];
-        actions.edit = function(id) {
-            window.location.href = "{{ url()->current() }}/{id}".format({id: id});
-        };
-
         actions.callback.form.onSuccessCallback = function(res) {
             window.location.href = "{{ url()->current() }}/{id}".format({id: res.data.id});
         };

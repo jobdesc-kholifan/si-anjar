@@ -18,8 +18,10 @@ class CreateTrProjectSkTable extends Migration
             $table->bigInteger('project_id');
             $table->integer('revision');
             $table->string('no_sk', 30);
+            $table->text("pdf_payload")->nullable();
             $table->timestamp('printed_at')->nullable();
             $table->boolean('is_draft')->nullable();
+            $table->boolean('status_id')->nullable();
 
             $table->timestamps();
         });

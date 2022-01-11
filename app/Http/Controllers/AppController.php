@@ -6,6 +6,7 @@ class AppController extends Controller
 {
 
     protected $title = "Dashboard";
+    protected $route = ['/'];
 
     public function index()
     {

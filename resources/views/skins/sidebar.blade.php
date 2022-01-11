@@ -35,7 +35,7 @@ $menus = new AllMenuCollection(session('menu'));
 ?>
 <aside class="main-sidebar bg-gray-dark sidebar-dark-primary elevation-4">
     <a href="{{ url('/') }}" class="brand-link text-center py-2">
-        <span class="brand-text font-weight-light" style="font-size: 30px">SI <b></b></span>
+        <span class="brand-text font-weight-light" style="font-size: 30px">SI <b>ANJAR</b></span>
     </a>
 
     <div class="sidebar">

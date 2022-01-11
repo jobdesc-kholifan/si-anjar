@@ -99,9 +99,11 @@ class ProjectController extends Controller
                             ->render();
 
                     $btnEdit = false;
-                    if(findPermission(\DBMenus::project)->hasAccess(\DBFeature::delete))
-                        $btnEdit = (new Button("actions.edit($data->id)", Button::btnPrimary, Button::btnIconEdit))
+                    if(findPermission(\DBMenus::project)->hasAccess(\DBFeature::delete)) {
+                        $link = route(\DBRoutes::projectEdit, [$data->id]);
+                        $btnEdit = (new Button("actions.openLink('$link')", Button::btnPrimary, Button::btnIconEdit))
                             ->render();
+                    }
 
                     return \DBText::renderAction([$btnEdit, $btnDelete]);
                 })
@@ -262,6 +264,11 @@ class ProjectController extends Controller
     public function edit(Request $req, $projectId)
     {
         try {
+            $this->breadcrumbs = [
+                ['label' => 'Project', 'route' => \DBMenus::project],
+                ['label' => 'SK', 'active' => true]
+            ];
+
             findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::view);
 
             $tab = $req->get('tab', 'pic');

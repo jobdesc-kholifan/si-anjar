@@ -45,7 +45,7 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                     class="form-control"
                     name="project_value"
                     data-toggle="jquery-number"
-                    placeholder="{{ DBText::inputPlaceholder('Nilai Project') }}"
+                    placeholder="{{ DBText::inputPlaceholderIDR }}"
                     maxlength="100"
                 />
             </div>
@@ -53,7 +53,7 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
     </div>
     <div class="form-group">
         <div class="row justify-content-center align-items-center">
-            <label for="input-shares" class="col-12 col-sm-2 text-left text-sm-right required">Jumlah Lembar Saham</label>
+            <label for="input-shares" class="col-12 col-sm-2 text-left text-sm-right required">Harga Per Lembar Saham</label>
             <div class="col-12 col-sm-10">
                 <input
                     type="text"
@@ -61,10 +61,10 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                     class="form-control"
                     name="project_shares"
                     data-toggle="jquery-number"
-                    placeholder="{{ DBText::inputPlaceholder('Lembar Saham') }}"
+                    placeholder="{{ DBText::inputPlaceholderIDR }}"
                     maxlength="100"
                 />
-                <small id="harga-perlembar">Harga per lembar Rp. 100.000</small>
+                <small id="harga-perlembar">Jumlah lembar saham 0</small>
             </div>
         </div>
     </div>

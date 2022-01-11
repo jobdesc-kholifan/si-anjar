@@ -16,6 +16,18 @@ use App\Helpers\Collections\Projects\ProjectCollection;
             <label for="input-porsi">Nama Proyek: {{ $project->getName() }}</label>
         </div>
         <div class="form-group">
+            <label for="input-surkas" class="required">No Surkas</label>
+            <input
+                type="text"
+                id="input-surkas"
+                class="form-control"
+                name="surkas_no"
+                placeholder="{{ DBText::inputPlaceholder('No Surkas') }}"
+                required
+                value="{{ $noSurkas }}"
+            />
+        </div>
+        <div class="form-group">
             <label for="input-nominal" class="required">Jumlah Surkas</label>
             <input
                 type="text"
@@ -41,6 +53,26 @@ use App\Helpers\Collections\Projects\ProjectCollection;
                 data-auto-apply="true"
                 data-show-dropdowns="true"
             />
+        </div>
+        <div class="form-group">
+            <label for="input-description">Berita Transfer (opsional)</label>
+            <textarea
+                id="input-description"
+                class="form-control"
+                name="description"
+                placeholder="{{ DBText::inputPlaceholder('Berita Transfer') }}"
+                rows="5"
+            ></textarea>
+        </div>
+        <div class="form-group">
+            <label for="input-other-description">Berita Transfer Tambahan (opsional)</label>
+            <textarea
+                id="input-other-description"
+                class="form-control"
+                name="other_description"
+                placeholder="{{ DBText::inputPlaceholder('Berita Transfer Tambahan') }}"
+                rows="5"
+            ></textarea>
         </div>
         <div class="form-group">
             <label for="file-lampiran-surkas" class="col-12 col-sm-2 text-left text-sm-right required">Lampiran</label>

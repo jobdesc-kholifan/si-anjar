@@ -5,6 +5,7 @@ class DBRoutes
 
     const dashboardInvestor = 'dashbaord.investor';
     const dashboardProject = 'dashboard.project';
+    const dashboardSurkas = 'dashboard.surkas';
 
     const profile = 'profile';
 
@@ -33,26 +34,36 @@ class DBRoutes
 
     const securityMenu = 'security.menus';
     const securityMenuSelect = 'security.menus.select';
+    const securityMenuEdit = 'security.menus.edit';
 
     const securityPrivileges = 'security.privileges';
 
     const investor = 'investor';
     const investorCreate = 'investor.create';
     const investorSelect = 'investor.select';
+    const investorTemplateExcel = 'investor.template.excel';
+    const investorExportExcel = 'investor.export.excel';
+    const investorImportExcel = 'investor.import.excel';
 
     const staticProject = '#project';
     const project = 'project';
     const projectCreate = 'project.create';
     const projectEdit = 'project.edit';
     const projectShow = 'project.show';
+    const projectDetail = 'project.detail';
 
     const projectInvestor = 'project.investor';
     const projectInvestorAll = 'project.investor.all';
 
     const projectSK = 'project.sk';
     const projectSKUpdate = 'project.sk.update';
+    const projectSKPrint = 'project.sk.print';
 
     const projectSurkas = 'project.surkas';
+    const projectSurkasTotal = 'project.surkas.total';
+    const projectSurkasExportExcel = 'project.surkas.export-excel';
 
     const SK = 'sk';
+
+    const surkas = 'surkas';
 }

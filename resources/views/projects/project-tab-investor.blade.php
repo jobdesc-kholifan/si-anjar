@@ -35,8 +35,8 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                                         <dd class="col-8 col-sm-10">{{ $project->getName() }}</dd>
                                         <dt class="col-4 col-sm-2">Nilai Proyek</dt>
                                         <dd class="col-8 col-sm-10">{{ IDR($project->getValue()) }}</dd>
-                                        <dt class="col-4 col-sm-2">Jumlah Lembar Saham</dt>
-                                        <dd class="col-8 col-sm-10">{{ number_format($project->getSharesValue(), 0, ",", ".") }} Lembar</dd>
+                                        <dt class="col-4 col-sm-2">Harga Per Lembar Saham</dt>
+                                        <dd class="col-8 col-sm-10">{{ IDR($project->getSharesValue()) }}</dd>
                                         <dt class="col-4 col-sm-2">Modal Disetor</dt>
                                         <dd class="col-8 col-sm-10" id="label-modal-value">{{ IDR($project->getModalValue()) }}</dd>
                                         <dt class="col-4 col-sm-2">Kekurangan Modal Disetor</dt>
@@ -51,11 +51,11 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                                                 <span>Kembali ke Halaman SK</span>
                                             </a>
                                         @endif
-                                        <button type="button" class="btn btn-outline-secondary btn-sm mr-1" onclick="actions.setDraft()">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm mr-1" onclick="actions.setDraft(true)">
                                             <i class="fa fa-file-alt mr-1"></i>
                                             <span>Simpan Sebagai Draft</span>
                                         </button>
-                                        <button type="submit" class="btn btn-primary btn-sm" id="submit-form">
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="actions.setDraft(false)">
                                             <i class="fa fa-check-circle mr-1"></i>
                                             <span>Simpan</span>
                                         </button>
@@ -69,8 +69,8 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                                                 <th data-name="no" data-orderable="false" data-searchable="false">No</th>
                                                 <th data-data="investor.no_ktp" data-name="investor.no_ktp">No. KTP</th>
                                                 <th data-data="investor.investor_name" data-name="investor.investor_name">Nama Investor</th>
-                                                <th data-data="investment_percentage" data-name="investment_value">Lembar Saham</th>
-                                                <th data-data="investment_percentage" data-name="investment_value" class="text-right text-bold">Nominal</th>
+                                                <th data-data="investment_percentage" data-name="investment_value">Nominal</th>
+                                                <th data-data="investment_percentage" data-name="investment_value" class="text-right text-bold">Harga Lembar Saham</th>
                                                 <th data-data="investment_percentage" data-name="investment_value" class="text-center">Porsi Saham</th>
                                                 <th data-data="action" data-orderable="false" data-searchable="false" style="width: 200px">Aksi</th>
                                             </tr>
@@ -111,10 +111,10 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
         });
 
         const actions = {
-            setDraft: function() {
-                projectInvestor.options.isDraft = true;
-                $('#submit-form').click();
-            }
+            setDraft: function(draft) {
+                projectInvestor.options.isDraft = draft;
+                $form.submit();
+            },
         };
 
         ServiceAjax.get("{{ route(DBRoutes::projectInvestorAll, [$projectId]) }}", {data: {isDraft: '{{ $isDraft }}'}})
@@ -127,7 +127,8 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                 }
             })
 
-        const $form = $('#form-project').formSubmit({
+        const $form = $('#form-project');
+        $form.formSubmit({
             data: function(params) {
                 params.investors = projectInvestor.toString();
                 params.isDraft = projectInvestor.options.isDraft;
@@ -138,6 +139,7 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                     if(confirm("Apakah data yang diinputkan sudah benar?")) {
                         projectInvestor.validate();
                         return projectInvestor.isValid();
+                        return true;
                     }
 
                     return false;
