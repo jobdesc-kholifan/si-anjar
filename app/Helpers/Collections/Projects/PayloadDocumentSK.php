@@ -10,12 +10,12 @@ class PayloadDocumentSK extends  DocumentPayload
 {
 
     private $defaultContent = "Dear Pemegang Saham,
-Setelah melalui tahap campaign, kami dari tim __title__ memberikan keputusan mengenai
-pembagian porsi saham pada __title__ sebagaimana yang tertera pada lampiran SK No
-__nomor__. Pemegang Saham yang tercantum pada lampiran diwajibkan untuk membaca dan mengikuti syarat
-dan ketentuan berinvestasi __title__.
+Setelah melalui tahap campaign, kami dari tim {title} memberikan keputusan mengenai
+pembagian porsi saham pada {title} sebagaimana yang tertera pada lampiran SK No
+{nomor}. Pemegang Saham yang tercantum pada lampiran diwajibkan untuk membaca dan mengikuti syarat
+dan ketentuan berinvestasi {title}.
 
-Syarat dan Ketentuan Berinvestasi di __title__:
+Syarat dan Ketentuan Berinvestasi di {title}:
 1. Pemegang Saham yang tertera namanya pada lampiran Surat Keputusan Porsi Saham ini merupakan yang sudah
 menyetorkan dana investasinya.
 2. Dalam menjalankan bisnis terdapat risiko atau potensi kerugian yang harus dipahami baik oleh pihak penerbit
