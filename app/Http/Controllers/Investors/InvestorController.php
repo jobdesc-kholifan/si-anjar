@@ -80,6 +80,10 @@ class InvestorController extends Controller
                     $query->where(DB::raw('TRIM(LOWER(investor_name))'), 'like', "%$searchValue%");
                 });
 
+            if($req->has('not_in')) {
+                $query->whereNotIn('id', collect($req->get('not_in'))->except($req->get('id'))->toArray());
+            }
+
             $json = [];
             foreach($query->get() as $db)
                 $json[] = ['id' => $db->id, 'text' => $db->investor_name];

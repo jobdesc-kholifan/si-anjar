@@ -23,6 +23,11 @@ class ProjectSurkasCollection extends Collection
         return $this->get('surkas_value');
     }
 
+    public function getAdminFee()
+    {
+        return $this->get('admin_fee');
+    }
+
     public function getSurkasDate($format = 'd/m/Y')
     {
         $date = $this->get('surkas_date');

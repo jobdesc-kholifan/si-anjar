@@ -17,6 +17,7 @@
                                 <th data-data="project.project_name" data-name="project.project_name">Nama Proyek</th>
                                 <th data-data="surkas_date" data-name="surkas_date">Tgl Transfer</th>
                                 <th data-data="surkas_value" data-name="surkas_value" class="text-right">Jumlah</th>
+                                <th data-data="admin_fee" data-name="admin_fee" class="text-right">Biaya Admin</th>
                                 <th data-data="action" data-orderable="false" data-searchable="false">Aksi</th>
                             </tr>
                             </thead>

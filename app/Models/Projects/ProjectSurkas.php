@@ -21,6 +21,7 @@ class ProjectSurkas extends Model
         'surkas_no',
         'surkas_value',
         'surkas_date',
+        'admin_fee',
         'description',
         'other_description',
         'status_id',
@@ -30,6 +31,7 @@ class ProjectSurkas extends Model
         'surkas_no',
         'surkas_value',
         'surkas_date',
+        'admin_fee',
         'description',
         'other_description',
     ];

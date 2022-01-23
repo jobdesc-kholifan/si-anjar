@@ -44,7 +44,15 @@ const ProjectInvestorForm = function(element, form) {
 };
 
 ProjectInvestorForm.prototype.init = function() {
-    FormComponents.select2.init(this.$selectInvestor);
+    FormComponents.select2.init(this.$selectInvestor, {
+        ajax: {
+            data: () => {
+                return {
+                    not_in: this.__form.list('investor_id', this.$.data('data').investor_id)
+                };
+            }
+        }
+    });
     FormComponents.number.init(this.$nominalShares);
 
     this.$nominalShares.on('keydown keyup keypress', () => {
@@ -311,6 +319,16 @@ ProjectInvestor.prototype.countOf = function() {
     });
 
     return countOf;
+};
+
+ProjectInvestor.prototype.list = function(value, execpt = null) {
+    const list = [];
+    this.$body.children().each((i, item) => {
+        const data = $(item).data('data');
+        if(data[value] !== execpt)
+            list.push(data[value]);
+    });
+    return list;
 };
 
 ProjectInvestor.prototype.toJSON = function() {
