@@ -46,7 +46,8 @@ $hasCreate = findPermission(DBMenus::project)->hasAccess(DBFeature::create);
                                         <tr>
                                             <th data-data="surkas_no" data-name="surkas_no">No. Surkas</th>
                                             <th data-data="surkas_date" data-name="surkas_date">Tanggal Surkas</th>
-                                            <th data-data="surkas_value" data-name="surkas_value">Jumlah</th>
+                                            <th data-data="surkas_value" data-name="surkas_value" class="text-right">Jumlah</th>
+                                            <th data-data="admin_fee" data-name="admin_fee" class="text-right">Biaya Admin</th>
                                             <th data-data="status.name" data-name="status.name">Status</th>
                                             <th data-data="action" data-orderable="false" data-searchable="false" style="width: 200px">Aksi</th>
                                         </tr>

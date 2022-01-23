@@ -19,6 +19,7 @@ class CreateTrProjectSurkasTable extends Migration
             $table->string('surkas_no', 30);
             $table->double('surkas_value', 18, 2);
             $table->date('surkas_date');
+            $table->double('admin_fee', 18, 2)->nullable();
             $table->text('description')->nullable();
             $table->text('other_description')->nullable();
 

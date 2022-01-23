@@ -20,6 +20,8 @@
                     <dd class="col-sm-6">{{ $surkas->getSurkasDate() }}</dd>
                     <dt class="col-sm-6">Jumlah</dt>
                     <dd class="col-sm-6">{{ IDR($surkas->getSurkasValue()) }}</dd>
+                    <dt class="col-sm-6">Biaya Admin</dt>
+                    <dd class="col-sm-6">{{ IDR($surkas->getAdminFee()) }}</dd>
                     <dt class="col-sm-12">
                         Lampiran
                         <div id="file-lampiran" data-files="{{ $surkas->getFileAttachment()->toJson() }}"></div>

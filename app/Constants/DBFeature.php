@@ -13,4 +13,6 @@ class DBFeature
 
     const approvedSK = 'approved-sk';
     const approvedSurkas = 'approved-surkas';
+
+    const surkasAdminFee = 'surkas-admin-fee';
 }

@@ -80,6 +80,9 @@ class ProjectSurkasController extends Controller
                 ->addColumn('surkas_value', function ($row) {
                     return (new IDRLabel($row->surkas_value))->render();
                 })
+                ->addColumn('admin_fee', function ($row) {
+                    return (new IDRLabel($row->admin_fee))->render();
+                })
                 ->editColumn('status', function($data) {
                     return !is_null($data->status) ? ['name' => $data->status->name] : ['name' => '-'];
                 })

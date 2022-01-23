@@ -56,6 +56,9 @@ class SurkasController extends Controller
                 ->addColumn('surkas_value', function ($row) {
                     return (new IDRLabel($row->surkas_value))->render();
                 })
+                ->addColumn('admin_fee', function ($row) {
+                    return (new IDRLabel($row->admin_fee))->render();
+                })
                 ->editColumn('project.project_name', function ($data) {
                     $showDetail = new Button("actions.showProject($data->project_id)", Button::btnLinkPrimary, null, 'btn-md');
                     $showDetail->setAlign('text-left');

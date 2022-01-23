@@ -39,6 +39,20 @@ use App\Helpers\Collections\Projects\ProjectCollection;
                 maxlength="100"
             />
         </div>
+        @if(findPermission(DBMenus::project)->hasAccess(DBFeature::surkasAdminFee))
+        <div class="form-group">
+            <label for="input-admin-fee" class="required">Biaya Admin</label>
+            <input
+                type="text"
+                id="input-admin-fee"
+                class="form-control"
+                name="admin_fee"
+                data-toggle="jquery-number"
+                placeholder="Rp. 0"
+                maxlength="100"
+            />
+        </div>
+        @endif
         <div class="form-group">
             <label for="input-surkas-date" class="required">Tanggal Surkas</label>
             <input
