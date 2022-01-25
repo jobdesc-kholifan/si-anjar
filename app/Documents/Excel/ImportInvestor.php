@@ -66,7 +66,7 @@ class ImportInvestor
                 $emergencyName, $emergencyPhone, $emergencyRelationship
             ) = $item;
 
-            if(!in_array($noKTP, $this->dataNoKtp)) {
+            if(!array_key_exists($noKTP, $this->dataNoKtp)) {
 
                 if (!empty($bankCode)) {
                     if (!array_key_exists($bankCode, $banks)) {
@@ -151,12 +151,9 @@ class ImportInvestor
                     ]);
                 }
 
-                $this->dataNoKtp[] = $noKTP;
+                $this->dataNoKtp[$noKTP] = $investorName;
             } else {
-                $this->duplicated[] = (object) [
-                    'no_ktp' => $noKTP,
-                    'investor_name' => $investorName,
-                ];
+                $this->duplicated[$noKTP] = $investorName;
             }
         }
 
@@ -233,8 +230,10 @@ class ImportInvestor
     public function getDuplicatedMessage()
     {
         $message = '<ul style="padding-left: 15px;margin: 0;">';
-        foreach($this->duplicated as $duplicate)
-            $message .= "<li>$duplicate->no_ktp - $duplicate->investor_name</li>";
+        foreach($this->duplicated as $no_ktp => $investor_name) {
+            $duplicate = $this->dataNoKtp[$no_ktp];
+            $message .= "<li>$no_ktp - <b>$investor_name</b> dengan <b>$duplicate</b></li>";
+        }
 
         $message .= "</ul>";
         return $message;
