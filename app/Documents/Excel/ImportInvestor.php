@@ -27,6 +27,10 @@ class ImportInvestor
     /* @var Bank|Relation */
     protected $bank;
 
+    protected $duplicated = [];
+
+    protected $dataNoKtp = [];
+
     public function __construct(array $arrays)
     {
         $this->items = collect($arrays)->except(0);
@@ -62,87 +66,97 @@ class ImportInvestor
                 $emergencyName, $emergencyPhone, $emergencyRelationship
             ) = $item;
 
-            if(!empty($bankCode)) {
-                if(!array_key_exists($bankCode, $banks)) {
-                    $queryBank = $this->bank->where(DB::raw('TRIM(LOWER(bank_code))'), trim(strtolower($bankCode)))
-                        ->first();
+            if(!in_array($noKTP, $this->dataNoKtp)) {
 
-                    $bank = new BankCollection($queryBank);
-                    if (is_null($queryBank)) {
-                        $bank = BankCollection::create([
-                            'bank_code' => $bankCode,
-                            'bank_name' => $bankName,
-                        ]);
+                if (!empty($bankCode)) {
+                    if (!array_key_exists($bankCode, $banks)) {
+                        $queryBank = $this->bank->where(DB::raw('TRIM(LOWER(bank_code))'), trim(strtolower($bankCode)))
+                            ->first();
+
+                        $bank = new BankCollection($queryBank);
+                        if (is_null($queryBank)) {
+                            $bank = BankCollection::create([
+                                'bank_code' => $bankCode,
+                                'bank_name' => $bankName,
+                            ]);
+                        }
+
+                        $banks[$bankCode] = $bank;
                     }
-
-                    $banks[$bankCode] = $bank;
                 }
-            }
 
-            $genderKey = configKey($gender);
-            if(!empty($genderKey) && !array_key_exists($genderKey, $configs)) {
-                $configs[$genderKey] = findConfig()->in($genderKey)
-                    ->get($genderKey, function() use ($parentConfig, $genderKey, $gender) {
-                        return ConfigCollection::create([
-                            'parent_id' => $parentConfig->get(\DBTypes::gender)->getId(),
-                            'slug' => $genderKey,
-                            'name' => preg_replace('/\s+/', '', $gender),
-                        ]);
-                    });
-            } else if (!empty($gender)) $configs[$genderKey] = new ConfigCollection();
+                $genderKey = configKey($gender);
+                if (!empty($genderKey) && !array_key_exists($genderKey, $configs)) {
+                    $configs[$genderKey] = findConfig()->in($genderKey)
+                        ->get($genderKey, function () use ($parentConfig, $genderKey, $gender) {
+                            return ConfigCollection::create([
+                                'parent_id' => $parentConfig->get(\DBTypes::gender)->getId(),
+                                'slug' => $genderKey,
+                                'name' => preg_replace('/\s+/', '', $gender),
+                            ]);
+                        });
+                } else if (!empty($gender)) $configs[$genderKey] = new ConfigCollection();
 
-            $religionKey = configKey($religion);
-            if(!empty($religionKey) && !array_key_exists($religionKey, $configs)) {
-                $configs[$religionKey] = findConfig()->in($religionKey)
-                    ->get($religionKey, function() use ($parentConfig, $religionKey, $religion) {
-                        return ConfigCollection::create([
-                            'parent_id' => $parentConfig->get(\DBTypes::religion)->getId(),
-                            'slug' => $religionKey,
-                            'name' => trim($religion),
-                        ]);
-                    });
-            } else if (!empty($gender)) $configs[$religionKey] = new ConfigCollection();
+                $religionKey = configKey($religion);
+                if (!empty($religionKey) && !array_key_exists($religionKey, $configs)) {
+                    $configs[$religionKey] = findConfig()->in($religionKey)
+                        ->get($religionKey, function () use ($parentConfig, $religionKey, $religion) {
+                            return ConfigCollection::create([
+                                'parent_id' => $parentConfig->get(\DBTypes::religion)->getId(),
+                                'slug' => $religionKey,
+                                'name' => trim($religion),
+                            ]);
+                        });
+                } else if (!empty($gender)) $configs[$religionKey] = new ConfigCollection();
 
-            $relationshipKey = configKey($relationship);
-            if(!empty($relationshipKey) && !array_key_exists($relationshipKey, $configs)) {
-                $configs[$relationshipKey] = findConfig()->in($relationshipKey)
-                    ->get($relationshipKey, function() use ($parentConfig, $relationshipKey, $relationship) {
-                        return ConfigCollection::create([
-                            'parent_id' => $parentConfig->get(\DBTypes::relationship)->getId(),
-                            'slug' => $relationshipKey,
-                            'name' => trim($relationship),
-                        ]);
-                    });
-            } else if (!empty($gender)) $configs[$relationshipKey] = new ConfigCollection();
+                $relationshipKey = configKey($relationship);
+                if (!empty($relationshipKey) && !array_key_exists($relationshipKey, $configs)) {
+                    $configs[$relationshipKey] = findConfig()->in($relationshipKey)
+                        ->get($relationshipKey, function () use ($parentConfig, $relationshipKey, $relationship) {
+                            return ConfigCollection::create([
+                                'parent_id' => $parentConfig->get(\DBTypes::relationship)->getId(),
+                                'slug' => $relationshipKey,
+                                'name' => trim($relationship),
+                            ]);
+                        });
+                } else if (!empty($gender)) $configs[$relationshipKey] = new ConfigCollection();
 
-            if(!empty($investorName)) {
-                $items[] = new InvestorCollection([
-                    'id' => $id,
-                    'investor_name' => $investorName,
-                    'email' => $email,
-                    'phone_number' => $phone,
-                    'phone_number_alternative' => $phoneAlternative,
-                    'address' => $address,
-                    'no_ktp' => $noKTP,
-                    'npwp' => $npwp,
-                    'place_of_birth' => $pob,
-                    'date_of_birth' => dbDate($dob),
-                    'gender_id' => $configs[$genderKey]->getId(),
-                    'religion_id' => $configs[$religionKey]->getId(),
-                    'relationship_id' => $configs[$relationshipKey]->getId(),
-                    'job_name' => $jobName,
-                    'emergency_name' => $emergencyName,
-                    'emergency_phone_number' => $emergencyPhone,
-                    'emergency_relationship' => $emergencyRelationship,
-                    'banks' => [
-                        [
-                            'bank_id' => $banks[$bankCode]->getId(),
-                            'branch_name' => $branchName,
-                            'no_rekening' => $noRekening,
-                            'atas_nama' => $onBehalf
+                if (!empty($investorName)) {
+                    $items[] = new InvestorCollection([
+                        'id' => $id,
+                        'investor_name' => $investorName,
+                        'email' => $email,
+                        'phone_number' => $phone,
+                        'phone_number_alternative' => $phoneAlternative,
+                        'address' => $address,
+                        'no_ktp' => $noKTP,
+                        'npwp' => $npwp,
+                        'place_of_birth' => $pob,
+                        'date_of_birth' => dbDate($dob),
+                        'gender_id' => $genderKey != '' ? $configs[$genderKey]->getId() : null,
+                        'religion_id' => $religionKey != '' ? $configs[$religionKey]->getId() : null,
+                        'relationship_id' => $relationshipKey != '' ? $configs[$relationshipKey]->getId() : null,
+                        'job_name' => $jobName != '' ? $jobName : null,
+                        'emergency_name' => $emergencyName,
+                        'emergency_phone_number' => $emergencyPhone,
+                        'emergency_relationship' => $emergencyRelationship,
+                        'banks' => [
+                            [
+                                'bank_id' => $bankCode != '' ? $banks[$bankCode]->getId() : null,
+                                'branch_name' => $branchName,
+                                'no_rekening' => $noRekening,
+                                'atas_nama' => $onBehalf
+                            ]
                         ]
-                    ]
-                ]);
+                    ]);
+                }
+
+                $this->dataNoKtp[] = $noKTP;
+            } else {
+                $this->duplicated[] = (object) [
+                    'no_ktp' => $noKTP,
+                    'investor_name' => $investorName,
+                ];
             }
         }
 
@@ -204,5 +218,25 @@ class ImportInvestor
                 }
             }
         }
+    }
+
+    public function hasDuplicated()
+    {
+        return count($this->duplicated);
+    }
+
+    public function getDuplicated()
+    {
+        return $this->duplicated;
+    }
+
+    public function getDuplicatedMessage()
+    {
+        $message = '<ul style="padding-left: 15px;margin: 0;">';
+        foreach($this->duplicated as $duplicate)
+            $message .= "<li>$duplicate->no_ktp - $duplicate->investor_name</li>";
+
+        $message .= "</ul>";
+        return $message;
     }
 }

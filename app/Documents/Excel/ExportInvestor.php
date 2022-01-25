@@ -6,8 +6,9 @@ use App\Helpers\Collections\Investors\InvestorCollection;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use PhpOffice\PhpSpreadsheet\Cell\StringValueBinder;
 
-class ExportInvestor implements FromView,ShouldAutoSize
+class ExportInvestor extends StringValueBinder implements FromView,ShouldAutoSize
 {
 
     /* @var InvestorCollection */
