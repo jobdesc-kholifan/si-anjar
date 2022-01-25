@@ -551,7 +551,7 @@ class InvestorController extends Controller
                 $importDocument = new ImportInvestor($excelData[0]);
 
                 if($importDocument->hasDuplicated())
-                    throw new \Exception("Terdapat duplikasi No. KTP " . $importDocument->getDuplicatedMessage()."Silahkan cek kembali data anda", \DBCodes::authorizedError);
+                    throw new \Exception("Terdapat duplikasi No. KTP " . $importDocument->getDuplicatedMessage(), \DBCodes::authorizedError);
 
                 $importDocument->save();
             }
