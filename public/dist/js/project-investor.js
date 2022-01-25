@@ -173,9 +173,6 @@ ProjectInvestorForm.prototype.init = function() {
                 .html(`Tidak dapat menambahkan investor, jumlah modal sudah mencapai batas maksimal`);
         }
 
-        console.log('countOf', countOf.nominal);
-        console.log('project_value', this.__form.options.projectValue);
-
         this.__form.$body.children().last().data('form').$btnAdd.removeClass('d-none');
     });
 };
