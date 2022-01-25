@@ -30,39 +30,69 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                                     @endif
                                 </h4>
                                 <div class="form-group">
-                                    <dl class="row">
-                                        <dt class="col-4 col-sm-2">Proyek</dt>
-                                        <dd class="col-8 col-sm-10">{{ $project->getName() }}</dd>
-                                        <dt class="col-4 col-sm-2">Nilai Proyek</dt>
-                                        <dd class="col-8 col-sm-10">{{ IDR($project->getValue()) }}</dd>
-                                        <dt class="col-4 col-sm-2">Harga Per Lembar Saham</dt>
-                                        <dd class="col-8 col-sm-10">{{ IDR($project->getSharesValue()) }}</dd>
-                                        <dt class="col-4 col-sm-2">Modal Disetor</dt>
-                                        <dd class="col-8 col-sm-10" id="label-modal-value">{{ IDR($project->getModalValue()) }}</dd>
-                                        <dt class="col-4 col-sm-2">Kekurangan Modal Disetor</dt>
-                                        <dd class="col-8 col-sm-10" id="label-modal-lack">{{ IDR($project->getValue() - $project->getModalValue()) }}</dd>
+                                    <dl class="row" id="sticky-header">
+                                        <dt class="col-12 col-sm-2">Proyek</dt>
+                                        <dd class="col-12 col-sm-10">{{ $project->getName() }}</dd>
+                                        <dt class="col-12 col-lg-2">Nilai Proyek</dt>
+                                        <dd class="col-12 col-sm-10">{{ IDR($project->getValue()) }}</dd>
+                                        <dt class="col-12 col-lg-2">Harga Per Lembar Saham</dt>
+                                        <dd class="col-12 col-sm-10">{{ IDR($project->getSharesValue()) }}</dd>
+                                        <dt class="col-12 col-lg-2">Modal Disetor</dt>
+                                        <dd class="col-12 col-sm-10" data-action="label-modal-value">{{ IDR($project->getModalValue()) }}</dd>
+                                        <dt class="col-12 col-lg-2">Kekurangan Modal Disetor</dt>
+                                        <dd class="col-12 col-sm-10" data-action="label-modal-lack">{{ IDR($project->getValue() - $project->getModalValue()) }}</dd>
                                     </dl>
+                                    <div class="position-relative">
+                                        <div class="row project-info d-none" id="sticky-header-content">
+                                            <div class="col-12 col-md-6">
+                                                <dl class="row">
+                                                    <dt class="col-12 col-lg-4">Modal Disetor</dt>
+                                                    <dd class="col-12 col-sm-8" data-action="label-modal-value">{{ IDR($project->getModalValue()) }}</dd>
+                                                    <dt class="col-12 col-lg-4">Kekurangan Modal Disetor</dt>
+                                                    <dd class="col-12 col-sm-8" data-action="label-modal-lack">{{ IDR($project->getValue() - $project->getModalValue()) }}</dd>
+                                                </dl>
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <div class="form-group mt-3 d-md-flex justify-content-end align-items-center">
+                                                    @if($tabActive == 'sk')
+                                                        <a href="{{ route(DBRoutes::projectSK, [$projectId]) }}" class="btn btn-outline-secondary btn-sm-block btn-sm mr-1 mb-1">
+                                                            <i class="fa fa-angle-left mr-1"></i>
+                                                            <span>Kembali ke Halaman SK</span>
+                                                        </a>
+                                                    @endif
+                                                    <button type="button" class="btn btn-outline-secondary btn-sm-block btn-sm mr-1 mb-1" onclick="actions.setDraft(true)">
+                                                        <i class="fa fa-file-alt mr-1"></i>
+                                                        <span>Simpan Sebagai Draft</span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-primary btn-sm-block btn-sm mb-1" onclick="actions.setDraft(false)">
+                                                        <i class="fa fa-check-circle mr-1"></i>
+                                                        <span>Simpan</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 @if($hasUpdate)
-                                    <div class="form-group d-flex justify-content-end align-items-center">
+                                    <div class="form-group d-md-flex justify-content-end align-items-center">
                                         @if($tabActive == 'sk')
-                                            <a href="{{ route(DBRoutes::projectSK, [$projectId]) }}" class="btn btn-outline-secondary btn-sm mr-1">
+                                            <a href="{{ route(DBRoutes::projectSK, [$projectId]) }}" class="btn btn-outline-secondary btn-sm-block btn-sm mr-1 mb-1">
                                                 <i class="fa fa-angle-left mr-1"></i>
                                                 <span>Kembali ke Halaman SK</span>
                                             </a>
                                         @endif
-                                        <button type="button" class="btn btn-outline-secondary btn-sm mr-1" onclick="actions.setDraft(true)">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm-block btn-sm mr-1 mb-1" onclick="actions.setDraft(true)">
                                             <i class="fa fa-file-alt mr-1"></i>
                                             <span>Simpan Sebagai Draft</span>
                                         </button>
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="actions.setDraft(false)">
+                                        <button type="button" class="btn btn-primary btn-sm-block btn-sm mb-1" onclick="actions.setDraft(false)">
                                             <i class="fa fa-check-circle mr-1"></i>
                                             <span>Simpan</span>
                                         </button>
                                     </div>
                                 @endif
                                 <div class="form-group">
-                                    <div class="w-100">
+                                    <div class="table-responsive w-100">
                                         <table class="table table-striped table-hover w-100" id="table-project-investor">
                                             <thead>
                                             <tr>
@@ -120,6 +150,7 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
         ServiceAjax.get("{{ route(DBRoutes::projectInvestorAll, [$projectId]) }}", {data: {isDraft: '{{ $isDraft }}'}})
             .done(res => {
                 if(res.result) {
+                    console.log(res.data.length);
                     if(res.data.length === 0)
                         projectInvestor.add();
 
@@ -154,5 +185,25 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                     window.location.href = "{{ route(DBRoutes::projectInvestor, [$projectId]) }}";
             },
         });
+        // When the user scrolls the page, execute myFunction
+        window.onscroll = function() {myFunction()};
+
+        // Get the header
+        var header = document.getElementById("sticky-header");
+        var content = document.getElementById("sticky-header-content");
+
+        // Get the offset position of the navbar
+        var sticky = header.offsetTop + header.clientHeight + 10;
+
+        // Add the sticky class to the header when you reach its scroll position. Remove "sticky" when you leave the scroll position
+        function myFunction() {
+            if (window.pageYOffset > sticky) {
+                content.classList.remove('d-none');
+                content.classList.add("sticky-bottom");
+            } else {
+                content.classList.add('d-none');
+                content.classList.remove("sticky-bottom");
+            }
+        }
     </script>
 @endpush

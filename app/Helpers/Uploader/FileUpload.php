@@ -121,10 +121,9 @@ class FileUpload
                 'file_size' => SupportFile::size(storage_path($file->directory) . DIRECTORY_SEPARATOR . $file->file_name),
                 'mime_type' => $binaryFile->getClientMimeType(),
                 'description' => $description,
-                'preview' => sprintf("%s/%s/%s/show/%s",
+                'preview' => sprintf("%s/%s/show/%s",
                     url('preview'),
                     str_replace('/', '_', $file->directory),
-                    env('APP_KEY_VALUE'),
                     $file->file_name,
                 ),
             ];

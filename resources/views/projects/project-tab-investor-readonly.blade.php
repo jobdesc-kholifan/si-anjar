@@ -26,17 +26,17 @@ use App\Helpers\Collections\Projects\ProjectCollection;
                                         - {{ $noSK }}
                                     @endif</h4>
                                 <div class="form-group">
-                                    <dl class="row">
-                                        <dt class="col-4 col-sm-2">Proyek</dt>
-                                        <dd class="col-8 col-sm-10">{{ $project->getName() }}</dd>
-                                        <dt class="col-4 col-sm-2">Nilai Proyek</dt>
-                                        <dd class="col-8 col-sm-10">{{ IDR($project->getValue()) }}</dd>
-                                        <dt class="col-4 col-sm-2">Harga Per Lembar Saham</dt>
-                                        <dd class="col-8 col-sm-10">{{ IDR($project->getSharesValue()) }} Lembar</dd>
-                                        <dt class="col-4 col-sm-2">Modal Disetor</dt>
-                                        <dd class="col-8 col-sm-10" id="label-modal-value">{{ IDR($project->getModalValue()) }}</dd>
-                                        <dt class="col-4 col-sm-2">Kekurangan Modal Disetor</dt>
-                                        <dd class="col-8 col-sm-10" id="label-modal-lack">{{ IDR($project->getValue() - $project->getModalValue()) }}</dd>
+                                    <dl class="row" id="sticky-header">
+                                        <dt class="col-12 col-sm-2">Proyek</dt>
+                                        <dd class="col-12 col-sm-10">{{ $project->getName() }}</dd>
+                                        <dt class="col-12 col-sm-2">Nilai Proyek</dt>
+                                        <dd class="col-12 col-sm-10">{{ IDR($project->getValue()) }}</dd>
+                                        <dt class="col-12 col-sm-2">Harga Per Lembar Saham</dt>
+                                        <dd class="col-12 col-sm-10">{{ IDR($project->getSharesValue()) }} Lembar</dd>
+                                        <dt class="col-12 col-sm-2">Modal Disetor</dt>
+                                        <dd class="col-12 col-sm-10" id="label-modal-value">{{ IDR($project->getModalValue()) }}</dd>
+                                        <dt class="col-12 col-sm-2">Kekurangan Modal Disetor</dt>
+                                        <dd class="col-12 col-sm-10" id="label-modal-lack">{{ IDR($project->getValue() - $project->getModalValue()) }}</dd>
                                     </dl>
                                 </div>
                                 <div class="form-group">
@@ -84,6 +84,7 @@ use App\Helpers\Collections\Projects\ProjectCollection;
         actionsSurkas.datatable.params = {
             _token: "{{ csrf_token() }}",
         };
+        actionsSurkas.datatable.order = [[2, 'asc']];
         actionsSurkas.datatable.columnDefs = [
             {
                 targets: 0,

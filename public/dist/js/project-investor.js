@@ -100,11 +100,21 @@ ProjectInvestorForm.prototype.init = function() {
     this.$btnDelete.click(() => {
         if(this.__form.$body.children().length > 1) {
             if(this.$.data('data').id > 0) {
-                this.$.addClass('d-none');
                 this.$.data('data').deleted = true;
+                this.$.addClass('d-none');
             }
 
             else this.$.remove();
+
+            let hasChild = 0;
+            for(let i = 0; i < this.__form.$body.children().length; i++) {
+                const $item = $(this.__form.$body.children().get(i));
+                if(!$item.hasClass('d-none'))
+                    hasChild++;
+            }
+
+            if(hasChild === 0)
+                this.__form.add();
         } else {
             this.$nominalShares.val(null);
             this.$inputNoKTP.empty();
@@ -115,7 +125,16 @@ ProjectInvestorForm.prototype.init = function() {
             this.$nominalShares.closest('td').find('small').empty();
         }
 
-        this.__form.$body.children().last().data('form').$btnAdd.removeClass('d-none');
+        let element=null;
+        for(let i = 0; i < this.__form.$body.children().length; i++) {
+            const $item = $(this.__form.$body.children().get(i));
+            if(!$item.hasClass('d-none'))
+                element = $item;
+        }
+
+        element.data('form').$btnAdd.removeClass('d-none');
+        this.__form.numbering();
+        this.__form.isValid();
     });
 
     this.$btnAdd.click(() => {
@@ -135,7 +154,12 @@ ProjectInvestorForm.prototype.init = function() {
                     .html('Lembar saham tidak boleh kosong');
             } else if (this.$nominalShares.val() !== null && this.$nominalShares.val() !== null) {
                 this.$btnAdd.addClass('d-none');
-                this.__form.add();
+                const $form = this.__form.add();
+
+                $form.data('form').$selectInvestor.select2('open');
+                setTimeout(() => {
+                    $('.select2-search__field').get(0).focus();
+                }, 500);
             }
         }
 
@@ -148,6 +172,8 @@ ProjectInvestorForm.prototype.init = function() {
             this.$nominalShares.closest('td').find('small')
                 .html(`Jumlah maksimal nominal saham yang diperbolehkan adalah Rp. ${idr(shareReady)}`);
         }
+
+        this.__form.$body.children().last().data('form').$btnAdd.removeClass('d-none');
     });
 };
 
@@ -165,8 +191,8 @@ const ProjectInvestor = function(selector, options) {
     this.$body = $(this.$.find('tbody'));
 
     this.options = new ProjectInvestorOptions(options);
-    this.$labelModalValue = $('#label-modal-value');
-    this.$labelModalLack = $('#label-modal-lack');
+    this.$labelModalValue = $('[data-action=label-modal-value]');
+    this.$labelModalLack = $('[data-action=label-modal-lack]');
 
     this.$form = $('<tr>').append(
         $('<td>').append($('<span>', {'data-action': 'nomor'})),
@@ -214,7 +240,7 @@ ProjectInvestor.prototype.add = function() {
 
     this.$body.append($form);
 
-    form.$btnAdd.removeClass('d-none');
+    this.numbering();
 
     return $form;
 };
@@ -226,6 +252,7 @@ ProjectInvestor.prototype.set = function(values) {
         $form.data('form').update();
     });
 
+    this.$body.children().last().data('form').$btnAdd.removeClass('d-none');
     this.isValid();
 };
 
@@ -237,34 +264,37 @@ ProjectInvestor.prototype.isValid = function() {
     for(let i = 0; i < children.length; i++) {
         const $item = $(children[i]);
 
-        const data = $item.data('data');
-        const form = $item.data('form');
+        if(!$item.hasClass('d-none')) {
+            const data = $item.data('data');
+            const form = $item.data('form');
 
-        if(modalValue + parseFloat(data.investment_value) > this.options.projectValue) {
-            isValid = false;
-            break;
+            if(modalValue + parseFloat(data.investment_value) > this.options.projectValue) {
+                isValid = false;
+                break;
+            }
+
+            if (form.$selectInvestor.val() === null) {
+                form.$selectInvestor.closest('td').find('small')
+                    .html('Investor tidak boleh kosong');
+                isValid = false;
+                break;
+            }
+
+            if (isNaN(parseInt(form.$nominalShares.val()))) {
+                form.$nominalShares.closest('td').find('small')
+                    .html('Nominal saham tidak boleh kosong');
+                isValid = false;
+                break;
+            }
+
+            modalValue += parseFloat(data.investment_value);
+            shareValue += parseFloat(data.shares_value);
         }
-
-        if (form.$selectInvestor.val() === null) {
-            form.$selectInvestor.closest('td').find('small')
-                .html('Investor tidak boleh kosong');
-            isValid = false;
-            break;
-        }
-
-        if (isNaN(parseInt(form.$nominalShares.val()))) {
-            form.$nominalShares.closest('td').find('small')
-                .html('Nominal saham tidak boleh kosong');
-            isValid = false;
-            break;
-        }
-
-        modalValue += parseFloat(data.investment_value);
-        shareValue += parseFloat(data.shares_value);
     }
 
     const kekurangan = this.options.projectValue - modalValue;
     const sharesKekurangan = kekurangan/this.options.sharesValue;
+    console.log(sharesKekurangan);
 
     this.$labelModalValue.html(`Rp. ${$.number(modalValue, null, ',', '.')} (${Math.round(shareValue * 100)/100} Lembar)`);
     this.$labelModalLack.html(`Rp. ${$.number(kekurangan, null, ',', '.')} (${Math.round(sharesKekurangan * 100)/100} Lembar)`);
@@ -285,16 +315,20 @@ ProjectInvestor.prototype.validate = function() {
         for(let i = 0; i < children.length; i++) {
             const $item = $(children[i]);
 
-            const data = $item.data('data');
-            const form = $item.data('form');
+            if(!$item.hasClass('d-none')) {
+                const data = $item.data('data');
+                const form = $item.data('form');
 
-            if(modalValue + parseFloat(data.investment_value) > this.options.projectValue) {
-                form.$nominalShares.closest('td').find('small')
-                    .html(`Jumlah lembar maksimal yang disa digunakan adalah ${idr(sharesValue)} lembar`);
+                if(modalValue + parseFloat(data.investment_value) > this.options.projectValue) {
+                    const message = `Jumlah nominal maksimal yang disa digunakan adalah ${idr(sharesValue)} nominal`;
+                    form.$nominalShares.closest('td').find('small')
+                        .html(message);
+                    AlertNotif.toastr.error(message);
+                }
+
+                modalValue += parseFloat(data.investment_value);
+                sharesValue -= data.shares_value;
             }
-
-            modalValue += parseFloat(data.investment_value);
-            sharesValue -= data.shares_value;
         }
 
         if(modalValue !== 0 && modalValue < this.options.projectValue)
@@ -311,11 +345,13 @@ ProjectInvestor.prototype.countOf = function() {
 
     this.$body.children().each((i, item) => {
         const $item = $(item);
-        const data = $item.data('data');
+        if(!$item.hasClass('d-none')) {
+            const data = $item.data('data');
 
-        countOf.shares += parseFloat(data.shares_value);
-        countOf.nominal += parseFloat(data.investment_value);
-        countOf.percentage += parseFloat(data.shares_percentage);
+            countOf.shares += parseFloat(data.shares_value);
+            countOf.nominal += parseFloat(data.investment_value);
+            countOf.percentage += parseFloat(data.shares_percentage);
+        }
     });
 
     return countOf;
@@ -324,11 +360,20 @@ ProjectInvestor.prototype.countOf = function() {
 ProjectInvestor.prototype.list = function(value, execpt = null) {
     const list = [];
     this.$body.children().each((i, item) => {
-        const data = $(item).data('data');
-        if(data[value] !== execpt)
-            list.push(data[value]);
+        const $item = $(item);
+        if(!$item.hasClass('d-none')) {
+            const data = $item.data('data');
+            if(data[value] !== execpt)
+                list.push(data[value]);
+        }
     });
     return list;
+};
+
+ProjectInvestor.prototype.numbering = function() {
+    this.$body.children().each((i, item) => {
+        $(item).data('form').$labelNomor.html(i + 1);
+    });
 };
 
 ProjectInvestor.prototype.toJSON = function() {

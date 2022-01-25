@@ -96,12 +96,12 @@ class ProjectSK extends Model
 
     public function lastRevision($projectId)
     {
-        /* @var Relation $this */
-        $row = $this->select(DB::raw('MAX(revision) last_revision'))
-            ->where('project_id', $projectId)
-            ->first();
+            /* @var Relation $this */
+            $row = $this->select(DB::raw('MAX(revision) last_revision'))
+                ->where('project_id', $projectId)
+                ->first();
 
-        return !is_null($row->last_revision) ? $row->last_revision : 0;
+            return !is_null($row->last_revision) ? $row->last_revision : 0;
     }
 
     public function getLatestId($projectId, $isDraft = true)

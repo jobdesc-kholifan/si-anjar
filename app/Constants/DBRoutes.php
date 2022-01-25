@@ -53,11 +53,13 @@ class DBRoutes
     const projectDetail = 'project.detail';
 
     const projectInvestor = 'project.investor';
+    const projectInvestorDraft = 'project.investor.draft';
     const projectInvestorAll = 'project.investor.all';
 
     const projectSK = 'project.sk';
     const projectSKUpdate = 'project.sk.update';
     const projectSKPrint = 'project.sk.print';
+    const projectSKPrintLatest = 'project.sk.print-latest';
 
     const projectSurkas = 'project.surkas';
     const projectSurkasTotal = 'project.surkas.total';

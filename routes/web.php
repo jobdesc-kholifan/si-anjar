@@ -60,7 +60,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::group(['prefix' => 'preview'], function () {
 
-        Route::get('{directory}/{token}/show/{filename}', [PreviewController::class, 'index']);
+        Route::get('{directory}/show/{filename}', [PreviewController::class, 'index']);
     });
 
     Route::group(['prefix' => 'dashboard'], function() {
@@ -192,12 +192,12 @@ Route::group(['middleware' => 'auth'], function () {
             Route::group(['prefix' => 'investor'], function () {
                 Route::post('datatables', [ProjectInvestorController::class, 'datatables']);
                 Route::get('all', [ProjectInvestorController::class, 'all'])->name(DBRoutes::projectInvestorAll);
-                Route::get('draft', [ProjectInvestorController::class, 'draft']);
-                Route::post('draft', [ProjectInvestorController::class, 'store']);
+                Route::get('draft', [ProjectInvestorController::class, 'draft'])->name(DBRoutes::projectInvestorDraft);
+                Route::post('draft', [ProjectSKController::class, 'store']);
 
                 Route::get('', [ProjectInvestorController::class, 'index'])->name(DBRoutes::projectInvestor);
                 Route::get('form', [ProjectInvestorController::class, 'form']);
-                Route::post('', [ProjectInvestorController::class, 'store']);
+                Route::post('', [ProjectSKController::class, 'store']);
                 Route::get('{id}', [ProjectInvestorController::class, 'show']);
                 Route::post('{id}', [ProjectInvestorController::class, 'update']);
                 Route::delete('{id}', [ProjectInvestorController::class, 'destroy']);
@@ -208,7 +208,8 @@ Route::group(['middleware' => 'auth'], function () {
                 Route::post('datatables', [ProjectSKController::class, 'datatables']);
                 Route::get('detail', [ProjectSKController::class, 'detail']);
                 Route::post('approved', [ProjectSKController::class, 'approved']);
-                Route::get('print-pdf', [ProjectSKController::class, 'printPDF'])->name(DBRoutes::projectSKPrint);
+                Route::get('print-pdf/{skId}', [ProjectSKController::class, 'printPDF'])->name(DBRoutes::projectSKPrint);
+                Route::get('print-pdf', [ProjectSKController::class, 'printPDF'])->name(DBRoutes::projectSKPrintLatest);
                 Route::get('form-print-pdf', [ProjectSKController::class, 'formPrintPDF']);
                 Route::post('form-print-pdf', [ProjectSKController::class, 'savePrintPDF']);
 
