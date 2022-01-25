@@ -546,13 +546,21 @@ class InvestorController extends Controller
 
             $excelData = Excel::toArray(null, $req->file('file-import'));
 
+            DB::beginTransaction();
             if(count($excelData[0]) > 1) {
                 $importDocument = new ImportInvestor($excelData[0]);
+
+                if($importDocument->hasDuplicated())
+                    throw new \Exception("Terdapat duplikasi No. KTP " . $importDocument->getDuplicatedMessage()."Silahkan cek kembali data anda", \DBCodes::authorizedError);
+
                 $importDocument->save();
             }
 
+            DB::commit();
+
             return $this->jsonSuccess(\DBMessages::successImport);
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->jsonError($e);
         }
     }
