@@ -57,8 +57,8 @@ class PDFDocumentSK extends DocumentBuilder
 
     public function header()
     {
-        $this->SetFont($this->fontFamily, 'B', $this->fontSize + 10);
-        $this->Cell(0, $this->wordHeight + 2, $this->sk->getPdfPayload()->getTitle(), 0, 1, 'C');
+        $this->SetFont($this->fontFamily, 'B', $this->fontSize + 5);
+        $this->MultiCell(0, $this->wordHeight + 2, $this->sk->getPdfPayload()->getTitle(), 0, 'C');
 
         $this->SetFont($this->fontFamily, '', $this->fontSize);
         $this->Cell(0, $this->wordHeight + 2, $this->sk->getPdfPayload()->getAddress(), 0, 1, 'C');

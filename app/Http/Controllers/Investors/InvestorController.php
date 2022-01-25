@@ -81,7 +81,10 @@ class InvestorController extends Controller
                 });
 
             if($req->has('not_in')) {
-                $query->whereNotIn('id', collect($req->get('not_in'))->except($req->get('id'))->toArray());
+                $notIn = collect($req->get('not_in'))->filter(function($data) {
+                    return $data != '';
+                });
+                $query->whereNotIn('id', $notIn->toArray());
             }
 
             $json = [];

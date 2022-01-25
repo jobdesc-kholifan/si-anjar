@@ -74,6 +74,12 @@ label:not(.form-check-label):not(.custom-file-label) {
     .toggle-pushmenu {
         display: none;
     }
+    .project-info {
+        width: calc(100% - 280px)!important;
+    }
+    .btn-sm-block {
+        width: auto!important;
+    }
 }
 
 @media (min-width: 576px) {
@@ -273,4 +279,20 @@ dl.row.font-size-md > dt, dl.row.font-size-md > dd {
 }
 .box-item.box-primary .text-amount {
     color: var(--primary);
+}
+.btn-sm-block {
+    width: 100%;
+}
+.sticky-bottom {
+    position: fixed;
+    top: 0;
+    background: #fff;
+    box-shadow: 1px 5px 10px 5px rgba(168, 168, 168, .5);
+    z-index: 9999;
+}
+.project-info.sticky-bottom {
+    width: calc(100% - 30px);
+    margin-left: -20px;
+    padding: 10px;
+    border-radius: 5px;
 }

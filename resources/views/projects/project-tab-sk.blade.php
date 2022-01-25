@@ -19,6 +19,12 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                             <div class="tab-pane active show fade" id="content-pic">
                                 <h4 class="pt-3 pb-2 px-2 mb-4 border-bottom">Form SK</h4>
                                 <div class="form-group text-right">
+                                    @if($countInvestor > 0)
+                                        <a href="{{ route(DBRoutes::projectSKPrintLatest, [$projectId]) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                            <i class="fa fa-print"></i>
+                                            <span class="ml-2">Cetak SK Terbaru</span>
+                                        </a>
+                                    @endif
                                     @if($countInvestor > 0 && $hasUpdate)
                                     <a href="{{ route(DBRoutes::projectSKUpdate, [$projectId]) }}" class="btn btn-outline-primary btn-sm">
                                         <i class="fa fa-plus-circle"></i>

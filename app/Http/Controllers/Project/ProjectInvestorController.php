@@ -50,7 +50,8 @@ class ProjectInvestorController extends Controller
             $skId = $this->projectSK->getLatestId($projectId, $req->get('isDraft', false));
             $query = $this->projectInvestor->defaultWith($this->projectInvestor->defaultSelects)
                 ->where('project_id', $projectId)
-                ->where('project_sk_id', $skId);
+                ->where('project_sk_id', $skId)
+                ->orderBy('id');
 
             return $this->jsonData($query->get());
         } catch (\Exception $e) {
@@ -145,71 +146,6 @@ class ProjectInvestorController extends Controller
                 'isDraft' => true,
             ]);
         } catch (\Exception $e) {
-            return $this->jsonError($e);
-        }
-    }
-
-    public function store(Request $req, $projectId)
-    {
-        try {
-            findPermission(\DBMenus::project)->hasAccessOrFail(\DBFeature::create);
-
-            DB::beginTransaction();
-
-            $isDraft = $req->get('isDraft');
-
-            $project = ProjectCollection::find($projectId);
-
-            $skId = $this->projectSK->getLatestId($projectId);
-
-            if(!is_null($skId)) {
-                $this->projectInvestor->where('project_sk_id', $skId)
-                    ->delete();
-                $this->projectSK->find($skId)->delete();
-            }
-
-            $config = findConfig()->in([\DBTypes::statusSKWaiting, \DBTypes::statusSKApproved]);
-
-            $status = $config->get(\DBTypes::statusSKWaiting);
-
-            $hasApprovedSK = findPermission(\DBMenus::project)->hasAccess(\DBFeature::approvedSK);
-            if($hasApprovedSK)
-                $status = $config->get(\DBTypes::statusSKApproved);
-
-            $revision = $this->projectSK->lastRevision($projectId);
-            $sk = $this->projectSK->create([
-                'project_id' => $projectId,
-                'revision' => $revision,
-                'no_sk' => sprintf("SK-%s", $project->getCode()),
-                'is_draft' => $isDraft,
-                'status_id' => $status->getId(),
-            ]);
-            $skId = $sk->id;
-
-            $investors = json_decode($req->get('investors', '[]'));
-
-            $insertInvestor = [];
-            foreach($investors as $investor) {
-
-                $insertInvestor[] = collect($investor)->only($this->projectInvestor->getFillable())
-                    ->merge([
-                        'project_id' => $projectId,
-                        'project_sk_id' => $skId,
-                        'created_at' => currentDate(),
-                        'updated_at' => currentDate(),
-                    ])->toArray();
-            }
-
-            $this->projectInvestor->insert($insertInvestor);
-
-            if($isDraft == 'false')
-                $this->project->updateModal($projectId);
-
-            DB::commit();
-
-            return $this->jsonSuccess(\DBMessages::successCreate);
-        } catch (\Exception $e) {
-            DB::rollBack();
             return $this->jsonError($e);
         }
     }

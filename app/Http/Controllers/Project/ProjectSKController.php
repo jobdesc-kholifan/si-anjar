@@ -86,7 +86,7 @@ class ProjectSKController extends Controller
 
                     $btnShowDraft = "";
                     if($data->is_draft) {
-                        $link = route(\DBRoutes::projectInvestor, [$projectId]);
+                        $link = route(\DBRoutes::projectInvestorDraft, [$projectId]);
                         $btnShowDraft = (new Button("actionsSK.openLink('$link')", Button::btnSecondary, Button::btnIconFile))
                             ->setLabel("Tampilkan Draft")
                             ->render();
@@ -143,7 +143,7 @@ class ProjectSKController extends Controller
 
             DB::beginTransaction();
 
-            $isDraft = $req->get('isDraft');
+            $isDraft = $req->get('isDraft') == 'true';
             $revision = $this->projectSK->lastRevision($projectId) + 1;
             $project = ProjectCollection::find($projectId);
 
@@ -155,32 +155,66 @@ class ProjectSKController extends Controller
             if($hasApprovedSK)
                 $status = $config->get(\DBTypes::statusSKApproved);
 
-            $sk = $this->projectSK->create([
-                'project_id' => $projectId,
-                'revision' => $revision,
-                'no_sk' => sprintf("SK-%s-rev%03d", $project->getCode(), $revision),
-                'is_draft' => $isDraft,
-                'status_id' => $status->getId(),
-            ]);
+            $isNewSk = false;
+            $skId = $this->projectSK->getLatestId($projectId, true);
+            if(is_null($skId)) {
+                $sk = $this->projectSK->create([
+                    'project_id' => $projectId,
+                    'revision' => $revision,
+                    'no_sk' => sprintf("SK-%s-rev%03d", $project->getCode(), $revision),
+                    'is_draft' => $isDraft,
+                    'status_id' => $status->getId(),
+                ]);
+
+                $skId = $sk->id;
+                $isNewSk = true;
+            }
 
             $investors = json_decode($req->get('investors', '[]'));
 
+            $deletedInvestor = [];
+            $updatedInvestor = [];
             $insertInvestor = [];
             foreach ($investors as $investor) {
-
-                $insertInvestor[] = collect($investor)->only($this->projectInvestor->getFillable())
+                $item = collect($investor)->only($this->projectInvestor->getFillable())
                     ->merge([
                         'project_id' => $projectId,
-                        'project_sk_id' => $sk->id,
+                        'project_sk_id' => $skId,
                         'created_at' => currentDate(),
                         'updated_at' => currentDate(),
-                    ])->toArray();
+                    ]);
+
+                if(!$isNewSk) {
+                    if($investor->id != 0) {
+                        if(!$investor->deleted) {
+                            $updatedInvestor[$investor->id] = $item->except('created_at')->toArray();
+                        } else {
+                            if(!in_array($investor->id, $deletedInvestor))
+                                $deletedInvestor[] = $investor->id;
+                        }
+                    } else if(!empty($investor->investor_id)) {
+                        $insertInvestor[] = $item->toArray();
+                    }
+                } else {
+                    $insertInvestor[] = $item->toArray();
+                }
             }
+
+            $this->projectInvestor->whereIn('id', $deletedInvestor)
+                ->delete();
 
             $this->projectInvestor->insert($insertInvestor);
 
-            if($isDraft == 'false')
+            foreach($updatedInvestor as $id => $values) {
+                $this->projectInvestor->where('id', $id)
+                    ->update($values);
+            }
+
+            if(!$isDraft) {
                 $this->project->updateModal($projectId);
+                $this->projectSK->where('id', $skId)
+                    ->update(['is_draft' => false]);
+            }
 
             DB::commit();
 
@@ -279,7 +313,7 @@ class ProjectSKController extends Controller
 
                 try {
                     $fileTTD->setReference($types->get(\DBTypes::fileSignatureSK), $skId);
-                    $fileTTD->moveTo('app/signature/sk', function ($file, $skId) {
+                    $fileTTD->moveTo('app/signature/sk', function ($file) use ($skId) {
                         /* @var UploadedFile $file */
                         return sprintf("signature-%s-id.%s", $skId, $file->getClientOriginalExtension());
                     });
@@ -297,20 +331,24 @@ class ProjectSKController extends Controller
             ]);
 
             return $this->jsonSuccess(\DBMessages::success, [
-                'redirect' => route(\DBRoutes::projectSKPrint, [$projectId]),
+                'redirect' => route(\DBRoutes::projectSKPrint, [$projectId, $skId]),
             ]);
         } catch (\Exception $e) {
             return $this->jsonError($e);
         }
     }
 
-    public function printPDF($projectId)
+    public function printPDF($projectId, $skId = null)
     {
         try {
 
-            $sk = $this->projectSK->getLatestReleased($projectId);
+            if(is_null($skId))
+                $skId = $this->projectSK->getLatestReleasedId($projectId);
 
-            $skId = $sk->getId();
+            $row = $this->projectSK->defaultWith($this->projectSK->defaultSelects)
+                ->find($skId);
+
+            $sk = new ProjectSKCollection($row);
             $rowProject = $this->project->defaultQuery()
                 ->with([
                     'data_investor' => function($query) use ($skId) {
