@@ -114,7 +114,7 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                                         <i class="fa fa-angle-left"></i>
                                         <span class="ml-2">Sebelumnya</span>
                                     </a>
-                                    <a href="{{ route(DBRoutes::projectSK, [$projectId]) }}" class="btn btn-outline-primary btn-sm">
+                                    <a href="{{ route(DBRoutes::projectSK, [$projectId]) }}" class="btn btn-outline-primary btn-sm" onclick="return confirm('Jika data yang diinputkan belum dijadikan draft/disimpan, maka data akan hilang. Apakah anda yakin ingin melanjutkan proses ini?')">
                                         <span class="mr-2">Selanjutnya</span>
                                         <i class="fa fa-angle-right"></i>
                                     </a>
@@ -205,5 +205,9 @@ $hasUpdate = findPermission(DBMenus::project)->hasAccess(DBFeature::update);
                 content.classList.remove("sticky-bottom");
             }
         }
+
+        window.onbeforeunload = function(e) {
+            return 'Jika data yang diinputkan belum dijadikan draft/disimpan, maka data akan hilang. Apakah anda yakin ingin melanjutkan proses ini?';
+        };
     </script>
 @endpush
