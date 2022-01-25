@@ -163,15 +163,18 @@ ProjectInvestorForm.prototype.init = function() {
             }
         }
 
+        else if(countOf.nominal > this.__form.options.projectValue) {
+            this.$nominalShares.closest('td').find('small')
+                .html(`Jumlah maksimal nominal saham yang diperbolehkan adalah Rp. ${idr(shareReady)}`);
+        }
+
         else if(countOf.nominal === this.__form.options.projectValue) {
             this.$nominalShares.closest('td').find('small')
                 .html(`Tidak dapat menambahkan investor, jumlah modal sudah mencapai batas maksimal`);
         }
 
-        else {
-            this.$nominalShares.closest('td').find('small')
-                .html(`Jumlah maksimal nominal saham yang diperbolehkan adalah Rp. ${idr(shareReady)}`);
-        }
+        console.log('countOf', countOf.nominal);
+        console.log('project_value', this.__form.options.projectValue);
 
         this.__form.$body.children().last().data('form').$btnAdd.removeClass('d-none');
     });
@@ -294,7 +297,6 @@ ProjectInvestor.prototype.isValid = function() {
 
     const kekurangan = this.options.projectValue - modalValue;
     const sharesKekurangan = kekurangan/this.options.sharesValue;
-    console.log(sharesKekurangan);
 
     this.$labelModalValue.html(`Rp. ${$.number(modalValue, null, ',', '.')} (${Math.round(shareValue * 100)/100} Lembar)`);
     this.$labelModalLack.html(`Rp. ${$.number(kekurangan, null, ',', '.')} (${Math.round(sharesKekurangan * 100)/100} Lembar)`);
@@ -319,11 +321,18 @@ ProjectInvestor.prototype.validate = function() {
                 const data = $item.data('data');
                 const form = $item.data('form');
 
-                if(modalValue + parseFloat(data.investment_value) >= this.options.projectValue) {
-                    const message = `Jumlah nominal maksimal yang disa digunakan adalah ${idr(sharesValue)} nominal`;
+                if(modalValue + parseFloat(data.investment_value) > this.options.projectValue) {
+                    const available = this.options.projectValue - modalValue;
+                    let message = `Jumlah nominal maksimal yang disa digunakan adalah ${idr(this.options.projectValue-modalValue)} nominal`;
+
+                    if(available === 0)
+                        message = 'Tidak dapat menambahkan investor, jumlah modal sudah mencapai batas maksimal';
+
                     form.$nominalShares.closest('td').find('small')
                         .html(message);
                     AlertNotif.toastr.error(message);
+
+                    break;
                 }
 
                 modalValue += parseFloat(data.investment_value);
