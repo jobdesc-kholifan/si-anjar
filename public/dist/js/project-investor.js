@@ -319,7 +319,7 @@ ProjectInvestor.prototype.validate = function() {
                 const data = $item.data('data');
                 const form = $item.data('form');
 
-                if(modalValue + parseFloat(data.investment_value) > this.options.projectValue) {
+                if(modalValue + parseFloat(data.investment_value) >= this.options.projectValue) {
                     const message = `Jumlah nominal maksimal yang disa digunakan adalah ${idr(sharesValue)} nominal`;
                     form.$nominalShares.closest('td').find('small')
                         .html(message);
