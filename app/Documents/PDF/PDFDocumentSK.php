@@ -128,9 +128,13 @@ class PDFDocumentSK extends DocumentBuilder
 
         $file = $this->sk->getPdfPayload()->getSignature()->first();
         if(!is_null($file)) {
-            $this->SetY($this->GetY() - 5);
-            $this->Image(storage_path($file->getDir() . DIRECTORY_SEPARATOR . $file->getFileName()), null, null, 50, 30);
-            $this->SetY($this->GetY() - 5);
+            if(!is_null($file->getDir()) && !is_null($file->getFileName())) {
+                $this->SetY($this->GetY() - 5);
+                $this->Image(storage_path($file->getDir() . DIRECTORY_SEPARATOR . $file->getFileName()), null, null, 50, 30);
+                $this->SetY($this->GetY() - 5);
+            } else {
+                $this->Ln(20);
+            }
         }
 
         $this->SetFont($this->fontFamily, 'BU', $this->fontSize);
